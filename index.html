@@ -1,33 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Cloudsim-plus by manoelcampos</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-dark.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+
+    <title>CloudSim++ by manoelcampos</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Cloudsim-plus</h1>
-        <p>CloudSim++: A CloudSim fork for Modeling and Simulation of Cloud Computing Infrastructures and Services that focuses on reusability principles and other ones such as DRY, KISS, SOLID and Design Patterns</p>
-        <p class="view"><a href="https://github.com/manoelcampos/cloudsim-plus">View the Project on GitHub <small>manoelcampos/cloudsim-plus</small></a></p>
-        <ul>
-          <li><a href="https://github.com/manoelcampos/cloudsim-plus/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/manoelcampos/cloudsim-plus/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/manoelcampos/cloudsim-plus">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <header>
+      <div class="inner">
+        <h1>CloudSim++</h1>
+        <h2>A CloudSim fork for Modeling and Simulation of Cloud Computing Infrastructures and Services that focuses on reusability principles and other ones such as DRY, KISS, SOLID and Design Patterns</h2>
+        <a href="https://github.com/manoelcampos/cloudsim-plus" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
 <a id="cloudsim-a-cloudsim-fork-for-modeling-and-simulation-of-cloud-computing-infrastructures-and-services-with-highly-cohesive-and-low-coupled-components" class="anchor" href="#cloudsim-a-cloudsim-fork-for-modeling-and-simulation-of-cloud-computing-infrastructures-and-services-with-highly-cohesive-and-low-coupled-components" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>CloudSim++ A CloudSim fork for Modeling and Simulation of Cloud Computing Infrastructures and Services with highly cohesive and low coupled components</h1>
 
 <p><a href="https://travis-ci.org/manoelcampos/cloudsim"><img src="https://img.shields.io/travis/manoelcampos/cloudsim/master.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/manoelcampos/cloudsim?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://www.codacy.com/app/manoelcampos/cloudsim?utm_source=github.com&amp;amp;utm_medium=referral&amp;amp;utm_content=manoelcampos/cloudsim&amp;amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/3f132b184d5e475dbbcd356ee84499fc" alt="Codacy Badge"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="LGPL licensed"></a></p>
@@ -108,7 +109,7 @@ broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 <span class="pl-smi">Log</span><span class="pl-k">.</span>printFormattedLine(<span class="pl-s"><span class="pl-pds">"</span>Minimal Example finished!<span class="pl-pds">"</span></span>);</pre></div>
 
 <h1>
-<a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-use-the-simulator-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-use-the-simulator-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to use the simulator. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png">😐</g-emoji>
+<a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to build my simulations. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png">😐</g-emoji>
 </h1>
 
 <p>Well, the design of the tool has a direct impact when you need to extend it to include some feature for your simulations. The simulator provides a set of classes such as Vm Schedulers, Cloudlet Schedulers, Vm Allocation Policies, Resource Provisioners, Utilization Models, Power Models and Datacenter Brokers that implement basic algorithms for every one of these  features. For instance, the <code>VmAllocationPolicySimple</code> class implements a Worst Fit
@@ -137,7 +138,19 @@ And unfortunately, there are several months of hard work that would need to be r
 
 <p>Firstly, there is a huge amount of changes that makes CloudSim++ <strong>NOT BACKWARD COMPATIBLE</strong> with original CloudSim. However, to port your CloudSim simulations to CloudSim++ can be relatively easy, as it will be presented further. </p>
 
-<p>Accordingly, the main contributions of CloudSim++ are as follows.</p>
+<p>Accordingly, the main contributions of CloudSim++ are:</p>
+
+<ul>
+<li>Improved class hierarchy and code that is easier to understand</li>
+<li>Reusable and standards conforming code</li>
+<li>Improved documentation</li>
+<li>Completely new Test Suites</li>
+<li>New set of features</li>
+<li>New examples for old and new features</li>
+<li>Update to Java 8</li>
+</ul>
+
+<p>All these improvements are described in details in the next sub-sections. </p>
 
 <h2>
 <a id="improved-class-hierarchy-and-code-that-is-easier-to-understand" class="anchor" href="#improved-class-hierarchy-and-code-that-is-easier-to-understand" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Improved class hierarchy and code that is easier to understand</h2>
@@ -151,7 +164,8 @@ And unfortunately, there are several months of hard work that would need to be r
 <a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
 <li>
 <a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
-<li>[org.cloudbus.cloudsim.resources]((modules/cloudsim/src/main/java/org/cloudbus/cloudsim/resources) for resources such as CPU and cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
+<li>
+<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
 <li>
 <a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
 <li>
@@ -212,7 +226,7 @@ Thus, the contributions in this area are as follows:</p>
 </ul>
 
 <h2>
-<a id="new-features" class="anchor" href="#new-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>New features</h2>
+<a id="new-set-of-features" class="anchor" href="#new-set-of-features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>New set of features</h2>
 
 <p>Some totally new features were introduced in CloudSim++:</p>
 
@@ -250,7 +264,7 @@ Thus, the contributions in this area are as follows:</p>
 </ul>
 
 <h2>
-<a id="updated-to-java-8" class="anchor" href="#updated-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Updated to Java 8</h2>
+<a id="update-to-java-8" class="anchor" href="#update-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update to Java 8</h2>
 
 <p>The <a href="modules/cloudsim">cloudsim module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html">Lambda Expressions, Streams and Functional Programming</a> of the Java 8. However, <a href="modules/cloudsim-examples">cloudsim-examples</a> project was updated just from Java 6 to 7 aiming to provide yet simple examples for beginner Java programmers, but less verbose code than Java 6.</p>
 
@@ -357,13 +371,25 @@ Instead, it requires an object that implements the new Resource interface (such 
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
 
 <p>This project is licensed under <a href="LICENSE">GNU Lesser GPLv3</a>, as defined in CloudSim 3 release.</p>
-      </section>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/manoelcampos/cloudsim-plus/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/manoelcampos/cloudsim-plus/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/manoelcampos/cloudsim-plus"></a> is maintained by <a href="https://github.com/manoelcampos">manoelcampos</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/manoelcampos">manoelcampos</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
+
+  
   </body>
 </html>
