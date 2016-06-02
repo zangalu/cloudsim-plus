@@ -34,11 +34,13 @@
         <h1>
 <a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
 
-<p><a href="https://travis-ci.org/manoelcampos/cloudsim-plus"><img src="https://img.shields.io/travis/manoelcampos/cloudsim-plus/master.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/manoelcampos/cloudsim-plus?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim-plus/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://www.codacy.com/app/manoelcampos/cloudsim-plus?utm_source=github.com&amp;amp;utm_medium=referral&amp;amp;utm_content=manoelcampos/cloudsim-plus&amp;amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/3f132b184d5e475dbbcd356ee84499fc" alt="Codacy Badge"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="LGPL licensed"></a></p>
+<p><a href="https://travis-ci.org/manoelcampos/cloudsim-plus"><img src="https://img.shields.io/travis/manoelcampos/cloudsim-plus/master.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/manoelcampos/cloudsim-plus?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim-plus/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://www.codacy.com/app/manoelcampos/cloudsim-plus?utm_source=github.com&amp;amp;utm_medium=referral&amp;amp;utm_content=manoelcampos/cloudsim-plus&amp;amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/3f132b184d5e475dbbcd356ee84499fc" alt="Codacy Badge"></a> <a href="http://www.gnu.org/licenses/lgpl-3.0.en.html"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="LGPL licensed"></a></p>
 
 <p>CloudSim++ is a fork of <a href="https://github.com/Cloudslab/cloudsim/tree/20a7a55e537181489fcb9a2d42a3e539db6c0318">CloudSim 3</a> that was reengineered primarily to avoid code duplication for improved <a href="https://en.wikipedia.org/wiki/Code_reuse">code reuse</a>, to clean code and ensure compliance with software engineering principles and recomendations, aiming to provide a more extensible, less <a href="https://en.wikipedia.org/wiki/Coupling_(computer_programming)">coupled</a>, more <a href="https://en.wikipedia.org/wiki/Cohesion_(computer_science)">cohesive</a> cloud simulation tool.  </p>
 
 <p>It focuses on refactorings to reduce code duplication, increase usage of software engeneering standards and recommendations such as <a href="https://en.wikipedia.org/wiki/Software_design_pattern">Design Patterns</a>, <a href="https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">SOLID principles</a> and other ones such as <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a> and <a href="https://pt.wikipedia.org/wiki/Don't_repeat_yourself">DRY</a>.</p>
+
+<p>CloudSim++ is developed through a partnership among the <a href="http://it.pt/MSP-Cv">Multimedia Signal Processing (MSP)</a> of the <a href="http://www.it.pt">Instituto de Telecomunicações (IT)</a> of Portugal, the <a href="http://www.ubi.pt">Universidade da Beira Interior (UBI)</a> and the <a href="http://www.ifto.edu.br">Instituto Federal de Educação Ciência e Tecnologia do Tocantins (IFTO)</a> (Brazil). It is supported by the Portuguese <strong>Fundação para a Ciência e a Tecnologia (FCT)</strong> and by the <strong>Brazilian foundation Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)</strong>.</p>
 
 <h1>
 <a id="how-to-use-cloudsim" class="anchor" href="#how-to-use-cloudsim" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use CloudSim++</h1>
@@ -73,7 +75,7 @@ Considering that you have <a href="http://maven.apache.org">maven</a> and <a hre
 <li>and a list of customer's cloudlets (objects that model resource requirements of a given application).</li>
 </ul>
 
-<p>By this way, the main code used to build such a simulation scenario can be as below. This is simply the code of the constructor method. The complete example is available at the cloudsim-examples module <a href="modules/cloudsim-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
+<p>By this way, the main code used to build such a simulation scenario can be as below. This is simply the code of the constructor method. The complete example is available at the cloudsim-examples module <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-v">this</span><span class="pl-k">.</span>vmList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
@@ -161,15 +163,15 @@ And unfortunately, there are several months of hard work that would need to be r
 
 <ul>
 <li>
-<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
+<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
 <li>
-<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
+<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
 <li>
-<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
+<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
 <li>
-<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
+<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
 <li>
-<a href="modules/cloudsim/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for UtilizationModel classes that define how a cloudlet uses physical resources.</li>
+<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for UtilizationModel classes that define how a cloudlet uses physical resources.</li>
 </ul>
 </li>
 <li>
@@ -221,7 +223,7 @@ Thus, the contributions in this area are as follows:</p>
 <li>Functional/integration tests using JUnit to test how a set of classes works together and even overall simulation scenarios.</li>
 <li>Continuous integration using <a href="http://travis-ci.org">Travis</a> services (see the badge at the top of this file).</li>
 <li>Inclusion of Maven Coverage Plugin to starting tracking the percentage of code that is being coverage by unit tests.</li>
-<li>Inclusion of public code coverage report using <a href="http://coveralls.io">Coveralls</a> services (see the badge at the top of this file). The code coverage raised from 20% to <a href="https://coveralls.io/github/manoelcampos/cloudsim?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim/badge.svg?branch=master" alt="Coverage Status"></a>.</li>
+<li>Inclusion of public code coverage report using <a href="http://coveralls.io">Coveralls</a> services (see the badge at the top of this file). The code coverage raised from 20% to <a href="https://coveralls.io/github/manoelcampos/cloudsim-plus?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim/badge.svg?branch=master" alt="Coverage Status"></a>.</li>
 <li>Bug fixes.</li>
 </ul>
 
@@ -232,9 +234,9 @@ Thus, the contributions in this area are as follows:</p>
 
 <ul>
 <li>
-<strong>A TableBuilder interface and a set of implementing classes to automate the process of printing simulation results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available at the <a href="/modules/cloudsim/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. To print results of a list of executed cloudlet you can use a single line of code such as <code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. All the perfectly aligned tables that you will see after running the examples uses the TextTableBuilder class.</li>
+<strong>A TableBuilder interface and a set of implementing classes to automate the process of printing simulation results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available at the <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. To print results of a list of executed cloudlet you can use a single line of code such as <code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. All the perfectly aligned tables that you will see after running the examples uses the TextTableBuilder class.</li>
 <li>
-<strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: the interfaces and classes included in the <a href="/modules/cloudsim/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> package allow you to keep an eye in your simulation execution and perform additional tasks when a given event happens. These listeners were implemented in some CloudSim++ classes such as below (the next section describes examples of this feature):
+<strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: the interfaces and classes included in the <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> package allow you to keep an eye in your simulation execution and perform additional tasks when a given event happens. These listeners were implemented in some CloudSim++ classes such as below (the next section describes examples of this feature):
 
 <ul>
 <li>CloudSim: to notify observers when any event is processed on CloudSim.<br>
@@ -245,7 +247,7 @@ Thus, the contributions in this area are as follows:</p>
 </ul>
 </li>
 <li>
-<strong>A set of builder classes to automate to process of creating multiple simulation objects such as Datacenters, Hosts, VMs and Cloudlets</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a> is a design pattern used to ease the creation of objects. As several simulations require the developer to create multiple instances of a given object with the same attribute values (such as several identical hosts), this starts being a repetitive, time-consuming and boring task. The package <a href="/modules/cloudsim/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> provide a set of classes to enable the automation of this instantiation process. The class <a href="/modules/cloudsim/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> is the start point to access all the introduced builders. New examples were not included yet, but the <a href="modules/cloudsim/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> makes intensive use of this new feature.</li>
+<strong>A set of builder classes to automate to process of creating multiple simulation objects such as Datacenters, Hosts, VMs and Cloudlets</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a> is a design pattern used to ease the creation of objects. As several simulations require the developer to create multiple instances of a given object with the same attribute values (such as several identical hosts), this starts being a repetitive, time-consuming and boring task. The package <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> provide a set of classes to enable the automation of this instantiation process. The class <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> is the start point to access all the introduced builders. New examples were not included yet, but the <a href="modules/cloudsim-plus/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> makes intensive use of this new feature.</li>
 </ul>
 
 <h2>
@@ -255,12 +257,12 @@ Thus, the contributions in this area are as follows:</p>
 
 <ul>
 <li>
-<a href="modules/cloudsim-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a> - the example dynamically create cloudlets according to the data of a workload trace file. VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. It may not represent a real world use case, but the example can be adapted to developer needs.<br>
+<a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a> - the example dynamically create cloudlets according to the data of a workload trace file. VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. It may not represent a real world use case, but the example can be adapted to developer needs.<br>
 </li>
 <li>
-<a href="/modules/cloudsim-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a> - the example performs VM migrations based on Host utilization threshold. </li>
+<a href="/modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a> - the example performs VM migrations based on Host utilization threshold. </li>
 <li>Implementation of custom DatacenterBroker and VmAllocationPolicy for the given examples.</li>
-<li>Examples using the new Listener features were included to the package <a href="modules/cloudsim-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
+<li>Examples using the new Listener features were included to the package <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
 </ul>
 
 <h2>
@@ -370,7 +372,7 @@ Instead, it requires an object that implements the new Resource interface (such 
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
 
-<p>This project is licensed under <a href="LICENSE">GNU Lesser GPLv3</a>, as defined in CloudSim 3 release.</p>
+<p>This project is licensed under <a href="http://www.gnu.org/licenses/lgpl-3.0.en.html">GNU Lesser GPLv3</a>, as defined in CloudSim 3 release.</p>
       </section>
     </div>
 
