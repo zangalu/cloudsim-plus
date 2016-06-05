@@ -57,9 +57,9 @@ But if you want just take a look on how it works or you are such a "terminal per
 <p>To run some example type the command: <code>sh script/bootstrap.sh ExampleClassName</code>.
 For instance, to run the CloudSimExample1 you can type: <code>sh script/bootstrap.sh CloudSimExample1</code>. 
 To run an example into a sub-directory, type <code>sh script/bootstrap.sh sub_directory_name.ExampleClassName</code>.
-For instance, to run the <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/SwfWorkloadFormatExample1.java">workload/SwfWorkloadFormatExample1</a> example, type <code>sh script/bootstrap.sh workload.SwfWorkloadFormatExample1</code>.</p>
+For instance, to run the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/SwfWorkloadFormatExample1.java">workload/SwfWorkloadFormatExample1</a> example, type <code>sh script/bootstrap.sh workload.SwfWorkloadFormatExample1</code>.</p>
 
-<p>The script checks if it is required to build the project and uses maven in this case, that will make sure to download all dependencies. To see what examples are available, just navigate through the <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples">examples directory</a>.</p>
+<p>The script checks if it is required to build the project and uses maven in this case, that will make sure to download all dependencies. To see what examples are available, just navigate through the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples">examples directory</a>.</p>
 
 <p>To just build the CloudSim++ and examples packages, execute the script without any parameter.  </p>
 
@@ -96,7 +96,7 @@ Below are the steps to start using the project:</p>
 <li>and a list of customer's cloudlets (objects that model resource requirements of a given application).</li>
 </ul>
 
-<p>By this way, the main code used to build such a simulation scenario can be as below. This is simply the code of the constructor method. The complete example is available at the cloudsim-examples module <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
+<p>By this way, the main code used to build such a simulation scenario can be as below. This is simply the code of the constructor method. The complete example is available at the cloudsim-examples module <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-v">this</span><span class="pl-k">.</span>vmList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
@@ -193,15 +193,15 @@ And unfortunately, there are several months of hard work that would need to be r
 
 <ul>
 <li>
-<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
 <li>
-<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
 <li>
-<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
 <li>
-<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
 <li>
-<a href="modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for UtilizationModel classes that define how a cloudlet uses physical resources.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for UtilizationModel classes that define how a cloudlet uses physical resources.</li>
 </ul>
 </li>
 <li>
@@ -264,9 +264,9 @@ Thus, the contributions in this area are as follows:</p>
 
 <ul>
 <li>
-<strong>A TableBuilder interface and a set of implementing classes to automate the process of printing simulation results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available at the <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. To print results of a list of executed cloudlet you can use a single line of code such as <code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. All the perfectly aligned tables that you will see after running the examples uses the TextTableBuilder class.</li>
+<strong>A TableBuilder interface and a set of implementing classes to automate the process of printing simulation results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available at the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. To print results of a list of executed cloudlet you can use a single line of code such as <code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. All the perfectly aligned tables that you will see after running the examples uses the TextTableBuilder class.</li>
 <li>
-<strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: the interfaces and classes included in the <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> package allow you to keep an eye in your simulation execution and perform additional tasks when a given event happens. These listeners were implemented in some CloudSim++ classes such as below (the next section describes examples of this feature):
+<strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: the interfaces and classes included in the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> package allow you to keep an eye in your simulation execution and perform additional tasks when a given event happens. These listeners were implemented in some CloudSim++ classes such as below (the next section describes examples of this feature):
 
 <ul>
 <li>CloudSim: to notify observers when any event is processed on CloudSim.<br>
@@ -277,7 +277,7 @@ Thus, the contributions in this area are as follows:</p>
 </ul>
 </li>
 <li>
-<strong>A set of builder classes to automate to process of creating multiple simulation objects such as Datacenters, Hosts, VMs and Cloudlets</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a> is a design pattern used to ease the creation of objects. As several simulations require the developer to create multiple instances of a given object with the same attribute values (such as several identical hosts), this starts being a repetitive, time-consuming and boring task. The package <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> provide a set of classes to enable the automation of this instantiation process. The class <a href="/modules/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> is the start point to access all the introduced builders. New examples were not included yet, but the <a href="modules/cloudsim-plus/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> makes intensive use of this new feature.</li>
+<strong>A set of builder classes to automate to process of creating multiple simulation objects such as Datacenters, Hosts, VMs and Cloudlets</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a> is a design pattern used to ease the creation of objects. As several simulations require the developer to create multiple instances of a given object with the same attribute values (such as several identical hosts), this starts being a repetitive, time-consuming and boring task. The package <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> provide a set of classes to enable the automation of this instantiation process. The class <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> is the start point to access all the introduced builders. New examples were not included yet, but the <a href="/cloudsim-plus/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> makes intensive use of this new feature.</li>
 </ul>
 
 <h2>
@@ -287,18 +287,18 @@ Thus, the contributions in this area are as follows:</p>
 
 <ul>
 <li>
-<a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a> - the example dynamically create cloudlets according to the data of a workload trace file. VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. It may not represent a real world use case, but the example can be adapted to developer needs.<br>
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a> - the example dynamically create cloudlets according to the data of a workload trace file. VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. It may not represent a real world use case, but the example can be adapted to developer needs.<br>
 </li>
 <li>
-<a href="/modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a> - the example performs VM migrations based on Host utilization threshold. </li>
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a> - the example performs VM migrations based on Host utilization threshold. </li>
 <li>Implementation of custom DatacenterBroker and VmAllocationPolicy for the given examples.</li>
-<li>Examples using the new Listener features were included to the package <a href="modules/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
+<li>Examples using the new Listener features were included to the package <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
 </ul>
 
 <h2>
 <a id="update-to-java-8" class="anchor" href="#update-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update to Java 8</h2>
 
-<p>The <a href="modules/cloudsim">cloudsim module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html">Lambda Expressions, Streams and Functional Programming</a> of the Java 8. However, <a href="modules/cloudsim-examples">cloudsim-examples</a> project was updated just from Java 6 to 7 aiming to provide yet simple examples for beginner Java programmers, but less verbose code than Java 6.</p>
+<p>The <a href="/cloudsim">cloudsim module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html">Lambda Expressions, Streams and Functional Programming</a> of the Java 8. However, <a href="/cloudsim-examples">cloudsim-examples</a> project was updated just from Java 6 to 7 aiming to provide yet simple examples for beginner Java programmers, but less verbose code than Java 6.</p>
 
 <p>The amazing Java 8 features allow developers to drastically reduce the number of lines to implement basic features such as iteration, filtering,
 sorting and processing lists, as well as reducing the number of <a href="https://en.wikipedia.org/wiki/Boilerplate_code">boilerplate code</a> required 
@@ -328,7 +328,7 @@ just to use classes having a single method.</p>
 
 <p>This makes the code clearer to understand and less verbose. Further, the new Stream API provides a complete set of features that even increase performance, such as allowing the <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html#section5">parallel processing of lists</a>.</p>
 
-<p>For more information about the changes and features included in this release, please read the <a href="CHANGELOG.md">CHANGELOG</a> file and the <a href="modules/cloudsim-examples">cloudsim-examples</a> project.</p>
+<p>For more information about the changes and features included in this release, please read the <a href="CHANGELOG.md">CHANGELOG</a> file and the <a href="/cloudsim-examples">cloudsim-examples</a> project.</p>
 
 <h1>
 <a id="what-are-the-practical-differences-of-using-cloudsim-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim" class="anchor" href="#what-are-the-practical-differences-of-using-cloudsim-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are the practical differences of using CloudSim++ instead of CloudSim? How can I update my simulations in order to use CloudSim++?</h1>
