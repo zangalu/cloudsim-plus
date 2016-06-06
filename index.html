@@ -39,18 +39,18 @@ without getting concerned about the low level details related to Cloud-based inf
 
 <p>Cloud computing is the leading technology for delivery of reliable, secure, fault-tolerant, sustainable, and scalable computational services.
 For assurance of such characteristics in cloud systems under development, it is required timely, repeatable, 
-and controllable methodologies for evaluation of new cloud applications and policies before actual development of cloud products. 
+and controllable methodologies for evaluation of new cloud applications and policies, before actual development of cloud products. 
 Because utilization of real testbeds limits the experiments to the scale of the testbed and makes 
 the reproduction of results an extremely difficult undertaking, simulation may be used.
-The current project is a suitable tool to rapidly develop such simulation scenarios and run them quickly, in an usual and modest PC. </p>
+Accordingly, the current project is a suitable tool to rapidly develop such simulation scenarios and run them quickly, in an usual and modest PC. </p>
 
 <p>CloudSim++ is a fork of <a href="https://github.com/Cloudslab/cloudsim/tree/20a7a55e537181489fcb9a2d42a3e539db6c0318">CloudSim 3</a> 
-that was reengineered primarily to avoid code duplication for improved <a href="https://en.wikipedia.org/wiki/Code_reuse">code reuse</a>, 
-to clean code and ensure compliance with software engineering principles and recomendations, aiming to provide a more extensible, 
+that was re-engineered primarily to avoid code duplication for improved <a href="https://en.wikipedia.org/wiki/Code_reuse">code reusability</a>
+and ensure compliance with software engineering principles and recomendations, aiming to provide a more extensible, 
 less <a href="https://en.wikipedia.org/wiki/Coupling_(computer_programming)">coupled</a>, 
 more <a href="https://en.wikipedia.org/wiki/Cohesion_(computer_science)">cohesive</a> cloud simulation tool.  </p>
 
-<p>It focuses on refactorings to reduce code duplication, increase usage of software engeneering standards and recommendations 
+<p>It focuses on usage of software engeneering standards and recommendations 
 such as <a href="https://en.wikipedia.org/wiki/Software_design_pattern">Design Patterns</a>, 
 <a href="https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">SOLID principles</a> 
 and other ones such as <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS</a> 
@@ -68,19 +68,23 @@ at <a href="http://www.csse.unimelb.edu.au/">the Computer Science and Software E
 <h1>
 <a id="how-to-use-cloudsim" class="anchor" href="#how-to-use-cloudsim" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use CloudSim++</h1>
 
-<p>CloudSim++ is a Maven project with some modules. The easier way to use the project is relying on some IDE such as NetBeans, Eclipse or IntelliJ IDEA.
-But if you want just take a look on how it works or you are such a "terminal person", the sub-sections below show the instructions.</p>
+<p>CloudSim++ is a Maven project with some modules. The easier way to use the project is relying on some IDE such as NetBeans, Eclipse or IntelliJ IDEA. 
+Accordingly, you can just check the gif below or see the complete instructions in the next sub-sections.</p>
 
 <p><img src="https://github.com/manoelcampos/cloudsim-plus/raw/master/cloudsim-plus-netbeans.gif" alt="Download and running CloudSim++ Example using NetBeans"></p>
 
-<p>Considering that you have <a href="https://git-scm.com">git</a> and <a href="http://maven.apache.org">maven</a> installed on you operating system, you have to first download the project source by cloning the repositosy using the following command at a terminal <code>git clone https://github.com/manoelcampos/cloudsim-plus.git</code> or you can just use the download button at this page. </p>
-
-<p>After downloading the project, you have to use a terminal to enter in the project directory. Now, choose one of the ways below to use the project.</p>
+<p>You can check a high quality version of this gif <a href="https://github.com/manoelcampos/cloudsim-plus/raw/master/cloudsim-plus-netbeans-hq.gif">here</a>.
+But if you are such a "terminal person", the sub-section below shows the instructions.</p>
 
 <h2>
-<a id="by-means-of-comnand-line-the-faster-way-to-see-how-it-works" class="anchor" href="#by-means-of-comnand-line-the-faster-way-to-see-how-it-works" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By means of comnand line (the faster way to see how it works)</h2>
+<a id="by-means-of-command-line-if-you-dont-like-or-dont-want-to-use-an-ide" class="anchor" href="#by-means-of-command-line-if-you-dont-like-or-dont-want-to-use-an-ide" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By means of command line (if you don't like or don't want to use an IDE)</h2>
 
-<p>There is a  <a href="script/bootstrap.sh">bash script</a> that you can use to build and run CloudSim++ examples. The script must be run on the project root directory in a Unix-like system such as Linux, FreeBDS and Mac OSX.</p>
+<p>Considering that you have <a href="https://git-scm.com">git</a> and <a href="http://maven.apache.org">maven</a> installed on your operating system, 
+download the project source by cloning the repositosy using the command <code>git clone https://github.com/manoelcampos/cloudsim-plus.git</code> 
+at a terminal. </p>
+
+<p>The project has a <a href="script/bootstrap.sh">bash script</a> that you can use to build and run CloudSim++ examples. 
+The script must be run on the project root directory in a Unix-like system such as Linux, FreeBDS and Mac OSX.</p>
 
 <p>To run some example type the command: <code>sh script/bootstrap.sh ExampleClassName</code>.
 For instance, to run the CloudSimExample1 you can type: <code>sh script/bootstrap.sh CloudSimExample1</code>. 
@@ -88,33 +92,34 @@ To run an example into a sub-directory, type <code>sh script/bootstrap.sh sub_di
 For instance, to run the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/SwfWorkloadFormatExample1.java">workload/SwfWorkloadFormatExample1</a> 
 example, type <code>sh script/bootstrap.sh workload.SwfWorkloadFormatExample1</code>.</p>
 
-<p>The script checks if it is required to build the project and uses maven in this case, that will make sure to download all dependencies. 
+<p>The script checks if it is required to build the project, using maven in this case, making sure to download all dependencies. 
 To see what examples are available, just navigate through the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples">examples directory</a>.</p>
 
 <p>To just build the CloudSim++ and examples packages, execute the script without any parameter.  </p>
 
 <h2>
-<a id="by-means-of-an-ide-the-easier-way-to-create-your-own-simulations" class="anchor" href="#by-means-of-an-ide-the-easier-way-to-create-your-own-simulations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By means of an IDE (the easier way to create your own simulations)</h2>
+<a id="by-means-of-an-ide-the-easier-way-to-just-take-a-look-or-to-create-your-own-simulations" class="anchor" href="#by-means-of-an-ide-the-easier-way-to-just-take-a-look-or-to-create-your-own-simulations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>By means of an IDE (the easier way to just take a look or to create your own simulations)</h2>
 
-<p>The easier way to use the project is relying on some IDE such as NetBeans, Eclipse or IntelliJ IDEA.
+<p>The easier way to use the project is relying on some IDE such as <a href="http://netbeans.org">NetBeans</a>, <a href="http://eclipse.org">Eclipse</a> 
+or <a href="http://jetbrains.com/idea/">IntelliJ IDEA</a>.
 Below are the steps to start using the project:</p>
 
 <ul>
-<li>Using a terminal, clone the project to a folder in your computer: <code>git clone https://github.com/manoelcampos/cloudsim-plus.git</code>
-</li>
+<li>Download the project sources using the download button on top of this page or clone it using <code>git clone https://github.com/manoelcampos/cloudsim-plus.git</code> 
+at a terminal.</li>
 <li>Open/import the project in your IDE:
 
 <ul>
-<li>For <a href="http://netbeans.org">NetBeans</a>, just use the "Open project" menu and select the directory where the project was cloned.</li>
-<li>For <a href="http://eclipse.org">Eclipse</a> or <a href="http://jetbrains.com/idea/">IntelliJ IDEA</a>, 
+<li>For NetBeans, just use the "Open project" menu and select the directory where the project was downloaded/cloned.</li>
+<li>For Eclipse or IntelliJ IDEA, 
 you have to import the project selecting the folder where the project was cloned. </li>
 </ul>
 </li>
-<li>Inside the opened/imported project you will have the cloudsim and cloudsim-examples modules. 
+<li>Inside the opened/imported project you will have the cloudsim-plus and cloudsim-plus-examples modules. 
 The cloudsim-plus module is where the simulator source code is, that usually you don't have to change, unless you want to contribute to the project. 
 The cloudsim-plus-examples is where you can start.</li>
-<li>Open the cloudsim-plus-examples module. The most basic examples are in the org.cloudbus.cloudsim.examples package. 
-You can run each one of the classes in this package to get a different example. </li>
+<li>Open the cloudsim-plus-examples module. The most basic examples are in the root of the org.cloudbus.cloudsim.examples package. 
+You can run any one of the classes in this package to get a specific example. </li>
 <li>If you want to build your own simulations, the easiest way is to create another class inside this module.</li>
 </ul>
 
@@ -122,23 +127,24 @@ You can run each one of the classes in this package to get a different example. 
 <a id="a-minimal-simulation-example" class="anchor" href="#a-minimal-simulation-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A minimal simulation example</h1>
 
 <p>The construction of a scenario to simulate the infrastructure of a Cloud provider is not so minimal. 
-In order to build such a simulation scenario you have to create, at least: </p>
+In order to build such a simulation you have to create, at least: </p>
 
 <ul>
 <li>a datacenter with a list of physical machines (Hosts); </li>
-<li>a broker that is accountable for submission of VMs and Cloudlets to be executed, on behalf of a given customer, into the cloud infrastructure; </li>
+<li>a broker that allows submission of VMs and Cloudlets to be executed, on behalf of a given customer, into the cloud infrastructure; </li>
 <li>a list of customer's virtual machines (VMs); </li>
-<li>and a list of customer's cloudlets (objects that model resource requirements of a given application).</li>
+<li>and a list of customer's cloudlets (objects that model resource requirements of different applications).</li>
 </ul>
 
 <p>By this way, the main code used to build such a simulation scenario can be as below. 
 This is simply the code of the constructor method. 
-The complete example is available at the cloudsim-examples module 
+The complete example is available at the cloudsim-plus-examples module 
 <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-v">this</span><span class="pl-k">.</span>vmList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
-<span class="pl-k">int</span> numberOfCloudUsers <span class="pl-k">=</span> <span class="pl-c1">1</span>; <span class="pl-c">//number of cloud customers</span>
+<span class="pl-c">//Number of cloud customers</span>
+<span class="pl-k">int</span> numberOfCloudUsers <span class="pl-k">=</span> <span class="pl-c1">1</span>; 
 <span class="pl-k">boolean</span> traceEvents <span class="pl-k">=</span> <span class="pl-c1">false</span>;
 
 <span class="pl-smi">CloudSim</span><span class="pl-k">.</span>init(numberOfCloudUsers, <span class="pl-smi">Calendar</span><span class="pl-k">.</span>getInstance(), traceEvents);
@@ -153,17 +159,18 @@ The complete example is available at the cloudsim-examples module
 <span class="pl-v">this</span><span class="pl-k">.</span>vmList<span class="pl-k">.</span>add(vm0);
 broker0<span class="pl-k">.</span>submitVmList(vmList);
 
+<span class="pl-c">/*Creates a cloudlet that represents an application to be run inside a VM.*/</span>
 <span class="pl-smi">Cloudlet</span> cloudlet0 <span class="pl-k">=</span> createCloudlet(broker0, vm0);
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList<span class="pl-k">.</span>add(cloudlet0);
 broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 
-<span class="pl-c">//Starts the simulation and waits all tasks to be executed</span>
+<span class="pl-c">/*Starts the simulation and waits all cloudlets to be executed*/</span>
 <span class="pl-smi">CloudSim</span><span class="pl-k">.</span>startSimulation();
 
 <span class="pl-c">//Finishes the simulation</span>
 <span class="pl-smi">CloudSim</span><span class="pl-k">.</span>stopSimulation();
 
-<span class="pl-c">/*Prints results when simulation is over</span>
+<span class="pl-c">/*Prints results when the simulation is over</span>
 <span class="pl-c">(you can use your own code here to print what you want from this cloudlet list)*/</span>
 <span class="pl-k">List&lt;<span class="pl-smi">Cloudlet</span>&gt;</span> finishedCloudlets <span class="pl-k">=</span> broker0<span class="pl-k">.</span>getCloudletsFinishedList();
 <span class="pl-smi">CloudletsTableBuilderHelper</span><span class="pl-k">.</span>print(<span class="pl-k">new</span> <span class="pl-smi">TextTableBuilder</span>(), finishedCloudlets);
@@ -182,23 +189,23 @@ There is also a <a href="https://github.com/manoelcampos/cloudsim-plus/wiki">Wik
 <a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to build my simulations. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png">😐</g-emoji>
 </h1>
 
-<p>Well, the design of the tool has a direct impact when you need to extend it to include some feature for your simulations. 
-The simulator provides a set of classes such as Vm Schedulers, Cloudlet Schedulers, Vm Allocation Policies, Resource Provisioners, 
-Utilization Models, Power Models and Datacenter Brokers that implement basic algorithms for every one of these  features. 
+<p>Well, the design of the tool has a direct impact when you need to extend it in order to include some feature required for your simulations. 
+The simulator provides a set of classes such as <code>VmSchedulers</code>s, <code>CloudletScheduler</code>s, <code>VmAllocationPolicy</code>s, <code>ResourceProvisioner</code>s, 
+<code>UtilizationModel</code>s, <code>PowerModel</code>s and <code>DatacenterBroker</code>s that implement basic algorithms for different goals. 
 For instance, the <code>VmAllocationPolicySimple</code> class implements a Worst Fit
-policy that selects the PM wich less processor cores in use to host the VM, and in fact it is the only policy available. </p>
+policy that selects the PM wich less processor cores in use to host a VM and, in fact, it is the only policy available. </p>
 
-<p>Usually you have to perform your own implementations of these features, such as a Best Fit VM allocation policy, 
-a resource Utilization Model with an upper threshold or a Datacenter Broker that selects the best Datacenter to submit a VM.</p>
+<p>Usually you have to write your own implementations of these classes, such as a Best Fit <code>VmAllocationPolicy</code>, 
+a resource <code>UtilizationModel</code> with an upper threshold or a <code>DatacenterBroker</code> that selects the best <code>Datacenter</code> to submit a VM.</p>
 
-<p>Considering that, several software engineering principles aim to ease the task of creating  new classes to implement those features. 
-They also try to avoid forcing you to change  core classes of the simulator in order to introduce a feature you need to implement.
-Changing these core classes is a bad practice, once you will not be able to automatically update your  project to new versions 
-of the simulator without losing your changes or struggle to fix merge conficts.  </p>
+<p>Considering that, several software engineering principles aim to ease the task of creating new classes to implement those features. 
+They also try to avoid forcing you to change core classes of the simulator in order to introduce a feature you need to implement.
+Changing these core classes is a bad practice, once you will not be able to automatically update your project to new versions 
+of the simulator, without losing your changes or struggling to fix merge conflicts.  </p>
 
-<p>And as I have seen in the forums that I've attended, many times users have to perform these changes in core classes 
+<p>And as I have seen in forums that I've attended, many times users have to perform these changes in core classes 
 just to implement some specific features they need. 
-By this way, I think those problems are enough reasons that show the need of a new reengineered version of the simulator.  </p>
+By this way, I think those problems are enough reasons that show the need of a new re-engineered version of the simulator.  </p>
 
 <h1>
 <a id="but-why-another-cloudsim-fork-unamused" class="anchor" href="#but-why-another-cloudsim-fork-unamused" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But why another CloudSim fork? <g-emoji alias="unamused" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f612.png">😒</g-emoji>
@@ -208,29 +215,29 @@ By this way, I think those problems are enough reasons that show the need of a n
 in order to really contribute to the project, benefiting everybody.</p>
 
 <p>Well, I strongly agree with you and in fact I tried that. However, the original CloudSim moved on to a new major release, 
-including a completely new set of classes to provide Container as a Service simulations, 
+introducing a completely new set of classes to provide Container as a Service (CaaS) simulations, 
 before the changes proposed here being merged to the official repository. 
 The huge amount of contributions of CloudSim++ are discussed in the section below. 
-By this way, all the work performed here was not incorporated to allow the new features to be developed using this redesigned version.
+By this way, all the work performed here was not incorporated to allow this new CaaS module to be developed using this redesigned version.
 And unfortunately, there are several months of hard work that would need to be replicated in order to merge both projects.</p>
 
 <h1>
 <a id="ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-blush" class="anchor" href="#ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-blush" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OK, but I'm just wondering what are the real contributions of CloudSim++ <g-emoji alias="blush" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60a.png">😊</g-emoji>
 </h1>
 
-<p>Firstly, there is a huge amount of changes that makes CloudSim++ <strong>NOT BACKWARD COMPATIBLE</strong> with original CloudSim. 
+<p>Thanks for asking. Firstly, there is a huge amount of changes that make CloudSim++ <strong>NOT BACKWARD COMPATIBLE</strong> with original CloudSim. 
 However, to port your CloudSim simulations to CloudSim++ can be relatively easy, as it will be presented further. </p>
 
 <p>Accordingly, the main contributions of CloudSim++ are:</p>
 
 <ul>
-<li>Improved class hierarchy and code that is easier to understand</li>
-<li>Reusable and standards conforming code</li>
-<li>Improved documentation</li>
-<li>Completely new Test Suites</li>
-<li>New set of features</li>
-<li>New examples for old and new features</li>
-<li>Update to Java 8</li>
+<li>Improved class hierarchy and code that is easier to understand.</li>
+<li>Reusable and standards-conforming code.</li>
+<li>Improved and extended documentation.</li>
+<li>Completely new Test Suites.</li>
+<li>New set of features.</li>
+<li>New examples for old and new features.</li>
+<li>Update to Java 8.</li>
 </ul>
 
 <p>All these improvements are described in details in the next sub-sections. </p>
@@ -245,50 +252,51 @@ behaviour that you want to use or extend</strong>. Some new packages are:
 
 <ul>
 <li>
-<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for VmAllocationPolicy classes that define how a PM is selected to host a VM.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/allocationpolicies">org.cloudbus.cloudsim.allocationpolicies</a> for <code>VmAllocationPolicy</code> classes that define how a PM is selected to host a VM.</li>
 <li>
-<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for DatacenterBroker classes that defines the policies for submission of customer VMs and cloudlets.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/brokers">org.cloudbus.cloudsim.brokers</a> for <code>DatacenterBroker</code> classes that define the policies for submission of customer VMs and cloudlets.</li>
 <li>
 <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/resources">org.cloudbus.cloudsim.resources</a> for resources such as CPU cores (Processor Elements - PEs), RAM, Hard Drive Storage, SAN Storage, etc.</li>
 <li>
-<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for VmScheduler and CloudletScheduler classes that defines how the execution of cloudlets and VMs are scheduled in the processor.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/schedulers">org.cloudbus.cloudsim.schedulers</a> for <code>VmScheduler</code> and <code>CloudletScheduler</code> classes that define how the execution of cloudlets and VMs are scheduled in the processor.</li>
 <li>
-<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for UtilizationModel classes that define how a cloudlet uses physical resources.</li>
+<a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/utilizationmodels">org.cloudbus.cloudsim.utilizationmodels</a> for <code>UtilizationModel</code> classes that define how a cloudlet uses physical resources.</li>
 </ul>
 </li>
 <li>
-<strong>More meaningful class and method names to provide clear understanding of the responsiblity of each one</strong>: usually you have to look at classes and their methods to figure out if there is a feature you want to use. 
+<strong>More meaningful class and method names to provide clear understanding of the responsiblity of each one</strong>: 
+usually you have to look at classes and their methods to figure out if there is a feature you want to use. 
 Not rarely you have to go through the documentation to understand what is the responsibility of a given class or method. 
-Using more specific and clear names frequently makes you to instantaneously find out what is the method or class you need. 
+Using more specific and clear names, frequently makes you to instantaneously find out what is the method or class you need. 
 It thus relieves you to read the documentation to start coding (<em>despite it is really important to read the documentation,
 sometimes you don't have time to go through the details</em>).</li>
 </ul>
 
 <h2>
-<a id="reusable-and-standards-conforming-code" class="anchor" href="#reusable-and-standards-conforming-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reusable and standards conforming code</h2>
+<a id="reusable-and-standards-conforming-code" class="anchor" href="#reusable-and-standards-conforming-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Reusable and standards-conforming code</h2>
 
 <ul>
 <li>
-<strong>Cleaner code that is easier to understand, maintain and test</strong>: a cleaner, clear, well organized code that always follows 
-the same code standards and formatting is easier to understand. 
+<strong>Cleaner code that is easier to understand, maintain and test</strong>: a cleaner and well organized code that always follows 
+the same standards and formatting is easier to understand. 
 And talking about an open source project, the best way to understand how the software works and how you can extend it is reading the source code. 
-If is follows the <a href="http://cleancoder.com">clean code</a> practice, <a href="https://en.wikipedia.org/wiki/Software_design_pattern">Design Patterns</a> and 
-<a href="https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">SOLID principles</a>, it will be easier to understand.</li>
+If it follows <a href="http://cleancoder.com">clean code</a> practices, <a href="https://en.wikipedia.org/wiki/Software_design_pattern">Design Patterns</a> and 
+<a href="https://en.wikipedia.org/wiki/SOLID_(object-oriented_design)">SOLID principles</a>, it will be easier to understand and extend.</li>
 <li>
-<strong>Division of very long and confuse methods into small, clean and very meaningful ones that usually makes just one thing</strong>: 
+<strong>Division of very long and confuse methods into small, clean and meaningful ones that usually make just one thing each one</strong>: 
 when using the approach of reading the code to understand how it works, it is very difficult to figure out what is happening into 
-a method with dozens or hundreds lines. And I'm not even talking about the problems to maintain such methods. 
+a method with dozen or hundred lines. And I'm not even talking about the problems to maintain such methods. 
 Thus, little methods with just one responsibility and with meangniful names are easier to maintain. 
 Further, they improve reuse and extension, the most important parts for you that are creating cloud simulations.</li>
 <li>
-<strong>Improved class hierarchy in order to follow the <a href="https://en.wikipedia.org/wiki/Interface_segregation_principle">Interface Segregation Principle (ISP)</a> 
-and increased reausability and facility for extension, following the <a href="https://en.wikipedia.org/wiki/Open/closed_principle">Open/Closed Principle (OCP)</a></strong>**: 
+<strong>Improved class hierarchy following the <a href="https://en.wikipedia.org/wiki/Interface_segregation_principle">Interface Segregation Principle (ISP)</a> 
+and <a href="https://en.wikipedia.org/wiki/Open/closed_principle">Open/Closed Principle (OCP)</a> to increase reausability and facility for extension</strong>: 
 the ISP states that <a href="https://en.wikipedia.org/wiki/Interface_segregation_principle#cite_note-ASD-1">"no client should be forced to depend on methods it does not use"</a> 
 and the OCP states that <a href="https://en.wikipedia.org/wiki/Open/closed_principle#cite_note-1">"software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification"</a>. 
-These principles together impacts directly developers that need to extend some simulator class to implement a desired behaviour 
-(such as a specific CloudletScheduler). The ISP preach that you should have a great number of small classes following the 
+These principles together impact directly developers that need to extend some simulator class to implement a desired behaviour 
+(such as a specific <code>CloudletScheduler</code>). The ISP preach that you should have a great number of small classes following the 
 <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">Single Responsibility Principle (SRP)</a> instead of a small set of big classes. 
-By this way, if you need to extend a given behaviour, usually you will have to extend a specific and little class, 
+By this way, if you need to extend a given behaviour, usually you just have to extend a specific and little class, 
 that has less code for you to worry about. By the other hand, the OCP relieves you of changing simulator classes to include a desired behaviour. 
 Thus, it focuses on trying to give you the serenity to change just your code. </li>
 <li>
@@ -296,8 +304,8 @@ Thus, it focuses on trying to give you the serenity to change just your code. </
 and the bad <a href="https://sourcemaking.com/antipatterns/cut-and-paste-programming">copy-and-paste anti-pattern</a></strong>: 
 copy-and-paste is a bad practice that degrades the source code along the time. 
 It makes difficulty to correct bugs when there may be several copies of the problematic code. 
-The duplicated code has to be tested several times, what usually leads to neglecting them. 
-Further, along the time, the number of duplicated just increases. </li>
+The duplicated code has to be tested several times, what usually leads to neglecting tests. 
+Further, along the time, the number of duplicated code just increases. </li>
 </ul>
 
 <h2>
@@ -306,37 +314,37 @@ Further, along the time, the number of duplicated just increases. </li>
 <ul>
 <li>
 <strong>Entirely documentation review and update</strong>, improving explanation of classes and method responsibilities, 
-fixing issues, correcting broken links, updating documentation that didn't reflect methods and class's responsibility anymore.</li>
+fixing issues, correcting broken links, updating documentation that didn't reflect methods and classes' responsibility anymore.</li>
 <li>
-<strong>Documentation extension</strong> to make clear key points of classes or methods.</li>
+<strong>Documentation extension</strong> to make clear the key points of classes and methods.</li>
 <li>
 <strong>Removal of duplicated documentation</strong> that just gets out-of-date along the time. 
-Now, subclasses that had documentation copied from the super class, just inherit the documentation of extends it using the 
+Subclasses that had documentation copied from the super class, just inherit the documentation or extend it using the 
 javadoc <a href="http://docs.oracle.com/javase/6/docs/technotes/tools/solaris/javadoc.html#inheritingcomments">@inheritdoc</a> tag.</li>
 <li>
-<strong>Inclusion of some missing documentation</strong> or documentation that just repeated the name of a method or attribute. 
-For instance "This is the id", doesn't help in anything.</li>
+<strong>Inclusion of some missing documentation</strong> and update of that ones just repeating the name of a method or attribute. 
+For instance, a javadoc such as "This is the id", doesn't help in anyway.</li>
 </ul>
 
 <h2>
 <a id="completely-new-test-suites" class="anchor" href="#completely-new-test-suites" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Completely new Test Suites</h2>
 
-<p>The original CloudSim already has some unit test suites, however, there isn't coverage reports enabled in the project. 
+<p>The original CloudSim already has some unit test suites, however, there aren't coverage reports enabled in the project. 
 After enabling these reports, it was realized that just 20% of the code was being covered by unit tests. 
 Tests are really important to try ensuring that the software works as expected and gives more security 
 and peace of mind to refactor the code, perform changes and fix bugs <g-emoji alias="pray" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f64f.png">🙏</g-emoji>. 
 After all, a broad code coverage also tries to ensure that you are getting accurate results from your simulations.</p>
 
-<p>Finally, an entire simulation is very complex, integrating several classes that communicate among themselves. Once, unit tests just check
+<p>Finally, an entire simulation is very complex, integrating several classes communicating among themselves. Once, unit tests just check
 isolated method calls, integration/functional tests are required to validate entire simulation scenarios.
-This project introduces a set of such tests into the simulator in order to increase simulation accuracy.
+This project introduces a set of such tests in order to increase simulation accuracy.
 Thus, the contributions in this area are as follows:</p>
 
 <ul>
-<li>Functional/integration tests using JUnit to test how a set of classes works together and even overall simulation scenarios.</li>
-<li>Continuous integration using <a href="http://travis-ci.org">Travis</a> services (see the badge at the top of this file).</li>
-<li>Inclusion of Maven Coverage Plugin to starting tracking the percentage of code that is being coverage by unit tests.</li>
-<li>Inclusion of public code coverage report using <a href="http://coveralls.io">Coveralls</a> services (see the badge at the top of this file). 
+<li>Functional/integration tests using JUnit to test a set of classes working together and overall simulation scenarios.</li>
+<li>Continuous integration using <a href="http://travis-ci.org">Travis</a> service (see the badge at the top of this file).</li>
+<li>Inclusion of Maven Coverage Plugin to start tracking the percentage of code that is being coverage by unit tests.</li>
+<li>Inclusion of public code coverage reports using <a href="http://coveralls.io">Coveralls</a> service (see the badge at the top of this file). 
 The code coverage raised from 20% to <a href="https://coveralls.io/github/manoelcampos/cloudsim-plus?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim-plus/badge.svg?branch=master" alt="Coverage Status"></a>.</li>
 <li>Bug fixes.</li>
 </ul>
@@ -348,38 +356,38 @@ The code coverage raised from 20% to <a href="https://coveralls.io/github/manoel
 
 <ul>
 <li>
-<strong>A TableBuilder interface and a set of implementing classes to automate the process of printing simulation 
+<strong>A <code>TableBuilder</code> interface and a set of implementing classes to automate the process of printing simulation 
 results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available
 at the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. 
 To print results of a list of executed cloudlet you can use a single line of code such as 
 <code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. 
-All the perfectly aligned tables that you will see after running the examples uses the TextTableBuilder class.</li>
+All the perfectly aligned tables that you will see after running the examples use the <code>TextTableBuilder</code> class.</li>
 <li>
 <strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: 
-the interfaces and classes included in the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> 
-package allow you to keep an eye in your simulation execution and perform additional tasks when a given event happens. 
-These listeners were implemented in some CloudSim++ classes such as below (the next section describes examples of this feature):
+interfaces and classes included in the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> 
+package allow you to keep track of simulation execution and perform additional tasks when a given event happens. 
+These listeners were implemented for some CloudSim++ classes such as below (the next section describes examples of this feature):
 
 <ul>
-<li>CloudSim: to notify observers when any event is processed on CloudSim.<br>
+<li>at <code>CloudSim</code> class: to notify observers when any event is processed by CloudSim++.<br>
 </li>
-<li>Host: to notify observers when VMs processing is updated.</li>
-<li>Vm: to notify observers when a host is allocated to a VM, a host is deallocated for a VM, the creation of a VM failed. </li>
-<li>Cloudlet: to notify observers when a cloudlet finishes executing.</li>
+<li>at <code>Host</code> class: to notify observers when VMs processing is updated.</li>
+<li>at <code>Vm</code> class: to notify observers when a host is allocated to a VM, a host is deallocated for a VM or the creation of a VM fails. </li>
+<li>at <code>Cloudlet</code> class: to notify observers when a cloudlet finishes executing.</li>
 </ul>
 </li>
 <li>
-<strong>A set of builder classes to automate to process of creating multiple simulation objects such as 
-Datacenters, Hosts, VMs and Cloudlets</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">builder</a> is a design pattern 
+<strong>A set of builder classes to automate the process of creating multiple simulation objects such as 
+<code>Datacenter</code>s, <code>Host</code>s, <code>Vm</code>s and <code>Cloudlet</code>s</strong>: <a href="https://en.wikipedia.org/wiki/Builder_pattern">Builder</a> is a design pattern 
 used to ease the creation of objects. As several simulations require the developer to create multiple instances of a 
-given object with the same attribute values (such as several identical hosts), this starts being a repetitive, 
+given object with the same attribute values (such as several identical hosts), that starts being a repetitive, 
 time-consuming and boring task. 
 The package <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> 
-provides a set of classes to enable the automation of this instantiation process. 
+provides a set of classes to automate the instantiation of such objects. 
 The class <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> 
 is the start point to access all the introduced builders. 
 New examples were not included yet, but the <a href="/cloudsim-plus/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> 
-makes intensive use of this new feature.</li>
+makes intensive use of such a new feature.</li>
 </ul>
 
 <h2>
@@ -390,14 +398,14 @@ makes intensive use of this new feature.</li>
 <ul>
 <li>
 <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a>: 
-the example dynamically create cloudlets according to the data of a workload trace file. 
+the example dynamically creates cloudlets according to the data of a workload trace file. 
 VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. 
-It may not represent a real world use case, but the example can be adapted to developer needs.<br>
+It may not represent a real world use case, but the example can be adapted according to developer needs.<br>
 </li>
 <li>
 <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a>: 
 the example performs VM migrations based on Host utilization threshold. </li>
-<li>Implementation of custom DatacenterBroker and VmAllocationPolicy for the given examples.</li>
+<li>Implementation of custom <code>DatacenterBroker</code> and <code>VmAllocationPolicy</code> for the given examples.</li>
 <li>Examples using the new Listener features were included to the package 
 <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
 </ul>
@@ -405,14 +413,14 @@ the example performs VM migrations based on Host utilization threshold. </li>
 <h2>
 <a id="update-to-java-8" class="anchor" href="#update-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update to Java 8</h2>
 
-<p>The <a href="/cloudsim">cloudsim module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of 
+<p>The <a href="/cloudsim-plus">CloudSim++ module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of 
 <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html">Lambda Expressions, Streams and Functional Programming</a> 
-of the Java 8. However, <a href="/cloudsim-examples">cloudsim-examples</a> project was updated just from Java 6 to 7 aiming 
+of the Java 8. However, <a href="/cloudsim-plus-examples">cloudsim-plus-examples</a> project was updated just from Java 6 to 7 aiming 
 to provide yet simple examples for beginner Java programmers, but less verbose code than Java 6.</p>
 
-<p>The amazing Java 8 features allow developers to drastically reduce the number of lines to implement basic features such as iteration, filtering,
-sorting and processing lists, as well as reducing the number of <a href="https://en.wikipedia.org/wiki/Boilerplate_code">boilerplate code</a> required 
-just to use classes having a single method.</p>
+<p>The amazing Java 8 features allow developers to drastically reduce the number of lines to implement basic tasks such as iteration, filtering,
+sorting and processing of lists, as well as reduction of <a href="https://en.wikipedia.org/wiki/Boilerplate_code">boilerplate code</a> required 
+to use classes having just one method.</p>
 
 <p>For instance, see the code below to create a Thread in Java 7:</p>
 
@@ -433,16 +441,16 @@ just to use classes having a single method.</p>
 })<span class="pl-k">.</span>start();</pre></div>
 
 <p>The iteration over lists now can be performed easily using the stream API. 
-The example below uses a single line of code to iterate over a list of cloudlets, binding every one to a specific VM.</p>
+The example below uses a single line of code to iterate over a list of cloudlets, binding every one to a given VM.</p>
 
 <div class="highlight highlight-source-java"><pre>cloudletList<span class="pl-k">.</span>forEach(cloudlet <span class="pl-k">-</span><span class="pl-k">&gt;</span> broker<span class="pl-k">.</span>bindCloudletToVm(cloudlet<span class="pl-k">.</span>getId(), vm<span class="pl-k">.</span>getId()));</pre></div>
 
 <p>This makes the code clearer to understand and less verbose. Further, the new Stream API provides a complete set of features 
-that even increase performance, such as allowing the 
+that even increases performance, such as allowing the 
 <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html#section5">parallel processing of lists</a>.</p>
 
 <p>For more information about the changes and features included in this release, please read the <a href="CHANGELOG.md">CHANGELOG</a> 
-file and the <a href="/cloudsim-examples">cloudsim-examples</a> project.</p>
+file and the <a href="/cloudsim-plus-examples">cloudsim-plus-examples</a> project.</p>
 
 <h1>
 <a id="what-are-the-practical-differences-of-using-cloudsim-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim" class="anchor" href="#what-are-the-practical-differences-of-using-cloudsim-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are the practical differences of using CloudSim++ instead of CloudSim? How can I update my simulations in order to use CloudSim++?</h1>
@@ -451,12 +459,12 @@ file and the <a href="/cloudsim-examples">cloudsim-examples</a> project.</p>
 there were introduced some new interfaces to follow the "program to an interface, not an implementation" 
 recommendation and also to increase <a href="https://en.wikipedia.org/wiki/Abstraction_(software_engineering)">abstraction</a>. 
 These new interfaces were also crucial to implement the <a href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object Pattern</a> 
-in order to try avoiding NullPointerException's.</p>
+in order to try avoiding <code>NullPointerException</code>s.</p>
 
-<p>By this way, the classes Datacenter, DatacenterCharacteristics, Host, Pe, Vm and Cloudlet were renamed due to 
-the introduction of interfaces with these names. Now all these classes have a suffix <em>Simple</em> 
-(as already defined for some previous classes such as PeProvisionerSimple and VmAllocationPolicySimple). 
-For instance, to instantiate a Cloudlet you have to execute a code such as:</p>
+<p>By this way, the classes <code>Datacenter</code>, <code>DatacenterCharacteristics</code>, <code>Host</code>, <code>Pe</code>, <code>Vm</code> and <code>Cloudlet</code> were renamed due to 
+the introduction of interfaces with these same names. Now all these classes have a suffix <em>Simple</em> 
+(as already defined for some previous classes such as <code>PeProvisionerSimple</code> and <code>VmAllocationPolicySimple</code>). 
+For instance, to instantiate a <code>Cloudlet</code> you have to execute a code such as:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">CloudletSimple</span> cloudlet <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">CloudletSimple</span>(required, parameters, here);</pre></div>
 
@@ -465,14 +473,14 @@ the recommendation is to declare your object using the interface, not the class:
 
 <div class="highlight highlight-source-java"><pre><span class="pl-smi">Cloudlet</span> cloudlet <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">CloudletSimple</span>(required, parameters, here);</pre></div>
 
-<p>Once the packages were reorganized, you have to adjust them. However, use your IDE to adjust the imports.</p>
+<p>Once the packages were reorganized, you have to adjust them. However, use your IDE to correct the imports for you.</p>
 
-<p>Additionally, the interface Storage was renamed to FileStorage and its implementations are SanStorage and HarddriveStorage, that can be used as before.
+<p>Additionally, the interface <code>Storage</code> was renamed to <code>FileStorage</code> and its implementations are <code>SanStorage</code> and <code>HarddriveStorage</code>, that can be used as before.
 Finally, the way you instantiate a host has changed too. 
-There aren't the classes RamProvisionerSimple and BwProvisionerSimple anymore. 
-Now you just have the generic class ResourceProvisionerSimple. 
-And this class doesn't requires a primitive value to define the resource capacity.
-Instead, it requires an object that implements the new Resource interface (such as the Ram and Bandwidth classes). 
+There aren't the classes <code>RamProvisionerSimple</code> and <code>BwProvisionerSimple</code> anymore. 
+Now you just have the generic class <code>ResourceProvisionerSimple</code>. 
+And this class doesn't require a primitive value to define the resource capacity.
+Instead, it requires an object that implements the new <code>Resource</code> interface (such as the <code>Ram</code> and <code>Bandwidth</code> classes). 
 By this way, to instantiate a host you can use a code such as below:</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-k">int</span> ram <span class="pl-k">=</span> <span class="pl-c1">20480</span>;
