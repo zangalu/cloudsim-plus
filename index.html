@@ -28,12 +28,41 @@
     <div id="content-wrapper">
       <div class="inner clearfix">
         <section id="main-content">
-          <h1>
-<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
-
-<p><a href="https://groups.google.com/d/forum/cloudsim-plus">https://groups.google.com/d/forum/cloudsim-plus</a></p>
+          <p><a href="https://groups.google.com/d/forum/cloudsim-plus">https://groups.google.com/d/forum/cloudsim-plus</a>
+<a id="top"></a></p>
 
 <p><a href="https://travis-ci.org/manoelcampos/cloudsim-plus"><img src="https://img.shields.io/travis/manoelcampos/cloudsim-plus/master.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/manoelcampos/cloudsim-plus?branch=master"><img src="https://coveralls.io/repos/github/manoelcampos/cloudsim-plus/badge.svg?branch=master" alt="Coverage Status"></a> <a href="https://www.codacy.com/app/manoelcampos/cloudsim-plus?utm_source=github.com&amp;amp;utm_medium=referral&amp;amp;utm_content=manoelcampos/cloudsim-plus&amp;amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/3f132b184d5e475dbbcd356ee84499fc" alt="Codacy Badge"></a> <a href="http://www.gnu.org/licenses/lgpl-3.0.en.html"><img src="https://img.shields.io/badge/license-LGPL-blue.svg" alt="LGPL licensed"></a></p>
+
+<p align="center">
+<b><a href="#overview">Overview</a></b>
+|
+<b><a href="#how-to-use-cloudsim-plus">How to use</a></b>
+|
+<b><a href="#a-minimal-simulation-example">Example</a></b>
+|
+<b><a href="#documentation-and-help">Docs and Help</a></b>
+|
+<b><a href="#why-care">Why should I care?</a></b>
+|
+<b><a href="#why-another-fork">Why another fork?</a></b>
+|
+<b><a href="#contributions">New contributions</a></b>
+|
+<b><a href="#differences">Differences from CloudSim</a></b>
+|
+<b><a href="#main-features">Main features</a></b>
+|
+<b><a href="#publications">Publications</a></b>
+|
+<b><a href="#license">License</a></b>
+|
+<b><a href="#contributing">Contribution Guide</a></b>
+
+
+</p>
+
+<h1>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Overview</h1>
 
 <p>CloudSim Plus is an extensible simulation framework that enables modeling, simulation, and experimentation of emerging Cloud computing 
 infrastructures and application services, allowing its users to focus on specific system design issues that they want to investigate, 
@@ -66,6 +95,8 @@ and by the <a href="http://www.capes.gov.br">Brazilian foundation Coordenação 
 
 <p>The original CloudSim project is developed in <a href="http://cloudbus.org/">the Cloud Computing and Distributed Systems (CLOUDS) Laboratory</a>, 
 at <a href="http://www.csse.unimelb.edu.au/">the Computer Science and Software Engineering Department</a> of <a href="http://www.unimelb.edu.au/">the University of Melbourne</a>.</p>
+
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
 
 <h1>
 <a id="how-to-use-cloudsim-plus" class="anchor" href="#how-to-use-cloudsim-plus" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use CloudSim Plus</h1>
@@ -126,6 +157,8 @@ You can run any one of the classes in this package to get a specific example. </
 <li>If you want to build your own simulations, the easiest way is to create another class inside this module.</li>
 </ul>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
 <h1>
 <a id="a-minimal-simulation-example" class="anchor" href="#a-minimal-simulation-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A minimal simulation example</h1>
 
@@ -179,6 +212,8 @@ broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 <span class="pl-smi">CloudletsTableBuilderHelper</span><span class="pl-k">.</span>print(<span class="pl-k">new</span> <span class="pl-smi">TextTableBuilder</span>(), finishedCloudlets);
 <span class="pl-smi">Log</span><span class="pl-k">.</span>printFormattedLine(<span class="pl-s"><span class="pl-pds">"</span>Minimal Example finished!<span class="pl-pds">"</span></span>);</pre></div>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
 <h1>
 <a id="documentation-and-help" class="anchor" href="#documentation-and-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation and Help</h1>
 
@@ -189,6 +224,10 @@ You can see the javadoc documentation for classes and their elements directly on
 There is also a <a href="https://github.com/manoelcampos/cloudsim-plus/wiki">Wiki page</a> with additional information such as a FAQ list.  </p>
 
 <p>A Google Group forum is also available at <a href="https://groups.google.com/d/forum/cloudsim-plus">https://groups.google.com/d/forum/cloudsim-plus</a></p>
+
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
+<p><a id="why-care"></a></p>
 
 <h1>
 <a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to build my simulations. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png">😐</g-emoji>
@@ -212,6 +251,10 @@ of the simulator, without losing your changes or struggling to fix merge conflic
 just to implement some specific features they need. 
 By this way, I think those problems are enough reasons that show the need of a new re-engineered version of the simulator.  </p>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
+<p><a id="why-another-fork"></a></p>
+
 <h1>
 <a id="but-why-another-cloudsim-fork-unamused" class="anchor" href="#but-why-another-cloudsim-fork-unamused" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But why another CloudSim fork? <g-emoji alias="unamused" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f612.png">😒</g-emoji>
 </h1>
@@ -225,6 +268,10 @@ before the changes proposed here being merged to the official repository.
 The huge amount of contributions of CloudSim Plus are discussed in the section below. 
 By this way, all the work performed here was not incorporated to allow this new CaaS module to be developed using this redesigned version.
 And unfortunately, there are several months of hard work that would need to be replicated in order to merge both projects.</p>
+
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
+<p><a id="contributions"></a></p>
 
 <h1>
 <a id="ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" class="anchor" href="#ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OK, but I'm just wondering what are the real contributions of CloudSim Plus <g-emoji alias="blush" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60a.png">😊</g-emoji>
@@ -461,6 +508,10 @@ that even increases performance, such as allowing the
 <p>For more information about the changes and features included in this release, please read the <a href="CHANGELOG.md">CHANGELOG</a> 
 file and the <a href="/cloudsim-plus-examples">cloudsim-plus-examples</a> project.</p>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
+<p><a id="differences"></a></p>
+
 <h1>
 <a id="what-are-the-practical-differences-of-using-cloudsim-plus-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim-plus" class="anchor" href="#what-are-the-practical-differences-of-using-cloudsim-plus-instead-of-cloudsim-how-can-i-update-my-simulations-in-order-to-use-cloudsim-plus" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are the practical differences of using CloudSim Plus instead of CloudSim? How can I update my simulations in order to use CloudSim Plus?</h1>
 
@@ -500,6 +551,10 @@ By this way, to instantiate a host you can use a code such as below:</p>
         <span class="pl-k">new</span> <span class="pl-k">ResourceProvisionerSimple&lt;&gt;</span>(<span class="pl-k">new</span> <span class="pl-smi">Bandwidth</span>(bw)),
         storage, peList, <span class="pl-k">new</span> <span class="pl-smi">VmSchedulerTimeShared</span>(peList));</pre></div>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
+<p><a id="main-features"></a></p>
+
 <h1>
 <a id="main-features-of-the-simulator" class="anchor" href="#main-features-of-the-simulator" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Main features of the simulator</h1>
 
@@ -513,10 +568,9 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <li>Support for user-defined policies for allocation of hosts to virtual machines and policies for allocation of host resources to virtual machines.</li>
 </ul>
 
-<h1>
-<a id="download" class="anchor" href="#download" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Download</h1>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
 
-<p>The download package contains all the source code, examples, jars, and API html files.</p>
+<p><a id="publications"></a></p>
 
 <h1>
 <a id="publications-about-the-original-cloudsim-version" class="anchor" href="#publications-about-the-original-cloudsim-version" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications about the original CloudSim version</h1>
@@ -529,15 +583,22 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <li>Rajkumar Buyya, Rajiv Ranjan and Rodrigo N. Calheiros, <a href="http://www.cloudbus.org/papers/CloudSim-HPCS2009.pdf">Modeling and Simulation of Scalable Cloud Computing Environments and the CloudSim Toolkit: Challenges and Opportunities</a>, Proceedings of the 7th High Performance Computing and Simulation Conference (HPCS 2009, ISBN: 978-1-4244-4907-1, IEEE Press, New York, USA), Leipzig, Germany, June 21-24, 2009.</li>
 </ul>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+  
+
 <h1>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h1>
 
 <p>This project is licensed under <a href="http://www.gnu.org/licenses/lgpl-3.0.en.html">GNU Lesser GPLv3</a>, as defined in CloudSim 3 release.</p>
 
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+
 <h1>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h1>
 
 <p>If you desire to contribute to the project, you are welcome. However, make sure to read the <a href="CONTRIBUTING.md">contribution guide</a> before you start.</p>
+
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
         </section>
 
         <aside id="sidebar">
