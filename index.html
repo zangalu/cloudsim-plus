@@ -36,6 +36,8 @@
 <p align="center">
 <b><a href="#overview">Overview</a></b>
 |
+<b><a href="#projects-modules">Modules</a></b>
+|
 <b><a href="#how-to-use-cloudsim-plus">How to use</a></b>
 |
 <b><a href="#a-minimal-simulation-example">Example</a></b>
@@ -94,7 +96,39 @@ and by the <a href="http://www.capes.gov.br">Brazilian foundation Coordenação 
 <p>The original CloudSim project is developed in <a href="http://cloudbus.org/">the Cloud Computing and Distributed Systems (CLOUDS) Laboratory</a>, 
 at <a href="http://www.csse.unimelb.edu.au/">the Computer Science and Software Engineering Department</a> of <a href="http://www.unimelb.edu.au/">the University of Melbourne</a>.</p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
+
+<h1>
+<a id="projects-modules" class="anchor" href="#projects-modules" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Project's Modules</h1>
+
+<p>CloudSim Plus has a simpler structure that can be understood right away. It consists of 5 modules, 2 of which are new, as presented below.</p>
+
+<ul>
+<li>
+<a href="cloudsim-plus">cloudsim-plus</a>: the CloudSim Plus cloud simulation framework API that is used by all other modules. 
+It is the main module that contains the simulation framework implementation and is the only
+one you need to write your cloud simulations. </li>
+<li>
+<a href="cloudsim-plus-examples">cloudsim-plus-examples</a>: includes a series of different examples, since minimal simulation scenarios using basic 
+CloudSim Plus features, to complex scenarios using workloads from trace files or Vm migration examples. This is an excelent start point 
+for learning how to build cloud simulations using CloudSim Plus.</li>
+<li>
+<a href="cloudsim-plus-testbeds">cloudsim-plus-testbeds</a>: a new module that implements some simulation testbeds in a repeatable manner, 
+allowing a researcher to execute several simulation runs for a given experiment and collect statistical data using a scientific approach. 
+It represents real testbeds implemented to assess CloudSim Plus features, providing relevant results. The module provides a set of class which 
+can be used by other researchers to implement their own comprehensive testbeds. Different from the examples module that aims just
+to show how to use CloudSim Plus features, this module includes more complex simulation scenarios concerned in providing
+scientifically valid results. </li>
+<li>
+<a href="cloudsim-plus-benchmarks">cloudsim-plus-benchmarks</a>: a new module introduced to implement micro benchmarks using the 
+<a href="http://openjdk.java.net/projects/code-tools/jmh/">Java Microbenchmark Harness framework (JMH)</a> to enable measuring critical methods of the 
+CloudSim Plus API that have a high impact in the simulation framework performance.</li>
+<li>
+<a href="distribution">distribution</a>: a module used just to build jar files for distribution of packaged CloudSim Plus binaries, documentation and source code.<br>
+</li>
+</ul>
+
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <h1>
 <a id="how-to-use-cloudsim-plus" class="anchor" href="#how-to-use-cloudsim-plus" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>How to use CloudSim Plus</h1>
@@ -155,7 +189,7 @@ You can run any one of the classes in this package to get a specific example. </
 <li>If you want to build your own simulations, the easiest way is to create another class inside this module.</li>
 </ul>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <h1>
 <a id="a-minimal-simulation-example" class="anchor" href="#a-minimal-simulation-example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A minimal simulation example</h1>
@@ -214,7 +248,7 @@ broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 The image below, for a simulation with two cloudlets (applications) gives you a preview. 
 <img src="simulation-results.png" alt="Simulation Results"></p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <h1>
 <a id="documentation-and-help" class="anchor" href="#documentation-and-help" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Documentation and Help</h1>
@@ -227,12 +261,12 @@ There is also a <a href="https://github.com/manoelcampos/cloudsim-plus/wiki">Wik
 
 <p>A Google Group forum is also available at <a href="https://groups.google.com/d/forum/cloudsim-plus">https://groups.google.com/d/forum/cloudsim-plus</a></p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="why-care"></a></p>
 
 <h1>
-<a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to build my simulations. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png">😐</g-emoji>
+<a id="why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" class="anchor" href="#why-should-i-care-about-this-cloudsim-fork-i-just-want-to-build-my-simulations-neutral_face" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Why should I care about this CloudSim fork? I just want to build my simulations. <g-emoji alias="neutral_face" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f610.png" ios-version="6.0">😐</g-emoji>
 </h1>
 
 <p>Well, the design of the tool has a direct impact when you need to extend it in order to include some feature required for your simulations. 
@@ -253,12 +287,12 @@ of the simulator, without losing your changes or struggling to fix merge conflic
 just to implement some specific features they need. 
 By this way, I think those problems are enough reasons that show the need of a new re-engineered version of the simulator.  </p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="why-another-fork"></a></p>
 
 <h1>
-<a id="but-why-another-cloudsim-fork-unamused" class="anchor" href="#but-why-another-cloudsim-fork-unamused" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But why another CloudSim fork? <g-emoji alias="unamused" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f612.png">😒</g-emoji>
+<a id="but-why-another-cloudsim-fork-unamused" class="anchor" href="#but-why-another-cloudsim-fork-unamused" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But why another CloudSim fork? <g-emoji alias="unamused" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f612.png" ios-version="6.0">😒</g-emoji>
 </h1>
 
 <p>I know what you are thinking: it would be better to pull a request to the original CloudSim repository 
@@ -271,12 +305,12 @@ The huge amount of contributions of CloudSim Plus are discussed in the section b
 By this way, all the work performed here was not incorporated to allow this new CaaS module to be developed using this redesigned version.
 And unfortunately, there are several months of hard work that would need to be replicated in order to merge both projects.</p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="contributions"></a></p>
 
 <h1>
-<a id="ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" class="anchor" href="#ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OK, but I'm just wondering what are the real contributions of CloudSim Plus <g-emoji alias="blush" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60a.png">😊</g-emoji>
+<a id="ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" class="anchor" href="#ok-but-im-just-wondering-what-are-the-real-contributions-of-cloudsim-plus-blush" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>OK, but I'm just wondering what are the real contributions of CloudSim Plus <g-emoji alias="blush" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f60a.png" ios-version="6.0">😊</g-emoji>
 </h1>
 
 <p>Thanks for asking. Firstly, there is a huge amount of changes that make CloudSim Plus <strong>NOT BACKWARD COMPATIBLE</strong> with original CloudSim. 
@@ -386,7 +420,7 @@ For instance, a javadoc such as "This is the id", doesn't help in anyway.</li>
 <p>The original CloudSim already has some unit test suites, however, there aren't coverage reports enabled in the project. 
 After enabling these reports, it was realized that just 20% of the code was being covered by unit tests. 
 Tests are really important to try ensuring that the software works as expected and gives more security 
-and peace of mind to refactor the code, perform changes and fix bugs <g-emoji alias="pray" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f64f.png">🙏</g-emoji>. 
+and peace of mind to refactor the code, perform changes and fix bugs <g-emoji alias="pray" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f64f.png" ios-version="6.0">🙏</g-emoji>. 
 After all, a broad code coverage also tries to ensure that you are getting accurate results from your simulations.</p>
 
 <p>Finally, an entire simulation is very complex, integrating several classes communicating among themselves. Once, unit tests just check
@@ -510,7 +544,7 @@ that even increases performance, such as allowing the
 <p>For more information about the changes and features included in this release, please read the <a href="CHANGELOG.md">CHANGELOG</a> 
 file and the <a href="/cloudsim-plus-examples">cloudsim-plus-examples</a> project.</p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="differences"></a></p>
 
@@ -553,7 +587,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
         <span class="pl-k">new</span> <span class="pl-k">ResourceProvisionerSimple&lt;&gt;</span>(<span class="pl-k">new</span> <span class="pl-smi">Bandwidth</span>(bw)),
         storage, peList, <span class="pl-k">new</span> <span class="pl-smi">VmSchedulerTimeShared</span>(peList));</pre></div>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="general-features"></a></p>
 
@@ -570,7 +604,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <li>Support for user-defined policies for allocation of hosts to virtual machines and policies for allocation of host resources to virtual machines.</li>
 </ul>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <p><a id="publications"></a></p>
 
@@ -585,7 +619,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <li>Rajkumar Buyya, Rajiv Ranjan and Rodrigo N. Calheiros, <a href="http://www.cloudbus.org/papers/CloudSim-HPCS2009.pdf">Modeling and Simulation of Scalable Cloud Computing Environments and the CloudSim Toolkit: Challenges and Opportunities</a>, Proceedings of the 7th High Performance Computing and Simulation Conference (HPCS 2009, ISBN: 978-1-4244-4907-1, IEEE Press, New York, USA), Leipzig, Germany, June 21-24, 2009.</li>
 </ul>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
   
 
 <h1>
@@ -593,7 +627,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
 
 <p>This project is licensed under <a href="http://www.gnu.org/licenses/gpl-3.0">GNU GPLv3</a>, as defined in CloudSim 3 source codes.</p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
 <h1>
 <a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Contributing</h1>
@@ -601,7 +635,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <p>If you desire to contribute to the project, you are welcome. However, make sure to read the <a href="CONTRIBUTING.md">contribution guide</a> before you start.
 If you just want to request a feature, feel free to use the <a href="https://github.com/manoelcampos/cloudsim-plus/issues">issues page</a>.</p>
 
-<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png">⬆️</g-emoji></a></p>
+<p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
         </section>
 
         <aside id="sidebar">
