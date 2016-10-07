@@ -16,3 +16,4 @@ org.cloudbus.cloudsim.resources
 org.cloudbus.cloudsim.schedulers
 org.cloudbus.cloudsim.util
 org.cloudbus.cloudsim.utilizationmodels
+org.cloudsimplus.heuristics
