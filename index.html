@@ -151,11 +151,8 @@ at a terminal. </p>
 <p>The project has a <a href="script/bootstrap.sh">bash script</a> that you can use to build and run CloudSim Plus examples. 
 This is a script for Unix-like system such as Linux, FreeBDS and Mac OSX.</p>
 
-<p>To run some example type the command: <code>sh script/bootstrap.sh ExampleClassName</code>.
-For instance, to run the CloudSimExample1 you can type: <code>sh script/bootstrap.sh org.cloudbus.cloudsim.examples.CloudSimExample1</code>. 
-To run an example into a sub-directory, type <code>sh script/bootstrap.sh package_name.ExampleClassName</code>.
-For instance, to run the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/SwfWorkloadFormatExample1.java">workload/SwfWorkloadFormatExample1</a> 
-example, type <code>sh script/bootstrap.sh org.cloudbus.cloudsim.examples.workload.SwfWorkloadFormatExample1</code>.</p>
+<p>To run some example type the command: <code>sh script/bootstrap.sh package.ExampleClassName</code>.
+For instance, to run the CloudSimExample1 you can type: <code>sh script/bootstrap.sh org.cloudbus.cloudsim.examples.CloudSimExample1</code>. </p>
 
 <p>The script checks if it is required to build the project, using maven in this case, making sure to download all dependencies. 
 To see what examples are available, just navigate through the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples">examples directory</a>.
@@ -205,7 +202,7 @@ In order to build such a simulation you have to create, at least: </p>
 <p>By this way, the main code used to build such a simulation scenario can be as below. 
 This is simply the code of the constructor method. 
 The complete example is available at the cloudsim-plus-examples module 
-<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/MinimalExample.java">here</a>.</p>
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/CloudSimExample0.java">here</a>.</p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-v">this</span><span class="pl-k">.</span>vmList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
@@ -225,9 +222,11 @@ The complete example is available at the cloudsim-plus-examples module
 <span class="pl-v">this</span><span class="pl-k">.</span>vmList<span class="pl-k">.</span>add(vm0);
 broker0<span class="pl-k">.</span>submitVmList(vmList);
 
-<span class="pl-c">/*Creates a cloudlet that represents an application to be run inside a VM.*/</span>
+<span class="pl-c">/*Creates Cloudlets that represent applications to be run inside a VM.*/</span>
 <span class="pl-smi">Cloudlet</span> cloudlet0 <span class="pl-k">=</span> createCloudlet(broker0, vm0);
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList<span class="pl-k">.</span>add(cloudlet0);
+<span class="pl-smi">Cloudlet</span> cloudlet1 <span class="pl-k">=</span> createCloudlet(broker0, vm0);
+<span class="pl-v">this</span><span class="pl-k">.</span>cloudletList<span class="pl-k">.</span>add(cloudlet1);
 broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 
 <span class="pl-c">/*Starts the simulation and waits all cloudlets to be executed*/</span>
