@@ -155,7 +155,7 @@ This is a script for Unix-like system such as Linux, FreeBDS and Mac OSX.</p>
 For instance, to run the CloudSimExample1 you can type: <code>sh script/bootstrap.sh org.cloudbus.cloudsim.examples.CloudSimExample1</code>. </p>
 
 <p>The script checks if it is required to build the project, using maven in this case, making sure to download all dependencies. 
-To see what examples are available, just navigate through the <a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples">examples directory</a>.
+To see what examples are available, just navigate through the <a href="/cloudsim-plus-examples/src/main/java/">examples directory</a>.
 To see more script options, run it without any parameter.  </p>
 
 <h2>
@@ -238,7 +238,7 @@ broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 <span class="pl-c">/*Prints results when the simulation is over</span>
 <span class="pl-c">(you can use your own code here to print what you want from this cloudlet list)*/</span>
 <span class="pl-k">List&lt;<span class="pl-smi">Cloudlet</span>&gt;</span> finishedCloudlets <span class="pl-k">=</span> broker0<span class="pl-k">.</span>getCloudletsFinishedList();
-<span class="pl-smi">CloudletsTableBuilderHelper</span><span class="pl-k">.</span>print(<span class="pl-k">new</span> <span class="pl-smi">TextTableBuilder</span>(), finishedCloudlets);
+<span class="pl-k">new</span> <span class="pl-smi">CloudletsTableBuilderHelper</span>(finishedCloudlets)<span class="pl-k">.</span>build();
 <span class="pl-smi">Log</span><span class="pl-k">.</span>printFormattedLine(<span class="pl-s"><span class="pl-pds">"</span>Minimal Example finished!<span class="pl-pds">"</span></span>);</pre></div>
 
 <p>And the results are more structured and clear, including the unit of some presented data, in order to allow better understanding. 
@@ -322,7 +322,7 @@ However, to port your CloudSim simulations to CloudSim Plus can be relatively ea
 <li>Completely new Test Suites.</li>
 <li>New set of features.</li>
 <li>New examples for old and new features.</li>
-<li>Update to Java 8.</li>
+<li>Updated to Java 8.</li>
 </ul>
 
 <p>All these improvements are described in details in the next sub-sections. </p>
@@ -443,13 +443,13 @@ The code coverage raised from 20% to <a href="https://www.codacy.com/app/manoelc
 <li>
 <strong>A <code>TableBuilder</code> interface and a set of implementing classes to automate the process of printing simulation 
 results in different formats such as Text (ASCII), CSV and HTML</strong>: the interface and classes are available
-at the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/util/">util</a> package. 
+at the <a href="/cloudsim-plus/src/main/java/org/cloudsimplus/util/tablebuilder/">org.cloudsimplus.util.tablebuilder</a> package. 
 To print results of a list of executed cloudlet you can use a single line of code such as 
-<code>CloudletsTableBuilderHelper.print(new TextTableBuilder(), broker.getCloudletsFinishedList());</code>. 
+<code>new CloudletsTableBuilderHelper(broker.getCloudletsFinishedList()).build();</code>. 
 All the perfectly aligned tables that you will see after running the examples use the <code>TextTableBuilder</code> class.</li>
 <li>
 <strong>Listener objects that allow you to be notified when different events happen during your simulation execution</strong>: 
-interfaces and classes included in the <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/listeners/">org.cloudbus.cloudsim.listeners</a> 
+interfaces and classes included in the <a href="/cloudsim-plus/src/main/java/org/cloudsimplus/listeners/">org.cloudsimplus.listeners</a> 
 package allow you to keep track of simulation execution and perform additional tasks when a given event happens. 
 These listeners were implemented for some CloudSim Plus classes such as below (the next section describes examples of this feature):
 
@@ -467,11 +467,11 @@ These listeners were implemented for some CloudSim Plus classes such as below (t
 used to ease the creation of objects. As several simulations require the developer to create multiple instances of a 
 given object with the same attribute values (such as several identical hosts), that starts being a repetitive, 
 time-consuming and boring task. 
-The package <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/">org.cloudbus.cloudsim.builders</a> 
+The package <a href="/cloudsim-plus/src/main/java/org/cloudsimplus/builders/">org.cloudsimplus.builders</a> 
 provides a set of classes to automate the instantiation of such objects. 
-The class <a href="/cloudsim-plus/src/main/java/org/cloudbus/cloudsim/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> 
+The class <a href="/cloudsim-plus/src/main/java/org/cloudsimplus/builders/SimulationScenarioBuilder.java">SimulationScenarioBuilder</a> 
 is the start point to access all the introduced builders. 
-New examples were not included yet, but the <a href="/cloudsim-plus/src/test/java/org/cloudbus/cloudsim/IntegrationTests/">Integration Tests package</a> 
+New examples were not included yet, but the <a href="/cloudsim-plus/src/test/java/org/cloudsimplus/IntegrationTests/">Integration Tests package</a> 
 makes intensive use of such a new feature.</li>
 <li>
 <strong>Delay the submission of cloudlets to VM</strong>, simulating the dynamic arrival of cloudlets 
@@ -486,21 +486,21 @@ inside the Cloud provider infrastructure. See the issue #11 for more details.<br
 
 <ul>
 <li>
-<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/workload/">Dynamic creation of cloudlets based on workload traces</a>: 
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/workload/">Dynamic creation of cloudlets based on workload traces</a>: 
 the example dynamically creates cloudlets according to the data of a workload trace file. 
 VMs are created to fulfil cloudlets' requirements and, in its turn, Hosts are created to fulfil VMs' requirements. 
 It may not represent a real world use case, but the example can be adapted according to developer needs.<br>
 </li>
 <li>
-<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/migration/">VM migration</a>: 
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/migration/">VM migration</a>: 
 the example performs VM migrations based on Host utilization threshold. </li>
 <li>Implementation of custom <code>DatacenterBroker</code> and <code>VmAllocationPolicy</code> for the given examples.</li>
 <li>Examples using the new Listener features were included to the package 
-<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/listeners/">org.cloudbus.cloudsim.examples.listeners</a>.</li>
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/listeners/">org.cloudsimplus.examples.listeners</a>.</li>
 </ul>
 
 <h2>
-<a id="update-to-java-8" class="anchor" href="#update-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Update to Java 8</h2>
+<a id="updated-to-java-8" class="anchor" href="#updated-to-java-8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Updated to Java 8</h2>
 
 <p>The <a href="/cloudsim-plus">CloudSim Plus module</a>, that represents the Cloud Simulation API, now requires the JDK 8 and makes intensive use of 
 <a href="http://www.oracle.com/webfolder/technetwork/tutorials/obe/java/Lambda-QuickStart/index.html">Lambda Expressions, Streams and Functional Programming</a> 
@@ -606,7 +606,7 @@ By this way, to instantiate a host you can use a code such as below:</p>
 <p><a id="publications"></a></p>
 
 <h1>
-<a id="publications-about-the-original-cloudsim-version" class="anchor" href="#publications-about-the-original-cloudsim-version" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications about the original CloudSim version</h1>
+<a id="publications-of-the-original-cloudsim-version" class="anchor" href="#publications-of-the-original-cloudsim-version" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Publications of the original CloudSim version</h1>
 
 <ul>
 <li>Anton Beloglazov, and Rajkumar Buyya, <a href="http://beloglazov.info/papers/2012-optimal-algorithms-ccpe.pdf">Optimal Online Deterministic Algorithms and Adaptive Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in Cloud Data Centers</a>, Concurrency and Computation: Practice and Experience, Volume 24, Number 13, Pages: 1397-1420, John Wiley &amp; Sons, Ltd, New York, USA, 2012.</li>
