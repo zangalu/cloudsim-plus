@@ -208,15 +208,15 @@ The complete example is available at the cloudsim-plus-examples module
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-c">//Number of cloud customers</span>
 <span class="pl-k">int</span> numberOfCloudUsers <span class="pl-k">=</span> <span class="pl-c1">1</span>; 
-<span class="pl-k">boolean</span> traceEvents <span class="pl-k">=</span> <span class="pl-c1">false</span>;
 
-<span class="pl-smi">CloudSim</span><span class="pl-k">.</span>init(numberOfCloudUsers, <span class="pl-smi">Calendar</span><span class="pl-k">.</span>getInstance(), traceEvents);
+<span class="pl-c">//Creates a CloudSim object to initialize the simulation.</span>
+<span class="pl-smi">CloudSim</span> simulation <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">CloudSim</span>(numberOfCloudUsers);
 
-<span class="pl-smi">Datacenter</span> datacenter0 <span class="pl-k">=</span> createDatacenter(<span class="pl-s"><span class="pl-pds">"</span>Datacenter0<span class="pl-pds">"</span></span>);
+<span class="pl-smi">Datacenter</span> datacenter0 <span class="pl-k">=</span> createDatacenter(simulation);
 
 <span class="pl-c">/*Creates a Broker accountable for submission of VMs and Cloudlets</span>
 <span class="pl-c">on behalf of a given cloud user (customer).*/</span>
-<span class="pl-smi">DatacenterBroker</span> broker0 <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">DatacenterBrokerSimple</span>(<span class="pl-s"><span class="pl-pds">"</span>Broker0<span class="pl-pds">"</span></span>);
+<span class="pl-smi">DatacenterBroker</span> broker0 <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">DatacenterBrokerSimple</span>(simulation);
 
 <span class="pl-smi">Vm</span> vm0 <span class="pl-k">=</span> createVm(broker0);
 <span class="pl-v">this</span><span class="pl-k">.</span>vmList<span class="pl-k">.</span>add(vm0);
@@ -230,10 +230,10 @@ broker0<span class="pl-k">.</span>submitVmList(vmList);
 broker0<span class="pl-k">.</span>submitCloudletList(cloudletList);
 
 <span class="pl-c">/*Starts the simulation and waits all cloudlets to be executed*/</span>
-<span class="pl-smi">CloudSim</span><span class="pl-k">.</span>startSimulation();
+simulation<span class="pl-k">.</span>start();
 
 <span class="pl-c">//Finishes the simulation</span>
-<span class="pl-smi">CloudSim</span><span class="pl-k">.</span>stopSimulation();
+simulation<span class="pl-k">.</span>stop();
 
 <span class="pl-c">/*Prints results when the simulation is over</span>
 <span class="pl-c">(you can use your own code here to print what you want from this cloudlet list)*/</span>
@@ -280,9 +280,9 @@ They also try to avoid forcing you to change core classes of the simulator in or
 Changing these core classes is a bad practice, once you will not be able to automatically update your project to new versions 
 of the simulator, without losing your changes or struggling to fix merge conflicts.  </p>
 
-<p>And as I have seen in forums that I've attended, many times users have to perform these changes in core classes 
+<p>And as we have seen in forums that we've attended, many times users have to perform these changes in core classes 
 just to implement some specific features they need. 
-By this way, I think those problems are enough reasons that show the need of a new re-engineered version of the simulator.  </p>
+By this way, we think those problems are enough reasons that show the need of a new re-engineered version of the simulator.  </p>
 
 <p align="right"><a href="#top"><g-emoji alias="arrow_up" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/2b06.png" ios-version="6.0">⬆️</g-emoji></a></p>
 
@@ -292,10 +292,10 @@ By this way, I think those problems are enough reasons that show the need of a n
 <a id="but-why-another-cloudsim-fork-unamused" class="anchor" href="#but-why-another-cloudsim-fork-unamused" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>But why another CloudSim fork? <g-emoji alias="unamused" fallback-src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f612.png" ios-version="6.0">😒</g-emoji>
 </h1>
 
-<p>I know what you are thinking: it would be better to pull a request to the original CloudSim repository 
+<p>We know what you are thinking: it would be better to pull a request to the original CloudSim repository 
 in order to really contribute to the project, benefiting everybody.</p>
 
-<p>Well, I strongly agree with you and in fact I tried that. However, the original CloudSim moved on to a new major release, 
+<p>Well, we strongly agree with you and in fact we tried that. However, the original CloudSim moved on to a new major release, 
 introducing a completely new set of classes to provide Container as a Service (CaaS) simulations, 
 before the changes proposed here being merged to the official repository. 
 The huge amount of contributions of CloudSim Plus are discussed in the section below. 
@@ -370,7 +370,7 @@ If it follows <a href="http://cleancoder.com">clean code</a> practices, <a href=
 <li>
 <strong>Division of very long and confuse methods into small, clean and meaningful ones that usually make just one thing each one</strong>: 
 when using the approach of reading the code to understand how it works, it is very difficult to figure out what is happening into 
-a method with dozen or hundred lines. And I'm not even talking about the problems to maintain such methods. 
+a method with dozen or hundred lines. And we'm not even discussing the problems to maintain such methods. 
 Thus, little methods with just one responsibility and with meangniful names are easier to maintain. 
 Further, they improve reuse and extension, the most important parts for you that are creating cloud simulations.</li>
 <li>
