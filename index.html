@@ -532,7 +532,7 @@ to use classes having just one method.</p>
 <p>The iteration over lists now can be performed easily using the stream API. 
 The example below uses a single line of code to iterate over a list of cloudlets, binding every one to a given VM.</p>
 
-<div class="highlight highlight-source-java"><pre>cloudletList<span class="pl-k">.</span>forEach(cloudlet <span class="pl-k">-</span><span class="pl-k">&gt;</span> broker<span class="pl-k">.</span>bindCloudletToVm(cloudlet<span class="pl-k">.</span>getId(), vm<span class="pl-k">.</span>getId()));</pre></div>
+<div class="highlight highlight-source-java"><pre>cloudletList<span class="pl-k">.</span>forEach(cloudlet <span class="pl-k">-</span><span class="pl-k">&gt;</span> broker<span class="pl-k">.</span>bindCloudletToVm(cloudlet, vm);</pre></div>
 
 <p>This makes the code clearer to understand and less verbose. Further, the new Stream API provides a complete set of features 
 that even increases performance, such as allowing the 
