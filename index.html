@@ -41,7 +41,7 @@
 |
 <b><a href="#how-to-use-cloudsim-plus">How to use</a></b>
 |
-<b><a href="#a-minimal-simulation-example">Example</a></b>
+<b><a href="#a-minimal-simulation-example">Examples</a></b>
 |
 <b><a href="#documentation-and-help">Docs and Help</a></b>
 |
@@ -113,7 +113,8 @@ at <a href="http://www.csse.unimelb.edu.au/">the Computer Science and Software E
 <a href="/cloudsim-plus-examples/src/main/">TableBuilder</a> objects that are used in all examples and enable printing simulation results in different formats such as ASCII Table, CSV or HTML. It shows simulation results in perfectly aligned tables, including data units and additional data.</li>
 <li>It is a strongly object-oriented framework that creates relationships among classes and allows chained call such as <code>cloudlet.getVm().getHost().getDatacenter()</code>.
 And guess what? You don't even have to worry about <code>NullPointerException</code> when making this chained call because CloudSim Plus uses the <a href="https://en.wikipedia.org/wiki/Null_Object_pattern">Null Object Design Pattern</a> to avoid that.</li>
-<li>Delay execution of submitted Cloudlets, enabling simulation of dynamic arrival of tasks.</li>
+<li>Delay creation of submitted Cloudlets, enabling simulation of dynamic arrival of tasks.</li>
+<li>Allow dynamic creation of VMs and Cloudlets without requiring creation of Datacenter Brokers at runtime, enabling VMs to be created on-demand according to arrived cloudlets.</li>
 <li>Classes and interfaces to allow implementation of <a href="http://en.wikipedia.org/wiki/Heuristic">heuristics</a> such as 
 <a href="http://en.wikipedia.org/wiki/Tabu_search">Tabu Search</a>, <a href="http://en.wikipedia.org/wiki/Simulated_annealing">Simulated Annealing</a>, 
 <a href="http://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms">Ant Colony Systems</a> and so on. See an <a href="/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/DatacenterBrokerHeuristicExample.java">example using Simulated Annealing here</a>.</li>
@@ -231,8 +232,10 @@ In order to build such a simulation you have to create, at least: </p>
 
 <p>By this way, the main code used to build such a simulation scenario can be as below. 
 This is simply the code of the constructor method. 
-The complete example is available at the cloudsim-plus-examples module 
-<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/CloudSimExample0.java">here</a>.</p>
+The complete example is available
+<a href="/cloudsim-plus-examples/src/main/java/org/cloudbus/cloudsim/examples/CloudSimExample0.java">here</a>,
+together with <a href="cloudsim-plus-examples">other examples</a>. Specific examples of CloudSim Plus, showing several
+new exclusive features and advanced scenarios, can be found <a href="cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/">here</a>. </p>
 
 <div class="highlight highlight-source-java"><pre><span class="pl-v">this</span><span class="pl-k">.</span>vmList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
 <span class="pl-v">this</span><span class="pl-k">.</span>cloudletList <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-k">ArrayList&lt;&gt;</span>();
