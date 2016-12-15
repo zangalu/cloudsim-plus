@@ -23,6 +23,7 @@ org.cloudbus.cloudsim.network.topologies.readers
 org.cloudbus.cloudsim.power.models
 org.cloudbus.cloudsim.provisioners
 org.cloudbus.cloudsim.resources
+org.cloudbus.cloudsim.schedulers
 org.cloudbus.cloudsim.schedulers.cloudlet
 org.cloudbus.cloudsim.schedulers.cloudlet.network
 org.cloudbus.cloudsim.schedulers.vm
