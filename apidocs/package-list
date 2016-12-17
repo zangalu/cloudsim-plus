@@ -1,7 +1,6 @@
 org.cloudbus.cloudsim.allocationpolicies
 org.cloudbus.cloudsim.allocationpolicies.power
 org.cloudbus.cloudsim.brokers
-org.cloudbus.cloudsim.brokers.network
 org.cloudbus.cloudsim.brokers.power
 org.cloudbus.cloudsim.cloudlets
 org.cloudbus.cloudsim.cloudlets.network
