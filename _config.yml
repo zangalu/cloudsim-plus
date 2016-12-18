@@ -2,7 +2,7 @@ title: "CloudSim Plus"
 description: "CloudSim Plus: A highly extensible and easier-to-use Framework for Modeling and Simulation of Cloud Computing Infrastructures and Services"
 google_analytics: 
 show_downloads: true
-theme: jekyll-theme-architect
+theme: jekyll-theme-slate
 
 gems:
   - jekyll-mentions
