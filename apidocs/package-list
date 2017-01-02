@@ -32,6 +32,7 @@ org.cloudbus.cloudsim.utilizationmodels
 org.cloudbus.cloudsim.vms
 org.cloudbus.cloudsim.vms.network
 org.cloudbus.cloudsim.vms.power
+org.cloudsimplus.autoscaling
 org.cloudsimplus.builders
 org.cloudsimplus.heuristics
 org.cloudsimplus.listeners
