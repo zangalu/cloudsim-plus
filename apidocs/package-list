@@ -34,6 +34,6 @@ org.cloudbus.cloudsim.vms.network
 org.cloudbus.cloudsim.vms.power
 org.cloudsimplus.autoscaling
 org.cloudsimplus.builders
+org.cloudsimplus.builders.tables
 org.cloudsimplus.heuristics
 org.cloudsimplus.listeners
-org.cloudsimplus.util.tablebuilder
