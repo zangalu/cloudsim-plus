@@ -3,7 +3,12 @@ description: "CloudSim Plus: A highly extensible and easier-to-use Framework for
 google_analytics: 
 show_downloads: true
 theme: jekyll-theme-architect
+encoding: utf-8
 
 gems:
   - jekyll-mentions
   - jemoji
+
+webrick:
+  headers:
+    keywords: "CloudSim Plus,CloudSim,Cloud Computing,Simulation,Framework,IaaS,PaaS,SaaS,Java 8,Maven,Maven Central"
