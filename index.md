@@ -42,7 +42,7 @@ The efforts dedicated to this project have been recognized by the [EU/Brasil Clo
 
 CloudSim Plus is developed through a partnership among the Systems, Security and Image Communication Lab of [Instituto de Telecomunicações (IT, Portugal)](http://www.it.pt), the [Universidade da Beira Interior (UBI, Portugal)](http://www.ubi.pt) and the [Instituto Federal de Educação Ciência e Tecnologia do Tocantins (IFTO, Brazil)](http://www.ifto.edu.br). It is supported by the Portuguese [Fundação para a Ciência e a Tecnologia (FCT)](https://www.fct.pt) and by the [Brazilian foundation Coordenação de Aperfeiçoamento de Pessoal de Nível Superior (CAPES)](http://www.capes.gov.br).
 
-There are different ways you can contribute to CloudSim Plus, as it is shown in the [contribution guide](CONTRIBUTING.md). One easy way is to click on the "Star" button at the top of the project's GitHub page, so that we can get more visibility.
+**There are different ways you can contribute to CloudSim Plus, as it is shown in the [contribution guide](CONTRIBUTING.md). One easy way is to click on the "Star" button at the top of the project's GitHub page, so that you are helping to promote the project.**
 
 The original [CloudSim](http://github.com/Cloudslab/cloudsim) project is developed in the [Cloud Computing and Distributed Systems (CLOUDS) Laboratory](http://cloudbus.org/), at the [Computer Science and Software Engineering Department](http://www.csse.unimelb.edu.au/) of the [University of Melbourne](http://www.unimelb.edu.au/).
 
@@ -57,7 +57,7 @@ CloudSim Plus provides a lot of exclusive features, ranging from the most basic 
   that performs on-demand up and down allocation of VM resources such as Ram, Bandwidth and PEs (CPUs) ([#7](https://github.com/manoelcampos/cloudsim-plus/issues/7));
 1. [Horizontal VM scaling](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/LoadBalancerByHorizontalVmScalingExample.java), allowing dynamic creation of VMs according to an overload condition. Such a condition is defined by a predicate that checks different VM resources usage such as CPU, RAM or BW ([#41](https://github.com/manoelcampos/cloudsim-plus/issues/41));
 1. [Parallel execution of simulations](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/ParallelSimulationsExample.java), allowing several simulations to be run simultaneously, in a isolated way, inside a multi-core computer ([#38](https://github.com/manoelcampos/cloudsim-plus/issues/38));
-1. A [Functional](https://en.wikipedia.org/wiki/Functional_programming) `DatacenterBrokerSimple` class that enables changing, at runtime, the policies to select: a Datacenter to place waiting VMs; a fallback Datacenter when a previous selected one fails in finding a suitable Host for a VM; and a VM to run each Cloudlet. This dynamic behavior allows implementing specific policies, without requiring the creation of new `DatacenterBroker` classes ([#25](https://github.com/manoelcampos/cloudsim-plus/issues/25), [#28](https://github.com/manoelcampos/cloudsim-plus/issues/28));
+1. A [Functional](https://en.wikipedia.org/wiki/Functional_programming) `DatacenterBrokerSimple` class that enables changing, at runtime, the policies to select: a Datacenter to place waiting VMs; a fallback Datacenter when a previous selected one fails in finding a suitable Host for a VM; and a VM to run each Cloudlet. This dynamic behavior allows implementing specific policies, without requiring the creation of new `DatacenterBroker` classes. Consider *P* the number of policies and *I* the number of implementations for each policy. For *P = 3* and *I = 2*, if you want to try all possible combinations of policies and implementations, without CloudSim Plus, it would be required to create 12 `DatacenterBroker` classes (*P* * *I^(P-1))*), instead of just using the existing one.  ([#25](https://github.com/manoelcampos/cloudsim-plus/issues/25), [#28](https://github.com/manoelcampos/cloudsim-plus/issues/28));
 1. [Delay creation of submitted Cloudlets](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/DynamicCloudletsArrival1.java) and VMs, enabling simulation of dynamic arrival of tasks ([#11](https://github.com/manoelcampos/cloudsim-plus/issues/11), [#23](https://github.com/manoelcampos/cloudsim-plus/issues/23));
 1. [Allow dynamic creation of VMs and Cloudlets without requiring creation of Datacenter Brokers at runtime](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/DynamicCreationOfVmsAndCloudletsExample.java), enabling VMs to be created on-demand according to arrived cloudlets ([#43](https://github.com/manoelcampos/cloudsim-plus/issues/43));
 1. [Listeners](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/listeners/) to enable simulation monitoring and creation of VMs and Cloudlets at runtime;
@@ -66,7 +66,7 @@ CloudSim Plus provides a lot of exclusive features, ranging from the most basic 
 1. Classes and interfaces to allow implementation of [heuristics](http://en.wikipedia.org/wiki/Heuristic) such as [Tabu Search](http://en.wikipedia.org/wiki/Tabu_search), [Simulated Annealing](http://en.wikipedia.org/wiki/Simulated_annealing), [Ant Colony Systems](http://en.wikipedia.org/wiki/Ant_colony_optimization_algorithms) and so on. See an [example using Simulated Annealing here](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/DatacenterBrokerHeuristicExample.java).
 1. [Implementation of the Completely Fair Scheduler](https://en.wikipedia.org/wiki/Completely_Fair_Scheduler) used in recent versions of the Linux Kernel. See an example [here](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/LinuxCompletelyFairSchedulerExample.java) ([#58](https://github.com/manoelcampos/cloudsim-plus/issues/58));
 1. Completely re-designed and reusable Network module. Totally refactored network examples to make them clear and easy to change ([#13](https://github.com/manoelcampos/cloudsim-plus/issues/13), [#49](https://github.com/manoelcampos/cloudsim-plus/issues/49), [#57](https://github.com/manoelcampos/cloudsim-plus/issues/57));
-1. Simpler constructors to instantiate simulation objects, making it less confusing to use the framework. It applies the Convention over Configuration principle (CoC) to ask just mandatory parameters when instantiating objects ([#30](https://github.com/manoelcampos/cloudsim-plus/issues/30));
+1. Simpler constructors to instantiate simulation objects, making it less confusing to use the framework. It applies the [Convention over Configuration principle (CoC)](https://en.wikipedia.org/wiki/Convention_over_configuration) to ask just mandatory parameters when instantiating objects ([#30](https://github.com/manoelcampos/cloudsim-plus/issues/30));
 1. TableBuilder objects that are used in all examples and enable printing simulation results in different formats such as ASCII Table, CSV or HTML. It shows simulation results in perfectly aligned tables, including data units and additional data. Check the last line of the [BasicFirstExample](/cloudsim-plus-examples/src/main/java/org/cloudsimplus/examples/BasicFirstExample.java) constructor to see how it is easy to print results;
 1. Throughout documentation update, improvement and extension;
 1. Improved class hierarchy, modules and package structure that is easier to understand and follows the [Separation of Concerns principle (SoC)](https://en.wikipedia.org/wiki/Separation_of_concerns);
@@ -178,10 +178,13 @@ DatacenterBroker broker0 = new DatacenterBrokerSimple(cloudsim);
 List<Host> hostList = new ArrayList<>(1);
 List<Pe> hostPes = new ArrayList<>(1);
 hostPes.add(new PeSimple(20000, new PeProvisionerSimple()));
-Host host0 = new HostSimple(0, 100000, hostPes);
-host0.setRamProvisioner(new ResourceProvisionerSimple(new Ram(10000)))
-     .setBwProvisioner(new ResourceProvisionerSimple(new Bandwidth(100000)))
-     .setVmScheduler(new VmSchedulerSpaceShared());
+long ram = 10000; //in Megabytes
+long storage = 100000; //in Megabytes
+long bw = 100000; //in Megabits/s
+Host host0 = new HostSimple(ram, bw, storage, hostPes);
+host0.setRamProvisioner(new ResourceProvisionerSimple())
+      .setBwProvisioner(new ResourceProvisionerSimple())
+      .setVmScheduler(new VmSchedulerSpaceShared());
 hostList.add(host0);
 
 //Creates a Datacenter with a list of Hosts.
@@ -311,15 +314,16 @@ VmAllocationPolicy vmAllocationPolicy = new VmAllocationPolicySimple();
 Datacenter datacenter0 = new DatacenterSimple(cloudsim, characts, vmAllocationPolicy);
 ```
 
-The way you instantiate a host has changed too. The classes `RamProvisionerSimple` and `BwProvisionerSimple` don't exist anymore. Now you just have the generic class `ResourceProvisionerSimple`. And this class doesn't require a primitive value to define the resource capacity. Instead, it requires an object that implements the new `Resource` interface (such as the `Ram` and `Bandwidth` classes). A `VmScheduler` constructor doesn't require any parameter. Instantiating a host should be now similar to:
+The way you instantiate a host has changed too. The classes `RamProvisionerSimple` and `BwProvisionerSimple` don't exist anymore. Now you just have the generic class `ResourceProvisionerSimple` and you can just use its default no-args constructor. RAM and bandwidth capacity of the host now are given in the constructor, as it already was for storage. A `VmScheduler` constructor doesn't require any parameter. You don't need to set an ID for each Host, since
+if one is not given, when the List of hosts is attached to a Datacenter, it will generate an ID for those hosts. Instantiating a host should be now similar to:
 
 ```java
 long ram = 20480; //in MB
 long bw = 1000000; //in Megabits/s
 long storage = 1000000; //in MB
-Host host = new HostSimple(id, storage, pesList);
-host.setRamProvisioner(new ResourceProvisionerSimple(new Ram(ram)))
-    .setBwProvisioner(new ResourceProvisionerSimple(new Bandwidth(bw)))
+Host host = new HostSimple(ram, bw, storage, pesList);
+host.setRamProvisioner(new ResourceProvisionerSimple())
+    .setBwProvisioner(new ResourceProvisionerSimple())
     .setVmScheduler(new VmSchedulerTimeShared());
 ``` 
 
