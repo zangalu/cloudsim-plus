@@ -74,7 +74,7 @@ import static java.util.Comparator.comparingDouble;
 /**
  * An example that scales VM PEs up or down, according to the arrival of Cloudlets.
  * A {@link VerticalVmScaling}
- * is set to each {@link #createListOfScalableVms(int) initially created VM}.
+ * is set to each {@link #createListOfVerticalScalableVms(int)} initially created VM}.
  * Every VM will check at {@link #SCHEDULING_INTERVAL specific time intervals}
  * if its PEs {@link #upperCpuUtilizationThreshold(Vm) are over or underloaded},
  * according to a <b>dynamic computed utilization threshold</b>.
@@ -124,6 +124,7 @@ public class HybridVmCpuScalingDynamicThreshold {
 
     private static final int CLOUDLETS = 10;
     private static final int CLOUDLETS_INITIAL_LENGTH = 20_000;
+    private Queue<Integer> workLoadQueue;
     private Queue<Double> requests;
 
     private int createdCloudlets;
@@ -146,21 +147,19 @@ public class HybridVmCpuScalingDynamicThreshold {
         cloudletList = new ArrayList<>(CLOUDLETS);
 
         simulation = new CloudSim();
+        // dinamic allocation of resources (Vms and Cloudlets)
         simulation.addOnClockTickListener(this::onClockTickListener);
 
         createDatacenter();
         broker0 = new DatacenterBrokerSimple(simulation);
 
-        // read the trace and create cloudlets and VMs
-        createCloudletListsFromTrace();
 
-        //vmList.addAll(createListOfScalableVms(VMS));
+        loadWorkloadTraceIntoQueue();
+
+        //initial allocation of cloulets and VMs
+        createCloudletListsAndVmsFromTrace();
 
         simulation.start();
-
-        //broker0.submitVmList(vmList);
-        //broker0.submitCloudletList(cloudletList);
-
 
 
         printSimulationResults();
@@ -171,6 +170,13 @@ public class HybridVmCpuScalingDynamicThreshold {
      * @param evt information about the event happened (that for this Listener is just the simulation time)
      */
     private void onClockTickListener(EventInfo evt) {
+
+        createCloudletListsAndVmsFromTrace();
+
+        System.out.println("WORKLOAD SIZE --> "+workLoadQueue.size()+" !!!!!");
+        System.out.println("REQUEST QUEUE SIZE --> "+requests.size()+" !!!!!");
+
+
         vmList.forEach(vm -> {
             Log.printFormatted(
                 "\t\tTime %6.1f: Vm %d CPU Usage: %6.2f%% (%2d vCPUs. Running Cloudlets: #%02d) Upper Threshold: %.2f History Entries: %d\n",
@@ -180,6 +186,14 @@ public class HybridVmCpuScalingDynamicThreshold {
                 vm.getPeVerticalScaling().getUpperThresholdFunction().apply(vm),
                 vm.getUtilizationHistory().getHistory().size());
         });
+
+        long timeInterval = 200;
+        try {
+            Thread.sleep(timeInterval);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void printSimulationResults() {
@@ -275,7 +289,7 @@ public class HybridVmCpuScalingDynamicThreshold {
     private Vm createVm() {
         final int id = createsVms++;
 
-        final Vm vm = new VmSimple(id, 10000, VM_PES)
+        final Vm vm = new VmSimple(id, 1000, VM_PES)
             .setRam(VM_RAM).setBw(1000).setSize(10000)
             .setCloudletScheduler(new CloudletSchedulerSpaceShared());
 
@@ -301,7 +315,7 @@ public class HybridVmCpuScalingDynamicThreshold {
      * {@code verticalCpuScaling.setLowerThresholdFunction(vm -> 0.4);}
      * </p>
      *
-     * @see #createListOfScalableVms(int)
+     * @see #createListOfVerticalScalableVms(int)
      */
     private VerticalVmScaling createVerticalPeScaling() {
         //The percentage in which the number of PEs has to be scaled
@@ -375,108 +389,51 @@ public class HybridVmCpuScalingDynamicThreshold {
         return history.size() > 10 ? MathUtil.median(history) * 1.2 : 0.7;
     }
 
-    /**
-     * Creates lists of Cloudlets to be submitted to the broker,
-     * simulating their arrivals at different times.
-     * Adds all created Cloudlets to the {@link #cloudletList}.
-     */
-    private void createCloudletListsFromTrace() {
+
+    private void loadWorkloadTraceIntoQueue() {
 
         String WORKLOAD_FILENAME = "trace10seconds.txt";
-        //Creates a List of Cloudlets that will start running immediately when the simulation starts
-
         final InputStream workloadFile = ResourceLoader.getInputStream(ScoapVmScalingExample.class, "workload/scoap/" + WORKLOAD_FILENAME);
         BufferedReader br= new BufferedReader(new InputStreamReader(workloadFile));
-        double currentTime=0.0;
-
-        int lambda=0;
-        //Interval in seconds between two values in the log file.
-        double interval=10.0;
-        double arrivalRate=0.0;
+        workLoadQueue = new LinkedList<>();
         String sCurrentLine;
-        requests = new LinkedList<>();
-
-
-
-
+        int lambda=0;
 
         try {
-
-
-            this.cloudletList = new ArrayList<>();
-
-
-            //Arrivals arrivals_generator = new Arrivals (this,queue);
-
-            if((sCurrentLine = br.readLine()) != null){
-                lambda = Integer.parseInt(sCurrentLine);
-                if (lambda == 0) {
-                    lambda = 1;
-                }
-                arrivalRate = lambda / interval;
-                requests.add(arrivalRate);
-                createAndSubmitVmsAndCloudlets(1);
-            }
-
-            /* Assigns an EventListener to be notified when the first Cloudlets finishes executing
-             * and then dynamically create a new list of VMs and Cloudlets to submit to the broker.*/
-            Cloudlet cloudlet0 = this.cloudletList.get(0);
-            cloudlet0.addOnFinishListener(event -> checkQueueAndAllocateCloudLets(event));
-
-            final long timeInterval = 200;
-            //This cycle is analyzing every row in the log file.
-            int i=0;
             while ((sCurrentLine = br.readLine()) != null) {
-
                 lambda = Integer.parseInt(sCurrentLine);
                 if (lambda == 0) {
                     lambda = 1;
                 }
-                i++;
-                arrivalRate = lambda / interval;
 
-                try {
+            workLoadQueue.add(lambda);
 
-                    if(i%10000==0) {
-                        System.out.println("queue size" + requests.size());
-                        createAndSubmitVmsAndCloudlets(1);
-                        Thread.sleep(timeInterval);
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-                requests.add(arrivalRate);
-
-               // cloudletList.add(createCloudlet(Long.valueOf(lambda), 1,10));
             }
         }
-             catch (IOException e){
-                System.out.print("Impossible to load the workload log file. The specified file-name does not exist");
-            }
-
-
-        /*
-        for (int i = 0; i < initialCloudletsNumber; i++) {
-            cloudletList.add(createCloudlet(CLOUDLETS_INITIAL_LENGTH+(i*1000), 2));
+        catch (IOException e){
+            System.out.print("Impossible to load the workload log file. The specified file-name does not exist");
         }
-
-
-         * Creates several Cloudlets, increasing the arrival delay and decreasing
-         * the length of each one.
-         * The progressing delay enables CPU usage to increase gradually along the arrival of
-         * new Cloudlets (triggering CPU up scaling at some point in time).
-         *
-         * The decreasing length enables Cloudlets to finish in different times,
-         * to gradually reduce CPU usage (triggering CPU down scaling at some point in time).
-         *
-         * Check the logs to understand how the scaling is working.
-
-        for (int i = 1; i <= remainingCloudletsNumber; i++) {
-            cloudletList.add(createCloudlet(CLOUDLETS_INITIAL_LENGTH*2/i, 1,i*2));
-        }
-        */
     }
+
+
+    private void createCloudletListsAndVmsFromTrace() {
+
+        requests = new LinkedList<>();
+        double interval=10.0;
+
+        //number of requests to read from the workload at every iteration
+        for(int i=0; i<1000; i++)
+        {
+            if(workLoadQueue.peek()!= null){
+                requests.add(workLoadQueue.poll()/interval);
+            }
+        }
+        if(requests.size()>0) {
+            createAndSubmitVmsAndCloudlets(1);
+        }
+
+    }
+
 
     /**
      * Dynamically creates and submits a set of VMs to the broker when
@@ -509,18 +466,17 @@ public class HybridVmCpuScalingDynamicThreshold {
         List<Cloudlet> newCloudletList = new ArrayList<>(vmsToCreate);
         Vm newAvailableVm;
 
-        Optional<Vm> availableVm = broker0.getVmWaitingList().stream().filter(vm -> vm.getCpuPercentUsage()<0.5).findAny();
+        Optional<Vm> availableVm = broker0.getVmWaitingList().stream().filter(vm -> vm.getCpuPercentUsage()<0.7).findAny();
 
         if(availableVm.isPresent()) {
             System.out.println("VM Present cpu usage "+availableVm.get().getCpuPercentUsage());
             newAvailableVm = availableVm.get();
             Cloudlet cloudlet = createCloudlet(newAvailableVm);
             this.cloudletList.add(cloudlet);
-            broker0.submitVm(newAvailableVm);
             broker0.submitCloudlet(cloudlet);
         }else{
             System.out.println("Create new VM");
-            newVmList = createListOfHorizontalScalableVms(vmsToCreate);
+            newVmList = createListOfVerticalScalableVms(vmsToCreate);
             this.vmList.addAll(newVmList);
             for(Vm vm : newVmList) {
                 Cloudlet cloudlet = createCloudlet(vm);
@@ -540,8 +496,6 @@ public class HybridVmCpuScalingDynamicThreshold {
         while ( (vm.getMips() - length )>0 && requests.size()>0){
             length += requests.poll();
         }
-        System.out.println("Instructions to execute "+length);
-
 
 
         long fileSize = 300; //Size (in bytes) before execution
