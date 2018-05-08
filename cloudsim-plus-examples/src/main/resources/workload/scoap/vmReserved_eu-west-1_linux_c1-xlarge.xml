@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+<workload_log_file filename="trace.txt" /><single_virtual_machine>
+	<name>c1-xlarge</name>
+	<mu>20.34</mu>
+	<region>eu-west-1</region>
+	<provider>Amazon</provider>
+	<reservation_period>_3year</reservation_period>
+	<os>linux</os>
+	<payments>
+		<vm_payment periodic_payment="0.0" running_payment="0.66" reservation_type="not_set" />
+		<vm_payment periodic_payment="972.0" running_payment="0.396" reservation_type="light" />
+		<vm_payment periodic_payment="2284.0" running_payment="0.252" reservation_type="medium" />
+		<vm_payment periodic_payment="7957.82" running_payment="0.0" reservation_type="heavy" />
+	</payments>
+	<reserved id="1" workload="0.0" num="1" reservation_type="heavy" />		
+	<reserved id="2" workload="15.15" num="1" reservation_type="medium" />
+	<reserved id="3" workload="30.40" num="1" reservation_type="medium" />
+	<reserved id="4" workload="44.37" num="1" reservation_type="medium" />
+	<reserved id="5" workload="57.90" num="1" reservation_type="light" />
+	<reserved id="6" workload="73.38" num="1" reservation_type="light" />
+</single_virtual_machine>
+</root>
