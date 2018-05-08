@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<root>
+<workload_log_file filename="/Users/marco/Desktop/TESI/SCOAP-planSynthesis/workloadLogOutput_eu-west-1_linux_c1-xlarge.txt" />
+<virtual_machines><single_virtual_machine>
+	<name>m1-small</name>
+	<mu>7.07</mu>
+	<region>eu-west-1</region>
+	<provider>Amazon</provider>
+	<reservation_period>not_set</reservation_period>
+	<os>linux</os>
+	<payments>
+		<vm_payment periodic_payment="0.0" running_payment="0.065" reservation_type="not_set" />
+	</payments>
+</single_virtual_machine>
+<single_virtual_machine>
+	<name>c1-medium</name>
+	<mu>14.45</mu>
+	<region>eu-west-1</region>
+	<provider>Amazon</provider>
+	<reservation_period>not_set</reservation_period>
+	<os>linux</os>
+	<payments>
+		<vm_payment periodic_payment="0.0" running_payment="0.165" reservation_type="not_set" />
+	</payments>
+</single_virtual_machine>
+<single_virtual_machine>
+	<name>m1-large</name>
+	<mu>18.98</mu>
+	<region>eu-west-1</region>
+	<provider>Amazon</provider>
+	<reservation_period>not_set</reservation_period>
+	<os>linux</os>
+	<payments>
+		<vm_payment periodic_payment="0.0" running_payment="0.26" reservation_type="not_set" />
+	</payments>
+</single_virtual_machine>
+<single_virtual_machine>
+	<name>c1-xlarge</name>
+	<mu>20.34</mu>
+	<region>eu-west-1</region>
+	<provider>Amazon</provider>
+	<reservation_period>not_set</reservation_period>
+	<os>linux</os>
+	<payments>
+		<vm_payment periodic_payment="0.0" running_payment="0.66" reservation_type="not_set" />
+	</payments>
+</single_virtual_machine>
+</virtual_machines>
+<thresholds>
+	<threshold id="7" workload="15.87" workload_step="15.87">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="8" workload="36.16" workload_step="20.29">
+		<on_demand num="2" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="9" workload="61.19" workload_step="25.03">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="10" workload="86.22" workload_step="25.03">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="11" workload="111.25" workload_step="25.03">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="12" workload="136.28" workload_step="25.03">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="13" workload="165.88" workload_step="29.6">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="1" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="14" workload="190.91" workload_step="25.03">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="15" workload="213.08" workload_step="22.17">
+		<on_demand num="3" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="16" workload="231.43" workload_step="18.35">
+		<on_demand num="1" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="17" workload="253.6" workload_step="22.17">
+		<on_demand num="3" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="1" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="18" workload="262.76" workload_step="9.16">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="19" workload="274.4" workload_step="11.64">
+		<on_demand num="1" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="20" workload="280.7" workload_step="6.3">
+		<on_demand num="3" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="21" workload="289.86" workload_step="9.16">
+		<on_demand num="0" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="22" workload="303.44" workload_step="13.58">
+		<on_demand num="2" vm_name="m1-small" />
+		<on_demand num="1" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+	<threshold id="23" workload="309.74" workload_step="6.3">
+		<on_demand num="3" vm_name="m1-small" />
+		<on_demand num="0" vm_name="c1-medium" />
+		<on_demand num="0" vm_name="m1-large" />
+		<on_demand num="0" vm_name="c1-xlarge" />
+	</threshold>
+</thresholds>
+</root>
