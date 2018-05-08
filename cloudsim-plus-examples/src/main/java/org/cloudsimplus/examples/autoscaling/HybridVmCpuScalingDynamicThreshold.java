@@ -114,7 +114,7 @@ public class HybridVmCpuScalingDynamicThreshold {
 
     private static final int HOST_PES = 32;
     private static final int VMS = 1;
-    private static final int VM_PES = 14;
+    private static final int VM_PES = 8;
     private static final int VM_RAM = 1200;
     private final CloudSim simulation;
     private DatacenterBroker broker0;
@@ -123,7 +123,6 @@ public class HybridVmCpuScalingDynamicThreshold {
     private List<Cloudlet> cloudletList;
 
     private static final int CLOUDLETS = 10;
-    private static final int CLOUDLETS_INITIAL_LENGTH = 20_000;
     private Queue<Integer> workLoadQueue;
     private Queue<Double> requests;
 
@@ -152,6 +151,7 @@ public class HybridVmCpuScalingDynamicThreshold {
 
         createDatacenter();
         broker0 = new DatacenterBrokerSimple(simulation);
+        broker0.setVmDestructionDelayFunction(vm -> 0.0);
 
 
         loadWorkloadTraceIntoQueue();
@@ -179,15 +179,15 @@ public class HybridVmCpuScalingDynamicThreshold {
 
         vmList.forEach(vm -> {
             Log.printFormatted(
-                "\t\tTime %6.1f: Vm %d CPU Usage: %6.2f%% (%2d vCPUs. Running Cloudlets: #%02d) Upper Threshold: %.2f History Entries: %d\n",
+                "\t\tTime %6.1f: Vm %d CPU Usage: %6.2f%% (%2d vCPUs. Running Cloudlets: #%02d) Cloudlet waiting: %s History Entries: %d\n",
                 evt.getTime(), vm.getId(), vm.getCpuPercentUsage()*100.0,
                 vm.getNumberOfPes(),
                 vm.getCloudletScheduler().getCloudletExecList().size(),
-                vm.getPeVerticalScaling().getUpperThresholdFunction().apply(vm),
+                vm.getBroker().getCloudletWaitingList(),
                 vm.getUtilizationHistory().getHistory().size());
         });
 
-        long timeInterval = 200;
+        long timeInterval = 100;
         try {
             Thread.sleep(timeInterval);
         } catch (InterruptedException e) {
@@ -220,7 +220,7 @@ public class HybridVmCpuScalingDynamicThreshold {
     private Host createHost() {
         List<Pe> peList = new ArrayList<>(HOST_PES);
         for (int i = 0; i < HOST_PES; i++) {
-            peList.add(new PeSimple(10000, new PeProvisionerSimple()));
+            peList.add(new PeSimple(50000, new PeProvisionerSimple()));
         }
 
         final long ram = 200000; //in Megabytes
@@ -254,6 +254,22 @@ public class HybridVmCpuScalingDynamicThreshold {
         }
 
         return newList;
+    }
+
+
+
+
+    private List<Vm> createListOfScalableVms(){
+
+        int numberOfVmsToCreate =1;
+
+        if(requests.size()<500) {
+            return createListOfHorizontalScalableVms(numberOfVmsToCreate);
+        }
+        else{
+            return createListOfVerticalScalableVms(numberOfVmsToCreate);
+        }
+
     }
 
 
@@ -422,7 +438,7 @@ public class HybridVmCpuScalingDynamicThreshold {
         double interval=10.0;
 
         //number of requests to read from the workload at every iteration
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<500; i++)
         {
             if(workLoadQueue.peek()!= null){
                 requests.add(workLoadQueue.poll()/interval);
@@ -462,21 +478,22 @@ public class HybridVmCpuScalingDynamicThreshold {
     private void createAndSubmitVmsAndCloudlets(int vmsToCreate) {
 
         Log.printFormattedLine("\n\t#Cloudlet finished. Submitting new VMs to the broker\n");
-        List<Vm> newVmList = new ArrayList<>(vmsToCreate);
+        List<Vm> newVmList = new ArrayList<>();
         List<Cloudlet> newCloudletList = new ArrayList<>(vmsToCreate);
         Vm newAvailableVm;
 
         Optional<Vm> availableVm = broker0.getVmWaitingList().stream().filter(vm -> vm.getCpuPercentUsage()<0.7).findAny();
 
+
         if(availableVm.isPresent()) {
-            System.out.println("VM Present cpu usage "+availableVm.get().getCpuPercentUsage());
+            System.out.println("VM Present "+availableVm.get().getId()+" with cpu usage "+availableVm.get().getCpuPercentUsage());
             newAvailableVm = availableVm.get();
             Cloudlet cloudlet = createCloudlet(newAvailableVm);
             this.cloudletList.add(cloudlet);
             broker0.submitCloudlet(cloudlet);
         }else{
             System.out.println("Create new VM");
-            newVmList = createListOfVerticalScalableVms(vmsToCreate);
+            newVmList = createListOfScalableVms();
             this.vmList.addAll(newVmList);
             for(Vm vm : newVmList) {
                 Cloudlet cloudlet = createCloudlet(vm);
@@ -486,6 +503,8 @@ public class HybridVmCpuScalingDynamicThreshold {
             broker0.submitCloudletList(newCloudletList);
             this.cloudletList.addAll(newCloudletList);
         }
+        broker0.setVmDestructionDelayFunction(vm ->0.0);
+
 
     }
 
@@ -506,13 +525,15 @@ public class HybridVmCpuScalingDynamicThreshold {
         //Sets the same utilization model for all these resources.
         UtilizationModel utilization = new UtilizationModelFull();
 
-        return new CloudletSimple(
+        Cloudlet cloudlet = new CloudletSimple(
             numberOfCreatedCloudlets++, length, numberOfCpuCores)
             .setFileSize(fileSize)
             .setOutputSize(outputSize)
             .setUtilizationModel(utilization)
             .setVm(vm)
             .addOnFinishListener(event -> checkQueueAndAllocateCloudLets(event));
+        cloudlet.setSubmissionDelay(1);
+        return cloudlet;
     }
 
     /**
