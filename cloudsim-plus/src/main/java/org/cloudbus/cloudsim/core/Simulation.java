@@ -319,20 +319,18 @@ public interface Simulation {
     void sendNow(SimEntity src, SimEntity dest, int tag, Object data);
 
     /**
-     * Starts the execution of CloudSim simulation and <b>waits for complete
-     * execution of all entities</b>, i.e. until all entities threads reach
+     * Starts simulation execution and <b>waits for
+     * all entities to finish</b>, i.e. until all entities threads reach
      * non-RUNNABLE state or there are no more events in the future event queue.
      * <p>
      * <b>Note</b>: This method should be called just after all the entities
-     * have been setup and added.
+     * have been setup and added. The method blocks until the simulation is ended.
      * </p>
      *
      * @return the last clock time
-     * @throws RuntimeException When the simulation already run once.
+     * @throws UnsupportedOperationException When the simulation has already run once.
      * If you paused the simulation and wants to resume it,
      * you must use {@link #resume()} instead of calling the current method.
-     * @pre $none
-     * @post $none
      */
     double start();
 
@@ -345,9 +343,18 @@ public interface Simulation {
     boolean terminate();
 
     /**
-     * Schedules the termination of the simulation for a given time before it has completely finished.
+     * Schedules the termination of the simulation for a given time (in seconds).
      *
-     * @param time the time at which the simulation has to be terminated
+     * <p>If a termination time is set, the simulation stays running even
+     * if there is no event to process.
+     * It keeps waiting for new dynamic events, such as the creation
+     * of Cloudlets and VMs at runtime.
+     * If no event happens, the clock is increased to simulate time passing.
+     * The clock increment is defined according to: (i) the lower {@link Datacenter#getSchedulingInterval()}
+     * between existing Datacenters;  or (ii) {@link #getMinTimeBetweenEvents()} in case
+     * no {@link Datacenter} has its schedulingInterval set.</p>
+     *
+     * @param time the time at which the simulation has to be terminated (in seconds)
      * @return true if the time given is greater than the current simulation time, false otherwise
      */
     boolean terminateAt(double time);
