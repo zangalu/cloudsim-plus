@@ -29,7 +29,7 @@ public class ScoapXMLparser {
 
         try {
 
-            final InputStream fXmlFile = ResourceLoader.getInputStream(ScoapXMLparser.class, path+VM_RESERVED);
+            final InputStream fXmlFile = ResourceLoader.getInputStream(ScoapXMLparser.class, path+VM_ON_DEMAND);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
