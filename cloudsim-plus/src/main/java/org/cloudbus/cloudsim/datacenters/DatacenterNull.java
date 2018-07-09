@@ -5,8 +5,7 @@ import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.core.events.SimEvent;
 import org.cloudbus.cloudsim.hosts.Host;
-import org.cloudbus.cloudsim.resources.File;
-import org.cloudbus.cloudsim.resources.FileStorage;
+import org.cloudbus.cloudsim.resources.DatacenterStorage;
 import org.cloudbus.cloudsim.vms.Vm;
 
 import java.util.Collections;
@@ -20,6 +19,8 @@ import java.util.List;
  * @see Datacenter#NULL
  */
 final class DatacenterNull implements Datacenter {
+    private static final DatacenterStorage storage = new DatacenterStorage();
+
     @Override public int getId() {
         return -1;
     }
@@ -28,9 +29,6 @@ final class DatacenterNull implements Datacenter {
     }
     @Override public String getName() {
         return "";
-    }
-    @Override public int addFile(File file) {
-        return 0;
     }
     @Override public List<Host> getHostList() {
         return Collections.emptyList();
@@ -55,18 +53,16 @@ final class DatacenterNull implements Datacenter {
     @Override public DatacenterCharacteristics getCharacteristics() {
         return DatacenterCharacteristics.NULL;
     }
-    @Override public List<FileStorage> getStorageList() {
-        return Collections.emptyList();
-    }
-    @Override public Datacenter setStorageList(List<FileStorage> storageList) {
-        return Datacenter.NULL;
-    }
+    @Override public DatacenterStorage getDatacenterStorage() { return storage; }
+    @Override public void setDatacenterStorage(DatacenterStorage datacenterStorage) {/**/}
     @Override public double getBandwidthPercentForMigration() { return 0; }
     @Override public void setBandwidthPercentForMigration(double bandwidthPercentForMigration) {/**/}
     @Override public double getPower() { return 0; }
     @Override public double getPowerInKWattsHour() { return 0; }
     @Override public SimEntity setState(State state) { return SimEntity.NULL; }
     @Override public boolean isStarted() { return false; }
+    @Override public boolean isAlive() { return false; }
+    @Override public boolean isFinished() { return false; }
     @Override public Simulation getSimulation() { return Simulation.NULL; }
     @Override public SimEntity setSimulation(Simulation simulation) { return this; }
     @Override public void processEvent(SimEvent ev) {/**/}
@@ -79,5 +75,4 @@ final class DatacenterNull implements Datacenter {
         return "Datacenter.NULL";
     }
     @Override public void setLog(boolean log) {/**/}
-    @Override public void println(String msg) {/**/}
 }

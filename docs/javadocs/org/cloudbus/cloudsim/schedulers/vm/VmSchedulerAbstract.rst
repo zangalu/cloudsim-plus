@@ -1,5 +1,3 @@
-.. java:import:: java.util.stream LongStream
-
 .. java:import:: org.cloudbus.cloudsim.hosts Host
 
 .. java:import:: org.cloudbus.cloudsim.provisioners PeProvisioner
@@ -8,7 +6,13 @@
 
 .. java:import:: org.cloudbus.cloudsim.vms Vm
 
+.. java:import:: org.slf4j Logger
+
+.. java:import:: org.slf4j LoggerFactory
+
 .. java:import:: java.util.stream IntStream
+
+.. java:import:: java.util.stream LongStream
 
 VmSchedulerAbstract
 ===================
@@ -102,11 +106,13 @@ getAllocatedMipsMap
 .. java:method:: protected Map<Vm, List<Double>> getAllocatedMipsMap()
    :outertype: VmSchedulerAbstract
 
-   Gets the map of VMs to MIPS, were each key is a VM and each value is the List of currently allocated MIPS from the respective physical PEs which are being used by such a VM.
+   Gets a map of MIPS allocated to each VM, were each key is a VM and each value is the List of currently allocated MIPS from the respective physical PEs which are being used by such a VM.
 
-   :return: the mips map
+   When VM is in migration, the allocated MIPS in the source Host is reduced due to migration overhead, according to the \ :java:ref:`getVmMigrationCpuOverhead()`\ . This is a situation that the allocated MIPS will be lower than the requested MIPS.
 
-   **See also:** :java:ref:`.getAllocatedMips(Vm)`
+   :return: the allocated MIPS map
+
+   **See also:** :java:ref:`.getAllocatedMips(Vm)`, :java:ref:`.getRequestedMipsMap()`
 
 getAvailableMips
 ^^^^^^^^^^^^^^^^
@@ -162,7 +168,9 @@ getRequestedMipsMap
 .. java:method:: protected Map<Vm, List<Double>> getRequestedMipsMap()
    :outertype: VmSchedulerAbstract
 
-   Gets a map of MIPS requested by each VM, where each key is a VM and each value is a list of MIPS requested by that VM.
+   Gets a map of MIPS requested by each VM, where each key is a VM and each value is a list of MIPS requested by that VM. When a VM is going to be placed into a Host, its requested MIPS is a list where each element is the MIPS capacity of each VM \ :java:ref:`Pe`\  and the list size is the number of PEs.
+
+   :return: the requested MIPS map
 
 getTotalAllocatedMipsForVm
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -182,21 +190,22 @@ getWorkingPeList
 .. java:method:: @Override public final List<Pe> getWorkingPeList()
    :outertype: VmSchedulerAbstract
 
-isAllowedToAllocateMips
-^^^^^^^^^^^^^^^^^^^^^^^
+isSuitableForVm
+^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean isAllowedToAllocateMips(List<Double> vmRequestedMipsShare)
+.. java:method:: @Override public final boolean isSuitableForVm(Vm vm, boolean showLog)
    :outertype: VmSchedulerAbstract
-
-   Checks if the requested amount of MIPS is available to be allocated to a VM.
-
-   :param vmRequestedMipsShare: a list of MIPS requested by a VM
-   :return: true if the requested MIPS List is available, false otherwise
 
 isSuitableForVm
 ^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public final boolean isSuitableForVm(Vm vm)
+.. java:method:: @Override public boolean isSuitableForVm(Vm vm, List<Double> requestedMips, boolean showLog)
+   :outertype: VmSchedulerAbstract
+
+isSuitableForVmInternal
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: protected abstract boolean isSuitableForVmInternal(Vm vm, List<Double> requestedMips, boolean showLog)
    :outertype: VmSchedulerAbstract
 
 percentOfMipsToRequest

@@ -31,6 +31,8 @@ final class DatacenterBrokerNull implements DatacenterBroker {
     @Override public boolean isStarted() {
         return false;
     }
+    @Override public boolean isAlive() { return false; }
+    @Override public boolean isFinished() { return false; }
     @Override public Simulation getSimulation() {
         return Simulation.NULL;
     }
@@ -77,16 +79,15 @@ final class DatacenterBrokerNull implements DatacenterBroker {
     @Override public DatacenterBroker addOneTimeOnVmsCreatedListener(EventListener<DatacenterBrokerEventInfo> listener) { return this; }
     @Override public Function<Vm, Double> getVmDestructionDelayFunction() { return vm -> 0.0; }
     @Override public DatacenterBroker setVmDestructionDelayFunction(Function<Vm, Double> function) { return this; }
+    @Override public Vm defaultVmMapper(Cloudlet cloudlet) { return Vm.NULL; }
     @Override public void setVmComparator(Comparator<Vm> comparator) {/**/}
     @Override public void setCloudletComparator(Comparator<Cloudlet> comparator) {/**/}
     @Override public void setLog(boolean log) {/**/}
-    @Override public void println(String msg) {/**/}
     @Override public void submitCloudlet(Cloudlet cloudlet) {/**/}
     @Override public void submitCloudletList(List<? extends Cloudlet> list) {/**/}
     @Override public void submitCloudletList(List<? extends Cloudlet> list, double submissionDelay) {/**/}
     @Override public void submitCloudletList(List<? extends Cloudlet> list, Vm vm) {/**/}
     @Override public void submitCloudletList(List<? extends Cloudlet> list, Vm vm, double submissionDelay) {/**/}
-
     @Override public void submitVm(Vm vm) {/**/}
     @Override public void submitVmList(List<? extends Vm> list) {/**/}
     @Override public void submitVmList(List<? extends Vm> list, double submissionDelay) {/**/}

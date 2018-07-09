@@ -12,6 +12,8 @@ final class SimEntityNull implements SimEntity {
     @Override public int compareTo(SimEntity o) { return 0; }
     @Override public SimEntity setState(State state) { return this; }
     @Override public boolean isStarted() { return false; }
+    @Override public boolean isAlive() { return false; }
+    @Override public boolean isFinished() { return false; }
     @Override public Simulation getSimulation() { return Simulation.NULL; }
     @Override public SimEntity setSimulation(Simulation simulation) { return this; }
     @Override public void processEvent(SimEvent ev) {/**/}
@@ -23,5 +25,4 @@ final class SimEntityNull implements SimEntity {
     @Override public String getName() {  return ""; }
     @Override public int getId() { return 0; }
     @Override public void setLog(boolean log) {/**/}
-    @Override public void println(String msg) {/**/}
 }

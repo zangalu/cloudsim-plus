@@ -8,7 +8,8 @@
 package org.cloudbus.cloudsim.core;
 
 import org.cloudbus.cloudsim.core.events.SimEvent;
-import org.cloudbus.cloudsim.util.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -21,6 +22,7 @@ import java.util.function.Predicate;
  * @since CloudSim Toolkit 1.0
  */
 public abstract class CloudSimEntity implements SimEntity {
+    private static final Logger logger = LoggerFactory.getLogger(CloudSimEntity.class.getSimpleName());
     /**
      * @see #isStarted()
      */
@@ -96,6 +98,11 @@ public abstract class CloudSimEntity implements SimEntity {
     public void start() {
         startEntity();
         this.setStarted(true);
+    }
+
+    @Override
+    public void shutdownEntity() {
+        setState(State.FINISHED);
     }
 
     /**
@@ -418,14 +425,11 @@ public abstract class CloudSimEntity implements SimEntity {
      * @param cloudSimTag an user-defined number representing the type of an
      *                    event/message
      * @param data        A reference to data to be sent with the event
-     * @pre delay >= 0.0
-     * @pre data != null
-     * @post $none
      */
     protected void send(final SimEntity dest, double delay, final int cloudSimTag, final Object data) {
         Objects.requireNonNull(dest);
         if (dest.getId() < 0) {
-            Log.printConcatLine(getName(), ".send(): Error - " + "invalid entity id ", dest);
+            logger.error("{}.send(): invalid entity id {} for {}", getName(), dest.getId(), dest);
             return;
         }
 
@@ -438,7 +442,8 @@ public abstract class CloudSimEntity implements SimEntity {
             throw new IllegalArgumentException("The specified delay is infinite value");
         }
 
-        if (dest.getId() != getId()) {// only delay messages between different entities
+        // only considers network delay when sending messages between different entities
+        if (dest.getId() != getId()) {
             delay += getNetworkDelay(getId(), dest.getId());
         }
 
@@ -455,8 +460,6 @@ public abstract class CloudSimEntity implements SimEntity {
      *                    If delay is a negative number, then it will be changed to 0
      * @param cloudSimTag an user-defined number representing the type of an
      *                    event/message
-     * @pre delay >= 0.0
-     * @post $none
      */
     protected void send(final SimEntity dest, final double delay, final int cloudSimTag) {
         send(dest, delay, cloudSimTag, null);
@@ -470,9 +473,6 @@ public abstract class CloudSimEntity implements SimEntity {
      * @param cloudSimTag an user-defined number representing the type of an
      *                    event/message
      * @param data        A reference to data to be sent with the event
-     * @pre delay >= 0.0
-     * @pre data != null
-     * @post $none
      */
     protected void sendNow(final SimEntity dest, final int cloudSimTag, final Object data) {
         send(dest, 0, cloudSimTag, data);
@@ -485,8 +485,6 @@ public abstract class CloudSimEntity implements SimEntity {
      * @param dest    the destination entity
      * @param cloudSimTag an user-defined number representing the type of an
      *                    event/message
-     * @pre delay >= 0.0
-     * @post $none
      */
     protected void sendNow(final SimEntity dest, final int cloudSimTag) {
         send(dest, 0, cloudSimTag, null);
@@ -499,8 +497,6 @@ public abstract class CloudSimEntity implements SimEntity {
      * @param src source of the message
      * @param dst destination of the message
      * @return delay to send a message from src to dst
-     * @pre src >= 0
-     * @pre dst >= 0
      */
     private double getNetworkDelay(final int src, final int dst) {
         return getSimulation().getNetworkTopology().getDelay(src, dst);
@@ -509,6 +505,16 @@ public abstract class CloudSimEntity implements SimEntity {
     @Override
     public boolean isStarted() {
         return started;
+    }
+
+    @Override
+    public boolean isAlive() {
+        return state != State.FINISHED;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return state == State.FINISHED;
     }
 
     /**
@@ -548,10 +554,4 @@ public abstract class CloudSimEntity implements SimEntity {
         this.log = log;
     }
 
-    @Override
-    public void println(final String msg){
-        if(log){
-            Log.printLine(msg);
-        }
-    }
 }

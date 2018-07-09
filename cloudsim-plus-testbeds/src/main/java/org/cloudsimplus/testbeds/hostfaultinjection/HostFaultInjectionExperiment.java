@@ -25,16 +25,6 @@
  */
 package org.cloudsimplus.testbeds.hostfaultinjection;
 
-import static org.cloudsimplus.testbeds.hostfaultinjection.HostFaultInjectionRunner.CLOUDLET_LENGTHS;
-import static java.util.Comparator.comparingDouble;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
@@ -52,8 +42,9 @@ import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.util.ResourceLoader;
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelDynamic;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
@@ -61,10 +52,18 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.cloudsimplus.faultinjection.HostFaultInjection;
 import org.cloudsimplus.faultinjection.VmCloner;
 import org.cloudsimplus.faultinjection.VmClonerSimple;
-import org.cloudsimplus.vmtemplates.AwsEc2Template;
 import org.cloudsimplus.slametrics.SlaContract;
 import org.cloudsimplus.testbeds.ExperimentRunner;
 import org.cloudsimplus.testbeds.SimulationExperiment;
+import org.cloudsimplus.vmtemplates.AwsEc2Template;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.*;
+
+import static java.util.Comparator.comparingDouble;
+import static java.util.stream.Collectors.toList;
+import static org.cloudsimplus.testbeds.hostfaultinjection.HostFaultInjectionRunner.CLOUDLET_LENGTHS;
 
 /**
  * An experiment using a {@link HostFaultInjection} to generate random Host failures.
@@ -74,6 +73,9 @@ import org.cloudsimplus.testbeds.SimulationExperiment;
  *
  * The experiment assesses if the SLA contract of the customer (represented by a {@link DatacenterBroker}
  * is being met or not.
+ *
+ * <p>For more details, check
+ * <a href="http://www.di.ubi.pt/~mario/files/MScDissertation-RaysaOliveira.pdf">Raysa Oliveira's Master Thesis (only in Portuguese)</a>.</p>
  *
  * @author raysaoliveira
  */
@@ -151,7 +153,7 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
 
     private HostFaultInjectionExperiment(int index, ExperimentRunner runner, long seed) {
         super(index, runner, seed);
-        setNumBrokersToCreate((int)numberSlaContracts());
+        setNumBrokersToCreate(readContractList().size());
         setAfterScenarioBuild(exp -> createFaultInjectionForHosts(getDatacenter0()));
         this.randCloudlet = new UniformDistr(this.getSeed());
         contractsMap = new HashMap<>();
@@ -174,19 +176,12 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
         }
     }
 
-    private long numberSlaContracts()  {
-        try {
-            return readContractList().size();
-        } catch (FileNotFoundException e) {
-            return 0;
-        }
-    }
-
-    private List<String> readContractList() throws FileNotFoundException {
+    private List<String> readContractList() {
         return ResourceLoader
                 .getBufferedReader(getClass(), SLA_CONTRACTS_LIST)
                 .lines()
                 .filter(l -> !l.startsWith("#"))
+                .filter(l -> !l.trim().isEmpty())
                 .collect(toList());
     }
 
@@ -256,13 +251,13 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
                         " contract could not be found and there isn't any cheaper one available."));
 
         final int faultToleranceLevel = getFaultToleranceLevelForTemplate(contract, instance);
-        Log.printFormattedLine(
-            "# There isn't any available VM template having an individual price of $%.2f, ", contract.getExpectedMaxPriceForSingleVm());
-        Log.printFormattedLine(
-            "  which enables meeting the %d-fault-tolerance level defined by broker %d.",
+        System.out.printf(
+            "# There isn't any available VM template having an individual price of $%.2f, \n", contract.getExpectedMaxPriceForSingleVm());
+        System.out.printf(
+            "  which enables meeting the %d-fault-tolerance level defined by broker %d.\n",
             contract.getMinFaultToleranceLevel(), broker.getId());
-        Log.printFormattedLine(
-            "  The fault-tolerance level was reduced to %d (enabling %d VMs to run simultaneously).", faultToleranceLevel, faultToleranceLevel);
+        System.out.printf(
+            "  The fault-tolerance level was reduced to %d (enabling %d VMs to run simultaneously).\n", faultToleranceLevel, faultToleranceLevel);
         /*
         After the k fault tolerance level was reduced because there isn't any VM that it's individual
         price multiplied by the k is lower or equal to the total price the customer is willing to pay.
@@ -331,12 +326,15 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
     public Cloudlet createCloudlet(final int id) {
         final int i = (int) (randCloudlet.sample() * CLOUDLET_LENGTHS.length);
         final long length = CLOUDLET_LENGTHS[i];
+        final UtilizationModel um = new UtilizationModelDynamic(UtilizationModel.Unit.ABSOLUTE, 50);
 
         final Cloudlet c
             = new CloudletSimple(id, length, CLOUDLET_PES)
             .setFileSize(CLOUDLET_FILESIZE)
             .setOutputSize(CLOUDLET_OUTPUTSIZE)
-            .setUtilizationModel(new UtilizationModelFull());
+            .setUtilizationModelCpu(new UtilizationModelFull())
+            .setUtilizationModelRam(um)
+            .setUtilizationModelBw(um);
         return c;
     }
 
@@ -401,8 +399,8 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
             getFaultInjection().addVmCloner (broker, new VmClonerSimple(this::cloneVm, this::cloneCloudlets));
         }
 
-        Log.printFormattedLine(
-            "\tFault Injection created for %s.\n\tMean Number of Failures per hour: %.6f (1 failure expected at each %.4f hours).",
+        System.out.printf(
+            "\tFault Injection created for %s.\n\tMean Number of Failures per hour: %.6f (1 failure expected at each %.4f hours).\n",
             datacenter, MEAN_FAILURE_NUMBER_PER_HOUR, poisson.getInterarrivalMeanTime());
     }
 
@@ -416,11 +414,13 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
      */
     private Vm cloneVm(final Vm vm) {
         final Vm clone = new VmSimple((long) vm.getMips(), (int) vm.getNumberOfPes());
-        /*It' not required to set an ID for the clone.
+        /*
+        It' not required to set an ID for the clone.
         It is being set here just to make it easy to
         relate the ID of the vm to its clone,
         since the clone ID will be 10 times the id of its
-        source VM.*/
+        source VM.
+        */
         clone.setId(vm.getId() * 10);
         clone.setDescription("Clone of VM " + vm.getId());
         clone
@@ -428,7 +428,7 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
             .setBw(vm.getBw().getCapacity())
             .setRam(vm.getBw().getCapacity())
             .setCloudletScheduler(new CloudletSchedulerTimeShared());
-        Log.printFormattedLine("\n\n#Cloning VM %d from Host %d\n\tMips %.2f Number of Pes: %d ",
+        System.out.printf("\n\n#Cloning VM %d from Host %d\n\tMips %.2f Number of Pes: %d\n",
             vm.getId(), vm.getHost().getId(), clone.getMips(), clone.getNumberOfPes());
 
         return clone;
@@ -582,8 +582,6 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
      * A main method just for test purposes.
      *
      * @param args
-     * @throws FileNotFoundException
-     * @throws IOException
      */
     public static void main(String[] args) {
         final HostFaultInjectionExperiment exp = new HostFaultInjectionExperiment(System.currentTimeMillis());
@@ -596,9 +594,9 @@ final class HostFaultInjectionExperiment extends SimulationExperiment {
         System.out.println("\n# Number of Host faults: " + exp.getFaultInjection().getNumberOfHostFaults());
         System.out.println("# Number of VM faults (VMs destroyed): " + exp.getFaultInjection().getNumberOfFaults());
         System.out.printf("# VMs MTBF average: %.2f minutes\n", exp.getFaultInjection().meanTimeBetweenVmFaultsInMinutes());
-        Log.printFormattedLine("# Time the simulations finished: %.2f minutes", exp.getCloudSim().clockInMinutes());
-        Log.printFormattedLine("# Hosts MTBF: %.2f minutes", exp.getFaultInjection().meanTimeBetweenHostFaultsInMinutes());
-        Log.printFormattedLine("\n# If the hosts are showing in the result equal to 0, it was because the vms ended before the failure was set.\n");
+        System.out.printf("# Time the simulations finished: %.2f minutes\n", exp.getCloudSim().clockInMinutes());
+        System.out.printf("# Hosts MTBF: %.2f minutes\n", exp.getFaultInjection().meanTimeBetweenHostFaultsInMinutes());
+        System.out.printf("\n# If the hosts are showing in the result equal to 0, it was because the vms ended before the failure was set.\n\n");
     }
 
     public HostFaultInjection getFaultInjection() {

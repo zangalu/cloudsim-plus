@@ -38,6 +38,18 @@ public interface SimEntity extends Nameable, Cloneable, Runnable, Comparable<Sim
     boolean isStarted();
 
     /**
+     * Checks if the entity is alive, i.e, it's not finished.
+     * @return
+     */
+    boolean isAlive();
+
+    /**
+     * Checks if the entity is finished or not.
+     * @return
+     */
+    boolean isFinished();
+
+    /**
      * Gets the CloudSim instance that represents the simulation to each the Entity is related to.
      * @return
      */
@@ -106,17 +118,4 @@ public interface SimEntity extends Nameable, Cloneable, Runnable, Comparable<Sim
      * @param log true to enable logging, false to disable
      */
     void setLog(boolean log);
-
-    /**
-     * Prints a given message if the logging is enabled for this entity.
-     * @param msg the message to be printed.
-     */
-    void println(String msg);
-
-    /**
-     * Prints an empty line if the logging is enabled for this entity.
-     */
-    default void println(){
-        println("");
-    }
 }

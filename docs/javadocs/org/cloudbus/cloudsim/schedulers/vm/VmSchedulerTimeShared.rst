@@ -1,8 +1,16 @@
-.. java:import:: org.cloudbus.cloudsim.util Log
-
 .. java:import:: org.cloudbus.cloudsim.resources Pe
 
 .. java:import:: org.cloudbus.cloudsim.vms Vm
+
+.. java:import:: org.slf4j Logger
+
+.. java:import:: org.slf4j LoggerFactory
+
+.. java:import:: java.util Iterator
+
+.. java:import:: java.util List
+
+.. java:import:: java.util Map
 
 VmSchedulerTimeShared
 =====================
@@ -104,9 +112,9 @@ getMipsShareToAllocate
    :param scalingFactor: the factor that will be used to reduce the amount of MIPS allocated to each vPE (which is a percentage value between [0 .. 1]) in case the VM is in migration
    :return: the List of MIPS allocated to the VM
 
-isSuitableForVm
-^^^^^^^^^^^^^^^
+isSuitableForVmInternal
+^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean isSuitableForVm(List<Double> vmMipsList)
+.. java:method:: @Override protected boolean isSuitableForVmInternal(Vm vm, List<Double> requestedMips, boolean showLog)
    :outertype: VmSchedulerTimeShared
 

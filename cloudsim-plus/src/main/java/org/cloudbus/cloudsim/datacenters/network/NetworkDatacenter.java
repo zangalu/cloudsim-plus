@@ -8,21 +8,17 @@
 package org.cloudbus.cloudsim.datacenters.network;
 
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
-import org.cloudbus.cloudsim.cloudlets.Cloudlet;
-import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.Simulation;
-import org.cloudbus.cloudsim.core.events.SimEvent;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.network.switches.AbstractSwitch;
 import org.cloudbus.cloudsim.network.switches.EdgeSwitch;
 import org.cloudbus.cloudsim.network.switches.Switch;
-import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletScheduler;
-import org.cloudbus.cloudsim.util.Log;
-import org.cloudbus.cloudsim.vms.Vm;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
@@ -65,8 +61,6 @@ public class NetworkDatacenter extends DatacenterSimple {
      * <br>
      * No PEs mean the Cloudlets can't be processed. A CloudResource must
      * contain one or more Machines. A Machine must contain one or more PEs.
-     *
-     * @post $none
      */
     public NetworkDatacenter(
         Simulation simulation,
@@ -91,81 +85,12 @@ public class NetworkDatacenter extends DatacenterSimple {
                 .collect(toList());
     }
 
-    @Override
-    protected boolean processVmCreate(SimEvent ev, boolean ackRequested) {
-        if(!super.processVmCreate(ev, ackRequested))
-            return false;
-
-        final Vm vm = (Vm) ev.getData();
-        Log.printLine(vm.getId() + " VM is created on " + vm.getHost().getId());
-        return true;
-    }
-
     /**
      * Adds a {@link AbstractSwitch} to the Datacenter.
      * @param sw the AbstractSwitch to be added
      */
     public void addSwitch(Switch sw){
         switchMap.add(sw);
-    }
-
-    @Override
-    protected void processCloudletSubmit(SimEvent ev, boolean ack) {
-        updateCloudletProcessing();
-
-        // gets the Cloudlet object
-        final Cloudlet cl = (Cloudlet) ev.getData();
-
-        // checks whether this Cloudlet has finished or not
-        if (cl.isFinished()) {
-            Log.printConcatLine(
-                    getName(), ": Warning - Cloudlet #",
-                    cl.getId(), " owned by ", cl.getBroker().getName(),
-                    " is already completed/finished.");
-            Log.printLine("Therefore, it is not being executed again\n");
-
-            // NOTE: If a Cloudlet has finished, then it won't be processed.
-            // So, if ack is required, this method sends back a result.
-            // If ack is not required, this method don't send back a result.
-            // Hence, this might cause CloudSim to be hanged since waiting
-            // for this Cloudlet back.
-            if (ack) {
-                // unique tag = operation tag
-                final int tag = CloudSimTags.CLOUDLET_SUBMIT_ACK;
-                sendNow(cl.getBroker(), tag, cl);
-            }
-
-            sendNow(cl.getBroker(), CloudSimTags.CLOUDLET_RETURN, cl);
-
-            return;
-        }
-
-        // process this Cloudlet to this Datacenter
-        cl.assignToDatacenter(this);
-
-        // time to transfer the files
-        final double fileTransferTime = predictFileTransferTime(cl.getRequiredFiles());
-
-        final CloudletScheduler scheduler = cl.getVm().getCloudletScheduler();
-        double estimatedFinishTime = scheduler.cloudletSubmit(cl, fileTransferTime);
-
-        if (estimatedFinishTime > 0.0) { // if this cloudlet is in the exec
-            // time to process the cloudlet
-            estimatedFinishTime += fileTransferTime;
-            send(this,
-                getCloudletProcessingUpdateInterval(estimatedFinishTime),
-                CloudSimTags.VM_UPDATE_CLOUDLET_PROCESSING_EVENT);
-
-            // event to update the stages
-            send(this, 0.0001, CloudSimTags.VM_UPDATE_CLOUDLET_PROCESSING_EVENT);
-        }
-
-        if (ack) {
-            // unique tag = operation tag
-            sendNow(cl.getBroker(), CloudSimTags.CLOUDLET_SUBMIT_ACK, cl);
-        }
-
-        checkCloudletsCompletionForAllHosts();
     }
 
     /**
@@ -175,5 +100,4 @@ public class NetworkDatacenter extends DatacenterSimple {
     public List<Switch> getSwitchMap() {
         return Collections.unmodifiableList(switchMap);
     }
-
 }

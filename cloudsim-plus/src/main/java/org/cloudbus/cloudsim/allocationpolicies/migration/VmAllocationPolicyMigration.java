@@ -39,8 +39,8 @@ public interface VmAllocationPolicyMigration extends VmAllocationPolicy {
      * Gets a <b>read-only</b> map of metric history.
      *
      * @TODO the map stores different data. Sometimes it stores the upper
-     * threshold, other it stores utilization threshold or predicted
-     * utilization, that is very confusing.
+     * threshold, other times it stores utilization threshold or predicted
+     * utilization. That is very confusing.
      *
      * @return the metric history
      */
@@ -55,7 +55,17 @@ public interface VmAllocationPolicyMigration extends VmAllocationPolicy {
     Map<Host, List<Double>> getTimeHistory();
 
     /**
-     * Checks if host is over utilized.
+     * Checks if host is currently under utilized, according the the
+     * conditions defined by the Allocation Policy.
+     *
+     * @param host the host
+     * @return true, if the host is under utilized; false otherwise
+     */
+    boolean isHostUnderloaded(Host host);
+
+    /**
+     * Checks if host is currently over utilized, according the the
+     * conditions defined by the Allocation Policy.
      *
      * @param host the host to check
      * @return true, if the host is over utilized; false otherwise
@@ -71,14 +81,6 @@ public interface VmAllocationPolicyMigration extends VmAllocationPolicy {
      * @return the over utilization threshold
      */
     double getOverUtilizationThreshold(Host host);
-
-    /**
-     * Checks if host is under utilized.
-     *
-     * @param host the host
-     * @return true, if the host is under utilized; false otherwise
-     */
-    boolean isHostUnderloaded(Host host);
 
     /**
      * Gets the percentage of total CPU utilization

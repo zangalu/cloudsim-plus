@@ -8,39 +8,45 @@
  */
 package org.cloudbus.cloudsim.examples.network;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.cloudbus.cloudsim.cloudlets.Cloudlet;
-import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
-import org.cloudbus.cloudsim.network.topologies.BriteNetworkTopology;
-import org.cloudbus.cloudsim.network.topologies.NetworkTopology;
-import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.datacenters.Datacenter;
-import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
-import org.cloudbus.cloudsim.datacenters.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.datacenters.DatacenterCharacteristicsSimple;
+import org.cloudbus.cloudsim.cloudlets.Cloudlet;
+import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.datacenters.Datacenter;
+import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.HostSimple;
-import org.cloudbus.cloudsim.util.Log;
+import org.cloudbus.cloudsim.network.topologies.BriteNetworkTopology;
+import org.cloudbus.cloudsim.network.topologies.NetworkTopology;
+import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.PeSimple;
-import org.cloudbus.cloudsim.util.ResourceLoader;
+import org.cloudbus.cloudsim.resources.SanStorage;
+import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
+import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
-import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
-import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
-import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
-import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple example showing how to create a Datacenter with 1 host and a network
- * topology and and run 1 cloudlet on it.
+ * topology, running 1 cloudlet on it.
+ * There is just one VM with a single PE of 250 MIPS.
+ * The Cloudlet requires 1 PE and has a length of 40000 MI.
+ * This way, the Cloudlet will take 160 seconds to finish (40000/250).
+ *
+ * <p>The Cloudlet is not requiring any files from a {@link SanStorage},
+ * but since a network topology is defined from the file topology.brite,
+ * communication delay between network elements is simulated,
+ * causing the Cloudlet to start executing just after a few seconds.</p>
  */
 public class NetworkExample1 {
     private List<Cloudlet> cloudletList;
@@ -57,51 +63,46 @@ public class NetworkExample1 {
     }
 
     public NetworkExample1() {
-        Log.printFormattedLine("Starting %s...", getClass().getSimpleName());
-        // First step: Initialize the CloudSim package. It should be called
-        // before creating any entities.
+        //Enables just some level of log messages.
+        //Make sure to import org.cloudsimplus.util.Log;
+        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
 
-        // Initialize the CloudSim library
+        System.out.println("Starting " + getClass().getSimpleName());
+
+        // First step: Initialize the CloudSim package.
         simulation = new CloudSim();
 
-        // Second step: Create Datacenters
         //Datacenters are the resource providers in CloudSim. We need at list one of them to run a CloudSim simulation
         Datacenter datacenter0 = createDatacenter();
 
-        //Third step: Create Broker
         DatacenterBroker broker = createBroker();
 
-        //Fourth step: Create one virtual machine
         vmlist = new ArrayList<>();
 
-        //VM description
-        int vmid = 0;
-        int mips = 250;
-        long size = 10000; //image size (MEGABYTE)
-        int ram = 512; //vm memory (MEGABYTE)
-        long bw = 1000;
-        int pesNumber = 1; //number of cpus
+        final int vmid = 0;
+        final int mips = 250;
+        final long size = 10000; //image size (MEGABYTE)
+        final int ram = 512; //vm memory (MEGABYTE)
+        final long bw = 1000; //in Megabits/s
+        final int pesNumber = 1; //number of cpus
 
-        //create VM
         Vm vm1 = new VmSimple(vmid, mips, pesNumber)
                 .setRam(ram).setBw(bw).setSize(size)
                 .setCloudletScheduler(new CloudletSchedulerTimeShared());
 
-        //add the VM to the vmList
         vmlist.add(vm1);
 
-        //submit vm list to the broker
         broker.submitVmList(vmlist);
 
-        //Fifth step: Create one Cloudlet
         cloudletList = new ArrayList<>();
 
         //Cloudlet properties
-        int id = 0;
-        long length = 40000;
-        long fileSize = 300;
-        long outputSize = 300;
-        UtilizationModel utilizationModel = new UtilizationModelFull();
+        final int id = 0;
+        final long length = 40000;
+        final long fileSize = 300;
+        final long outputSize = 300;
+        //The RAM, CPU and Bandwidth UtilizationModel.
+        final UtilizationModel utilizationModel = new UtilizationModelFull();
 
         Cloudlet cloudlet1 =
             new CloudletSimple(id, length, pesNumber)
@@ -115,7 +116,6 @@ public class NetworkExample1 {
         //submit cloudlet list to the broker
         broker.submitCloudletList(cloudletList);
 
-        //Sixth step: configure network
         //load the network topology file
         NetworkTopology networkTopology = BriteNetworkTopology.getInstance("topology.brite");
         simulation.setNetworkTopology(networkTopology);
@@ -129,31 +129,21 @@ public class NetworkExample1 {
         briteNode = 3;
         networkTopology.mapNode(broker.getId(), briteNode);
 
-        // Seventh step: Starts the simulation
         simulation.start();
 
-        // Final step: Print results when simulation is over
         List<Cloudlet> newList = broker.getCloudletFinishedList();
         new CloudletsTableBuilder(newList).build();
-        Log.printFormattedLine("%s finished!", getClass().getSimpleName());
+        System.out.println(getClass().getSimpleName() + " finished!");
     }
 
     private Datacenter createDatacenter() {
-        // Here are the steps needed to create a DatacenterSimple:
-        // 1. We need to create a list to store
-        //    our machine
         List<Host> hostList = new ArrayList<>();
-
-        // 2. A Machine contains one or more PEs or CPUs/Cores.
-        // In this example, it will have only one core.
         List<Pe> peList = new ArrayList<>();
 
         long mips = 1000;
 
-        // 3. Create PEs and add these into a list.
-        peList.add(new PeSimple(mips, new PeProvisionerSimple())); // need to store Pe id and MIPS Rating
+        peList.add(new PeSimple(mips, new PeProvisionerSimple()));
 
-        //4. Create HostSimple with its id and list of PEs and add them to the list of machines
         long ram = 2048; // in Megabytes
         long storage = 1000000; // in Megabytes
         long bw = 10000; //in Megabits/s
@@ -164,12 +154,14 @@ public class NetworkExample1 {
             .setVmScheduler(new VmSchedulerTimeShared());
         hostList.add(host);
 
-        // 6. Finally, we need to create a DatacenterSimple object.
         return new DatacenterSimple(simulation, hostList, new VmAllocationPolicySimple());
     }
 
-    //We strongly encourage users to develop their own broker policies, to submit vms and cloudlets according
-    //to the specific rules of the simulated scenario
+    /**
+     * Creates a DatacenterBroker.
+     * We strongly encourage users to develop their own broker policies,
+     * to submit vms and cloudlets according to the specific rules of the simulated scenario.
+     */
     private DatacenterBroker createBroker() {
         return new DatacenterBrokerSimple(simulation);
     }

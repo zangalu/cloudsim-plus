@@ -7,11 +7,10 @@
  */
 package org.cloudbus.cloudsim.power.models;
 
-import static org.junit.Assert.assertEquals;
-
-import org.cloudbus.cloudsim.util.Log;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author	Anton Beloglazov
@@ -58,13 +57,6 @@ public class PowerModelCubicTest {
     @Test
     public void testGetPowerCustomUsage() {
         assertEquals(MAX_POWER * STATIC_POWER_PERCENT + (MAX_POWER - MAX_POWER * STATIC_POWER_PERCENT) / Math.pow(100, 3) * Math.pow(0.5 * 100, 3), powerModel.getPower(0.5), 0);
-    }
-
-
-    public void testPrintPower() {
-        for (int i = 0; i <= 100; i++) {
-            Log.print(String.format("%d;%.2f\n", i, powerModel.getPower((double) i / 100)));
-        }
     }
 
 }

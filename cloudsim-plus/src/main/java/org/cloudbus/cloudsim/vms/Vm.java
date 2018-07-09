@@ -7,23 +7,23 @@
  */
 package org.cloudbus.cloudsim.vms;
 
-import org.cloudbus.cloudsim.core.Machine;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
-import org.cloudsimplus.autoscaling.HorizontalVmScaling;
-import org.cloudbus.cloudsim.core.UniquelyIdentificable;
+import org.cloudbus.cloudsim.cloudlets.Cloudlet;
+import org.cloudbus.cloudsim.core.CustomerEntity;
+import org.cloudbus.cloudsim.core.Machine;
+import org.cloudbus.cloudsim.core.UniquelyIdentifiable;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.resources.*;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletScheduler;
+import org.cloudsimplus.autoscaling.HorizontalVmScaling;
+import org.cloudsimplus.autoscaling.VerticalVmScaling;
+import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.listeners.VmDatacenterEventInfo;
+import org.cloudsimplus.listeners.VmHostEventInfo;
 
 import java.util.List;
 import java.util.function.Predicate;
-import org.cloudbus.cloudsim.core.CustomerEntity;
-
-import org.cloudsimplus.autoscaling.VerticalVmScaling;
-import org.cloudsimplus.listeners.VmHostEventInfo;
-import org.cloudsimplus.listeners.VmDatacenterEventInfo;
-import org.cloudsimplus.listeners.EventListener;
 
 /**
  * An interface to be implemented by each class that provides basic
@@ -38,7 +38,7 @@ import org.cloudsimplus.listeners.EventListener;
  * @author Manoel Campos da Silva Filho
  * @since CloudSim Plus 1.0
  */
-public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, CustomerEntity {
+public interface Vm extends Machine, UniquelyIdentifiable, Comparable<Vm>, CustomerEntity {
 
     /**
      * An attribute that implements the Null Object Design Pattern for {@link Vm}
@@ -75,28 +75,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * @return the cloudlet scheduler
      */
     CloudletScheduler getCloudletScheduler();
-
-    /**
-     * Gets the current allocated bw.
-     *
-     * @return the current allocated bw
-     */
-    long getCurrentAllocatedBw();
-
-    /**
-     * Gets the current allocated ram.
-     *
-     * @return the current allocated ram
-     */
-    long getCurrentAllocatedRam();
-
-    /**
-     * Gets the current allocated storage size.
-     *
-     * @return the current allocated size
-     * @see #getStorage()
-     */
-    long getCurrentAllocatedSize();
 
     /**
      * Gets the current requested bw.
@@ -149,7 +127,7 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
     /**
      * Changes the allocation of a given resource for a VM.
      * The old allocated amount will be changed to the new given amount.
-     *  @param resourceClass the class of the resource to change the allocation
+     * @param resourceClass the class of the resource to change the allocation
      * @param newTotalResourceAmount the new amount to change the current allocation to*/
     void allocateResource(Class<? extends ResourceManageable> resourceClass, long newTotalResourceAmount);
 
@@ -257,12 +235,10 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
     boolean removeOnCreationFailureListener(EventListener<VmDatacenterEventInfo> listener);
 
     /**
-     * Gets bandwidth resource assigned to the Vm,
-     * allowing to check its capacity (in Megabits/s) and usage.
+     * Gets bandwidth resource (in Megabits/s) assigned to the Vm,
+     * allowing to check its capacity  and usage.
      *
      * @return bandwidth resource.
-     * @pre $none
-     * @post $none
      */
     @Override
     Resource getBw();
@@ -272,8 +248,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * allowing to check its capacity (in Megabytes) and usage.
      *
      * @return the RAM resource
-     * @pre $none
-     * @post $none
      */
     @Override
     Resource getRam();
@@ -283,8 +257,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * allowing to check its capacity (in Megabytes) and usage.
      *
      * @return the storage resource
-     * @pre $none
-     * @post $none
      */
     @Override
     Resource getStorage();
@@ -314,6 +286,15 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
     double getCpuPercentUsage();
 
     /**
+     * Gets the current total CPU MIPS utilization of all PEs from all cloudlets running on this VM.
+     *
+     * @return total CPU utilization in MIPS
+     * @see #getCpuPercentUsage(double)
+     *
+     */
+    double getTotalCpuMipsUsage();
+
+    /**
      * Gets the total CPU MIPS utilization of all PEs from all cloudlets running on this VM at the
      * given time.
      *
@@ -328,8 +309,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * Gets the Virtual Machine Monitor (VMM) that manages the VM.
      *
      * @return VMM
-     * @pre $none
-     * @post $none
      */
     String getVmm();
 
@@ -340,6 +319,14 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * @return true, if it was created inside the Host, false otherwise
      */
     boolean isCreated();
+
+    /**
+     * Checks if the VM has enough capacity to run a Cloudlet.
+     *
+     * @param cloudlet the candidate Cloudlet to run inside the VM
+     * @return true if the VM can run the Cloudlet, false otherwise
+     */
+    boolean isSuitableForCloudlet(Cloudlet cloudlet);
 
     /**
      * Changes the created status of the Vm inside the Host.
@@ -365,12 +352,11 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
     void setInMigration(boolean inMigration);
 
     /**
-     * Sets the BW capacity
+     * Sets the bandwidth capacity (in Megabits/s)
      *
-     * @param bwCapacity new BW capacity
+     * @param bwCapacity new BW capacity (in Megabits/s)
      * @return
      * @pre bwCapacity > 0
-     * @post $none
      */
     Vm setBw(long bwCapacity);
 
@@ -378,8 +364,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * Sets the PM that hosts the VM.
      *
      * @param host Host to run the VM
-     * @pre host != $null
-     * @post $none
      */
     void setHost(Host host);
 
@@ -389,7 +373,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * @param ramCapacity new RAM capacity
      * @return
      * @pre ramCapacity > 0
-     * @post $none
      */
     Vm setRam(long ramCapacity);
 
@@ -399,8 +382,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * @param size new storage size
      * @return
      * @pre size > 0
-     * @post $none
-     *
      */
     Vm setSize(long size);
 
@@ -414,7 +395,6 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * (which is a relative delay from the current simulation time),
      * or {@link Double#MAX_VALUE} if there is no next Cloudlet to execute
      * @pre currentTime >= 0
-     * @post $none
      */
     double updateProcessing(double currentTime, List<Double> mipsShare);
 
@@ -625,13 +605,28 @@ public interface Vm extends Machine, UniquelyIdentificable, Comparable<Vm>, Cust
      * Gets the last time the VM was running some Cloudlet.
      * @return the last buzy time (in seconds)
      */
-    double getLastBuzyTime();
+    double getLastBusyTime();
 
     /**
      * Gets the last interval the VM was idle (without running any Cloudlet).
      * @return the last idle time interval (in seconds)
      */
     double getIdleInterval();
+
+    /**
+     * Checks if the VM is currently idle.
+     * @return true if the VM currently idle, false otherwise
+     */
+    boolean isIdle();
+
+    /**
+     * Checks if the VM has been idle for a given amount of time (in seconds).
+     * @param time the time interval to check if the VM has been idle (in seconds).
+     *             If time is zero, it will be checked if the VM is currently idle.
+     * @return true if the VM has been idle as long as the given time,
+     *         false if it's active of isn't idle as long enough
+     */
+    boolean isIdleEnough(double time);
 
     /**
      * Gets the object containing CPU utilization percentage history (between [0 and 1], where 1 is 100%).

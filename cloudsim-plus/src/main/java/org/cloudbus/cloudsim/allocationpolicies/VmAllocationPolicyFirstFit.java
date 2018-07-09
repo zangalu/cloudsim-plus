@@ -11,17 +11,13 @@ package org.cloudbus.cloudsim.allocationpolicies;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.vms.Vm;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
  * An <b>First Fit VM allocation policy</b>
  * which finds the first Host having suitable resources to place a given VM.
  *
- * <p><b>NOTE: This policy doesn't perform optimization of VM allocation (placement)
- * by means of VM migration.</b></p>
+ * <p><b>NOTE: This policy doesn't perform optimization of VM allocation by means of VM migration.</b></p>
  *
  * <p>If you are using any algorithms, policies or workload included in the power package please cite
  * the following paper:
@@ -42,20 +38,7 @@ public class VmAllocationPolicyFirstFit extends VmAllocationPolicyAbstract imple
     public Optional<Host> findHostForVm(final Vm vm) {
         return this.getHostList()
                 .stream()
-                .sorted()
                 .filter(h -> h.isSuitableForVm(vm))
                 .findFirst();
-    }
-
-    /**
-     * This implementation doesn't perform any
-     * VM placement optimization and, in fact, has no effect.
-     *
-     * @param vmList the list of VMs
-     * @return an empty map to indicate that it never performs optimization
-     */
-    @Override
-    public Map<Vm, Host> getOptimizedAllocationMap(final List<? extends Vm> vmList) {
-        return Collections.EMPTY_MAP;
     }
 }

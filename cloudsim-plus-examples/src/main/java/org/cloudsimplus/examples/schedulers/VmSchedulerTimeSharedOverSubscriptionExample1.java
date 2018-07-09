@@ -103,11 +103,14 @@ public class VmSchedulerTimeSharedOverSubscriptionExample1 {
     }
 
     public VmSchedulerTimeSharedOverSubscriptionExample1() {
+        /*Enables just some level of log messages.
+          Make sure to import org.cloudsimplus.util.Log;*/
+        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
+
+        simulation = new CloudSim();
         hostList = new ArrayList<>(HOSTS);
         vmList = new ArrayList<>(VMS);
         cloudletList = new ArrayList<>(CLOUDLETS);
-
-        simulation = new CloudSim();
 
         createDatacenter();
 
@@ -122,9 +125,9 @@ public class VmSchedulerTimeSharedOverSubscriptionExample1 {
         simulation.start();
 
         new CloudletsTableBuilder(broker0.getCloudletFinishedList())
-            .addColumn(5, new TextTableColumn("Host MIPS", "total"), c -> c.getVm().getHost().getTotalMipsCapacity())
-            .addColumn(8, new TextTableColumn("VM MIPS", "total"), c -> c.getVm().getTotalMipsCapacity())
-            .addColumn(9, new TextTableColumn("  VM MIPS", "requested"), this::getVmRequestedMips)
+            .addColumn(5,  new TextTableColumn("Host MIPS", "total"), c -> c.getVm().getHost().getTotalMipsCapacity())
+            .addColumn(8,  new TextTableColumn("VM MIPS", "total"), c -> c.getVm().getTotalMipsCapacity())
+            .addColumn(9,  new TextTableColumn("  VM MIPS", "requested"), this::getVmRequestedMips)
             .addColumn(10, new TextTableColumn("  VM MIPS", "allocated"), this::getVmAllocatedMips)
             .build();
 

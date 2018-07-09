@@ -38,7 +38,7 @@ public class DatacenterBrokerSimple extends DatacenterBrokerAbstract {
         super(simulation);
         setDatacenterSupplier(this::selectDatacenterForWaitingVms);
         setFallbackDatacenterSupplier(this::selectFallbackDatacenterForWaitingVms);
-        setVmMapper(this::selectVmForWaitingCloudlet);
+        setVmMapper(this::defaultVmMapper);
     }
 
     /**
@@ -62,23 +62,15 @@ public class DatacenterBrokerSimple extends DatacenterBrokerAbstract {
      * the remaining VMs or {@link Datacenter#NULL} if no suitable Datacenter was found
      */
     protected Datacenter selectFallbackDatacenterForWaitingVms() {
-        return getDatacenterList().stream()
-            .filter(dc -> !getDatacenterRequestedList().contains(dc))
-            .findFirst()
-            .orElse(Datacenter.NULL);
+        return getDatacenterList()
+                .stream()
+                .filter(dc -> !getDatacenterRequestedList().contains(dc))
+                .findFirst()
+                .orElse(Datacenter.NULL);
     }
 
-    /**
-     * Defines the policy used to select a Vm to host a Cloudlet
-     * that is waiting to be created.
-     * <br>It applies a Round-Robin policy to cyclically select
-     * the next Vm from the list of waiting VMs.
-     *
-     * @param cloudlet the cloudlet that needs a VM to be placed into
-     * @return the selected Vm for the cloudlet or {@link Vm#NULL} if
-     * no suitable VM was found
-     */
-    protected Vm selectVmForWaitingCloudlet(final Cloudlet cloudlet) {
+    @Override
+    public Vm defaultVmMapper(final Cloudlet cloudlet) {
         if (cloudlet.isBindToVm() && getVmExecList().contains(cloudlet.getVm())) {
             return cloudlet.getVm();
         }

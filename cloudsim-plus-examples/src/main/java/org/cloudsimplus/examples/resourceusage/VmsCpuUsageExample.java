@@ -39,8 +39,8 @@ import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelDynamic;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
@@ -68,8 +68,8 @@ public class VmsCpuUsageExample {
     private List<Cloudlet> cloudletList;
     private List<Vm> vmlist;
     private DatacenterBroker broker;
-    private static final int NUMBER_OF_VMS = 2;
-    private static final int NUMBER_OF_HOSTS = 2;
+    private static final int VMS_NUMBER = 2;
+    private static final int HOSTS_NUMBER = 2;
 
     /**
      * Starts the example execution.
@@ -80,7 +80,11 @@ public class VmsCpuUsageExample {
     }
 
     public VmsCpuUsageExample() {
-        Log.printFormattedLine("Starting %s ...", getClass().getSimpleName());
+        /*Enables just some level of log messages.
+          Make sure to import org.cloudsimplus.util.Log;*/
+        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
+
+        System.out.println("Starting " + getClass().getSimpleName());
         CloudSim simulation = new CloudSim();
 
         @SuppressWarnings("unused")
@@ -88,12 +92,12 @@ public class VmsCpuUsageExample {
 
         broker = new DatacenterBrokerSimple(simulation);
 
-        vmlist = new ArrayList<>(NUMBER_OF_VMS);
-        cloudletList = new ArrayList<>(NUMBER_OF_VMS);
+        vmlist = new ArrayList<>(VMS_NUMBER);
+        cloudletList = new ArrayList<>(VMS_NUMBER);
 
         int mips = 1000;
         int pesNumber = 1;
-        for (int i = 1; i <= NUMBER_OF_VMS; i++) {
+        for (int i = 1; i <= VMS_NUMBER; i++) {
             Vm vm = createVm(pesNumber, mips * i, i - 1);
             vmlist.add(vm);
             Cloudlet cloudlet = createCloudlet(pesNumber, i-1);
@@ -110,19 +114,22 @@ public class VmsCpuUsageExample {
 
         showCpuUtilizationForAllVms(finishTime);
 
-        Log.printFormattedLine("%s finished!", getClass().getSimpleName());
+        System.out.println(getClass().getSimpleName() + " finished!");
     }
 
     private Cloudlet createCloudlet(int pesNumber, int id) {
         long length = 10000;
         long fileSize = 300;
         long outputSize = 300;
-        UtilizationModel utilizationModel = new UtilizationModelFull();
+        UtilizationModel utilizationModelDynamic = new UtilizationModelDynamic(0.25);
+        UtilizationModel utilizationModelCpu = new UtilizationModelFull();
 
         Cloudlet cloudlet = new CloudletSimple(id, length, pesNumber);
         cloudlet.setFileSize(fileSize)
             .setOutputSize(outputSize)
-            .setUtilizationModel(utilizationModel);
+            .setUtilizationModelCpu(utilizationModelCpu)
+            .setUtilizationModelBw(utilizationModelDynamic)
+            .setUtilizationModelRam(utilizationModelDynamic);
         return cloudlet;
     }
 
@@ -140,12 +147,12 @@ public class VmsCpuUsageExample {
     }
 
     private void showCpuUtilizationForAllVms(final double simulationFinishTime) {
-        Log.printLine("\nHosts CPU utilization history for the entire simulation period");
+        System.out.println("\nHosts CPU utilization history for the entire simulation period\n");
         int numberOfUsageHistoryEntries = 0;
         for (Vm vm : vmlist) {
-            Log.printFormattedLine("VM %d", vm.getId());
+            System.out.printf("VM %d\n", vm.getId());
             if (vm.getStateHistory().isEmpty()) {
-                Log.printLine("\tThere isn't any usage history");
+                System.out.println("\tThere isn't any usage history");
                 continue;
             }
 
@@ -153,13 +160,13 @@ public class VmsCpuUsageExample {
                 final double vmCpuUsage = getVmCpuUtilizationInMips(vm, simulationFinishTime);
                 if (vmCpuUsage > 0) {
                     numberOfUsageHistoryEntries++;
-                    Log.printFormattedLine("\tTime: %2d CPU Utilization (MIPS): %.2f", clock, vmCpuUsage);
+                    System.out.printf("\tTime: %2d CPU Utilization (MIPS): %.2f\n", clock, vmCpuUsage);
                 }
             }
         }
 
         if (numberOfUsageHistoryEntries == 0) {
-            Log.printLine(" No CPU usage history was found");
+            System.out.println("No CPU usage history was found");
         }
     }
 
@@ -179,10 +186,10 @@ public class VmsCpuUsageExample {
     }
 
     private static Datacenter createDatacenter(CloudSim simulation) {
-        List<Host> hostList = new ArrayList<>(NUMBER_OF_HOSTS);
+        List<Host> hostList = new ArrayList<>(HOSTS_NUMBER);
         final int pesNumber = 1;
         final int mips = 1000;
-        for (int i = 1; i <= NUMBER_OF_HOSTS; i++) {
+        for (int i = 1; i <= HOSTS_NUMBER; i++) {
             Host host = createHost(pesNumber, mips*i, i-1);
             hostList.add(host);
         }
@@ -196,14 +203,15 @@ public class VmsCpuUsageExample {
             peList.add(new PeSimple(mips, new PeProvisionerSimple()));
         }
 
-        //4. Create Hosts with its id and list of PEs and add them to the list of machines
-        int ram = 2048; //host memory (MEGABYTE)
-        long storage = 1000000; //host storage
-        int bw = 10000;
+        final int ram = 2048; //host memory (MEGABYTE)
+        final long storage = 1000000; //host storage
+        final int bw = 10000;
 
-        return new HostSimple(ram, bw, storage, peList)
+        final Host host = new HostSimple(ram, bw, storage, peList)
             .setRamProvisioner(new ResourceProvisionerSimple())
             .setBwProvisioner(new ResourceProvisionerSimple())
             .setVmScheduler(new VmSchedulerTimeShared());
+        host.enableStateHistory();
+        return host;
     }
 }

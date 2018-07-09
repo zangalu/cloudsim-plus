@@ -66,7 +66,6 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.selectionpolicies.power.PowerVmSelectionPolicyMinimumUtilization;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelDynamic;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
@@ -196,7 +195,11 @@ public final class MigrationExample2_PowerUsage {
     }
 
     public MigrationExample2_PowerUsage(){
-        Log.printConcatLine("Starting ", getClass().getSimpleName(), "...");
+        /*Enables just some level of log messages.
+          Make sure to import org.cloudsimplus.util.Log;*/
+        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
+
+        System.out.println("Starting " + getClass().getSimpleName());
         simulation = new CloudSim();
 
         @SuppressWarnings("unused")
@@ -216,7 +219,7 @@ public final class MigrationExample2_PowerUsage {
         System.out.println("\n    WHEN A HOST CPU ALLOCATED MIPS IS LOWER THAN THE REQUESTED, IT'S DUE TO VM MIGRATION OVERHEAD)\n");
 
         hostList.stream().forEach(this::printHistory);
-        Log.printConcatLine(getClass().getSimpleName(), " finished!");
+        System.out.println(getClass().getSimpleName() + " finished!");
     }
 
     private void printHistory(Host host){
@@ -268,17 +271,15 @@ public final class MigrationExample2_PowerUsage {
     }
 
     public void createAndSubmitCloudlets(DatacenterBroker broker) {
-        double initialCloudletCpuUtilizationPercentage = CLOUDLET_INITIAL_CPU_PERCENTAGE;
         final List<Cloudlet> list = new ArrayList<>(VMS -1);
         Cloudlet cloudlet = Cloudlet.NULL;
-        int id = 0;
-        UtilizationModelDynamic um = createCpuUtilizationModel(initialCloudletCpuUtilizationPercentage, 1);
+        UtilizationModelDynamic um = createCpuUtilizationModel(CLOUDLET_INITIAL_CPU_PERCENTAGE, 1);
         for(Vm vm: vmList){
             cloudlet = createCloudlet(vm, broker, um);
             list.add(cloudlet);
         }
 
-        //Changes the CPU usage of the last cloudlet to increase dynamically
+        //Changes the CPU usage of the last cloudlet to start at a lower value and increase dynamically up to 100%
         cloudlet.setUtilizationModelCpu(createCpuUtilizationModel(0.2, 1));
 
         broker.submitCloudletList(list);
@@ -380,8 +381,8 @@ public final class MigrationExample2_PowerUsage {
      * Increments the CPU resource utilization, that is defined in percentage values.
      * @return the new resource utilization after the increment
      */
-    private double getCpuUsageIncrement(UtilizationModelDynamic um){
-        return  um.getUtilization() + um.getTimeSpan()* CLOUDLET_CPU_INCREMENT_PER_SECOND;
+    private double getCpuUsageIncrement(final UtilizationModelDynamic um){
+        return  um.getUtilization() + um.getTimeSpan()*CLOUDLET_CPU_INCREMENT_PER_SECOND;
     }
 
     /**
@@ -397,7 +398,7 @@ public final class MigrationExample2_PowerUsage {
             Host host = createHost(pes, HOST_MIPS);
             hostList.add(host);
         }
-        Log.printLine();
+        System.out.println();
 
         /* Defines the fallback VmAllocationPolicy to be used
         * in case there is not enough host CPU utilization history

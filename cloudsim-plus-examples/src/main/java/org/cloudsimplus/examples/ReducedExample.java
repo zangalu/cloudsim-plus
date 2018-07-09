@@ -23,7 +23,6 @@
  */
 package org.cloudsimplus.examples;
 
-import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicy;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
@@ -31,8 +30,6 @@ import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
 import org.cloudbus.cloudsim.core.CloudSim;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
-import org.cloudbus.cloudsim.datacenters.DatacenterCharacteristics;
-import org.cloudbus.cloudsim.datacenters.DatacenterCharacteristicsSimple;
 import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.HostSimple;
@@ -51,25 +48,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An example showing the most minimal code required to create
+ * An example showing a very minimal code required to create
  * a simulation scenario in CloudSim Plus.
  *
  * <p><b>NOTICE: This example is not intended to be reused and we strongly recommend
- * you not doing that. Since all the code was put inside a single method (the main
- * method) that is completely unappropriated.</b></p>
+ * you not doing that. Since all the code is inside a single method,
+ * that is completely unappropriated.</b></p>
  *
  * <p>This code has the <b>only intention</b> to show how it's simpler
  * and easier to create cloud computing simulations using CloudSim Plus.</p>
  *
- * <p>If you want a first basic, but organized and reusable example,
+ * <p>If you want a basic, but organized and reusable first example,
  * see the {@link BasicFirstExample}.</p>
  *
  * @author Manoel Campos da Silva Filho
  * @since CloudSim Plus 1.0
+ * @see BasicFirstExample
  */
 class ReducedExample {
     public static void main(String[] args) {
         //tag::cloudsim-plus-reduced-example[]
+        //Enables just some level of log messages
+        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
+
         //Creates a CloudSim object to initialize the simulation.
         CloudSim cloudsim = new CloudSim();
 

@@ -12,8 +12,9 @@ import org.cloudbus.cloudsim.core.events.SimEvent;
 import org.cloudbus.cloudsim.datacenters.network.NetworkDatacenter;
 import org.cloudbus.cloudsim.network.HostPacket;
 import org.cloudbus.cloudsim.util.Conversion;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.vms.Vm;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class allows to simulate Root switch which connects Datacenters to
@@ -38,6 +39,8 @@ import org.cloudbus.cloudsim.vms.Vm;
  * @since CloudSim Toolkit 3.0
  */
 public class RootSwitch extends AbstractSwitch {
+    private static final Logger logger = LoggerFactory.getLogger(RootSwitch.class.getSimpleName());
+
     /**
      * The level (layer) of the switch in the network topology.
      */
@@ -58,7 +61,7 @@ public class RootSwitch extends AbstractSwitch {
      * The downlink bandwidth of RootSwitch in Megabits/s.
      * It also represents the uplink bandwidth of connected aggregation Datacenter.
      */
-    public static final long DOWNLINK_BW = (long) Conversion.GIBABYTE * 40 * 8; // 40000 Megabits (40 Gigabits)
+    public static final long DOWNLINK_BW = (long) Conversion.GIGABYTE * 40 * 8; // 40000 Megabits (40 Gigabits)
 
     /**
      * Instantiates a Root AbstractSwitch specifying what other Datacenter are connected
@@ -84,7 +87,7 @@ public class RootSwitch extends AbstractSwitch {
         final Switch aggSwitch = findAggregateSwitchConnectedToGivenEdgeSwitch(edgeSwitch);
 
         if (aggSwitch == Switch.NULL) {
-            Log.printLine("No destination switch for this packet");
+            logger.error("No destination switch for this packet");
             return;
         }
 

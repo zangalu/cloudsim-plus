@@ -1,6 +1,4 @@
-.. java:import:: java.util.function BiFunction
-
-.. java:import:: java.util.stream LongStream
+.. java:import:: org.cloudbus.cloudsim.allocationpolicies.migration VmAllocationPolicyMigrationAbstract
 
 .. java:import:: org.cloudbus.cloudsim.datacenters Datacenter
 
@@ -8,11 +6,23 @@
 
 .. java:import:: org.cloudbus.cloudsim.provisioners ResourceProvisioner
 
-.. java:import:: org.cloudbus.cloudsim.util Log
+.. java:import:: org.cloudbus.cloudsim.resources Pe
+
+.. java:import:: org.cloudbus.cloudsim.resources Processor
+
+.. java:import:: org.cloudbus.cloudsim.resources ResourceManageable
 
 .. java:import:: org.cloudbus.cloudsim.vms Vm
 
 .. java:import:: org.cloudsimplus.autoscaling VerticalVmScaling
+
+.. java:import:: org.slf4j Logger
+
+.. java:import:: org.slf4j LoggerFactory
+
+.. java:import:: java.util.function BiFunction
+
+.. java:import:: java.util.stream LongStream
 
 VmAllocationPolicyAbstract
 ==========================
@@ -76,7 +86,7 @@ allocateHostForVm
 allocateHostForVm
 ^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean allocateHostForVm(Vm vm, Host host)
+.. java:method:: @SuppressWarnings @Override public boolean allocateHostForVm(Vm vm, Host host)
    :outertype: VmAllocationPolicyAbstract
 
 deallocateHostForVm
@@ -106,6 +116,23 @@ getHostList
 
 .. java:method:: @Override public final <T extends Host> List<T> getHostList()
    :outertype: VmAllocationPolicyAbstract
+
+getOptimizedAllocationMap
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public Map<Vm, Host> getOptimizedAllocationMap(List<? extends Vm> vmList)
+   :outertype: VmAllocationPolicyAbstract
+
+   {@inheritDoc}
+
+   This method implementation doesn't perform any
+   VM placement optimization and, in fact, has no effect.
+   The  class
+   provides an actual implementation for this method that can be overridden
+   by subclasses.
+
+   :param vmList: {@inheritDoc}
+   :return: {@inheritDoc}
 
 removeUsedPes
 ^^^^^^^^^^^^^

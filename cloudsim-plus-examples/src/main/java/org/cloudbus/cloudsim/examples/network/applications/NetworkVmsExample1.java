@@ -1,37 +1,31 @@
 package org.cloudbus.cloudsim.examples.network.applications;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
-import org.cloudbus.cloudsim.hosts.Host;
-import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
-import org.cloudbus.cloudsim.util.Log;
-import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
+import org.cloudbus.cloudsim.cloudlets.network.*;
 import org.cloudbus.cloudsim.core.CloudSim;
-import org.cloudbus.cloudsim.cloudlets.network.CloudletExecutionTask;
-import org.cloudbus.cloudsim.cloudlets.network.CloudletReceiveTask;
-import org.cloudbus.cloudsim.cloudlets.network.CloudletSendTask;
-import org.cloudbus.cloudsim.cloudlets.network.CloudletTask;
-import org.cloudbus.cloudsim.network.switches.EdgeSwitch;
 import org.cloudbus.cloudsim.datacenters.network.NetworkDatacenter;
+import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.network.NetworkHost;
-import org.cloudbus.cloudsim.vms.network.NetworkVm;
-import org.cloudbus.cloudsim.cloudlets.network.NetworkCloudlet;
+import org.cloudbus.cloudsim.network.switches.EdgeSwitch;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.resources.PeSimple;
+import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
-import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
+import org.cloudbus.cloudsim.vms.network.NetworkVm;
+import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple example showing how two {@link NetworkCloudlet}'s communicate
- * between them, each one running inside VMs of different hosts.
+ * between them, each one running inside VMs on different hosts.
  *
  * @author Manoel Campos da Silva Filho
  */
@@ -71,8 +65,8 @@ public class NetworkVmsExample1 {
     /**
      * Creates, starts, stops the simulation and shows results.
      */
-    public NetworkVmsExample1() {
-        Log.printFormattedLine("Starting %s...", getClass().getSimpleName());
+    private NetworkVmsExample1() {
+        System.out.println("Starting " + getClass().getSimpleName());
         simulation = new CloudSim();
 
         datacenter = createDatacenter();
@@ -91,11 +85,11 @@ public class NetworkVmsExample1 {
         new CloudletsTableBuilder(newList).build();
 
         for (NetworkHost host : datacenter.<NetworkHost>getHostList()) {
-            Log.printFormatted("\nHost %d data transferred: %d bytes",
+            System.out.printf("\nHost %d data transferred: %d bytes",
                     host.getId(), host.getTotalDataTransferBytes());
         }
 
-        Log.printFormattedLine("\n\n%s finished!", getClass().getSimpleName());
+        System.out.println(getClass().getSimpleName() + " finished!");
     }
 
     /**
@@ -106,7 +100,7 @@ public class NetworkVmsExample1 {
     private NetworkDatacenter createDatacenter() {
         List<Host> hostList = new ArrayList<>();
         for (int i = 0; i < NUMBER_OF_HOSTS; i++) {
-            Host host = createHost(i);
+            Host host = createHost();
             hostList.add(host);
         }
 
@@ -118,7 +112,7 @@ public class NetworkVmsExample1 {
         return newDatacenter;
     }
 
-    private Host createHost(int id) {
+    private Host createHost() {
         List<Pe> peList = createPEs(HOST_PES, HOST_MIPS);
         return new NetworkHost(HOST_RAM, HOST_BW, HOST_STORAGE, peList)
                 .setRamProvisioner(new ResourceProvisionerSimple())
@@ -231,15 +225,27 @@ public class NetworkVmsExample1 {
     }
 
     /**
-     * Adds a send task to list of tasks of the given {@link NetworkCloudlet}.
+     * Adds an execution task to the list of tasks of the given
+     * {@link NetworkCloudlet}.
      *
-     * @param sourceCloudlet the {@link NetworkCloudlet} to add the task to
-     * @param destinationCloudlet the destination where to send or from which is
-     * expected to receive data
+     * @param cloudlet the {@link NetworkCloudlet} the task will belong to
+     */
+    private static void addExecutionTask(NetworkCloudlet cloudlet) {
+        CloudletTask task = new CloudletExecutionTask(
+            cloudlet.getTasks().size(), CLOUDLET_EXECUTION_TASK_LENGTH);
+        task.setMemory(TASK_RAM);
+        cloudlet.addTask(task);
+    }
+
+    /**
+     * Adds a send task to the list of tasks of the given {@link NetworkCloudlet}.
+     *
+     * @param sourceCloudlet the {@link NetworkCloudlet} from which packets will be sent
+     * @param destinationCloudlet the destination {@link NetworkCloudlet} to send packets to
      */
     private void addSendTask(
-            NetworkCloudlet sourceCloudlet,
-            NetworkCloudlet destinationCloudlet) {
+        NetworkCloudlet sourceCloudlet,
+        NetworkCloudlet destinationCloudlet) {
         CloudletSendTask task = new CloudletSendTask(sourceCloudlet.getTasks().size());
         task.setMemory(TASK_RAM);
         sourceCloudlet.addTask(task);
@@ -249,12 +255,11 @@ public class NetworkVmsExample1 {
     }
 
     /**
-     * Adds a receive task to list of tasks of the given
+     * Adds a receive task to the list of tasks of the given
      * {@link NetworkCloudlet}.
      *
-     * @param cloudlet the {@link NetworkCloudlet} that the task will belong to
-     * @param sourceCloudlet the cloudlet where it is expected to receive
-     * packets from
+     * @param cloudlet the {@link NetworkCloudlet} the task will belong to
+     * @param sourceCloudlet the {@link NetworkCloudlet} expected to receive packets from
      */
     private void addReceiveTask(NetworkCloudlet cloudlet, NetworkCloudlet sourceCloudlet) {
         CloudletReceiveTask task = new CloudletReceiveTask(
@@ -262,19 +267,6 @@ public class NetworkVmsExample1 {
         task.setMemory(TASK_RAM);
         task.setNumberOfExpectedPacketsToReceive(NUMBER_OF_PACKETS_TO_SEND);
         cloudlet.addTask(task);
-    }
-
-    /**
-     * Adds an execution task to list of tasks of the given
-     * {@link NetworkCloudlet}.
-     *
-     * @param netCloudlet the {@link NetworkCloudlet} to add the task
-     */
-    private static void addExecutionTask(NetworkCloudlet netCloudlet) {
-        CloudletTask task = new CloudletExecutionTask(
-                netCloudlet.getTasks().size(), CLOUDLET_EXECUTION_TASK_LENGTH);
-        task.setMemory(TASK_RAM);
-        netCloudlet.addTask(task);
     }
 
 }

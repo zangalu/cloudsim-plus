@@ -9,7 +9,7 @@ package org.cloudbus.cloudsim.cloudlets;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.core.Simulation;
-import org.cloudbus.cloudsim.core.UniquelyIdentificable;
+import org.cloudbus.cloudsim.core.UniquelyIdentifiable;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.vms.Vm;
@@ -318,12 +318,14 @@ public abstract class CloudletAbstract implements Cloudlet {
     }
 
     @Override
-    public boolean setFinishedLengthSoFar(final long length) {
-        if (length < 0.0 || datacenterExecutionList.isEmpty()) {
+    public boolean addFinishedLengthSoFar(final long partialFinishedMI) {
+        if (partialFinishedMI < 0.0 || datacenterExecutionList.isEmpty()) {
             return false;
         }
 
-        getLastExecutionInDatacenterInfo().setFinishedSoFar(Math.min(length, this.getLength()));
+
+        final long maxLengthToAdd = Math.min(partialFinishedMI, getLength()-getFinishedLengthSoFar());
+        getLastExecutionInDatacenterInfo().addFinishedSoFar(maxLengthToAdd);
         notifyListenersIfCloudletIsFinished();
         return true;
     }
@@ -779,7 +781,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public String getUid() {
-        return UniquelyIdentificable.getUid(broker.getId(), id);
+        return UniquelyIdentifiable.getUid(broker.getId(), id);
     }
 
     @Override

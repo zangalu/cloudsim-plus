@@ -7,17 +7,17 @@
  */
 package org.cloudbus.cloudsim.core;
 
-import java.util.*;
-import java.util.stream.Stream;
-
 import org.cloudbus.cloudsim.core.events.*;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.network.topologies.NetworkTopology;
-import org.cloudbus.cloudsim.util.Log;
-import java.util.function.Predicate;
-
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -31,11 +31,12 @@ import static java.util.stream.Collectors.toList;
  * @since CloudSim Toolkit 1.0
  */
 public class CloudSim implements Simulation {
+    private static final Logger logger = LoggerFactory.getLogger(CloudSim.class.getSimpleName());
 
     /**
      * CloudSim Plus current version.
      */
-    public static final String VERSION = "2.3.0";
+    public static final String VERSION = "3.0.1";
 
     /**
      * An array that works as a circular queue with capacity for just 2 elements
@@ -187,7 +188,7 @@ public class CloudSim implements Simulation {
         this.cis = new CloudInformationService(this);
 
         if (minTimeBetweenEvents <= 0) {
-            throw new IllegalArgumentException("The minimal time between events should be positive, but is:" + minTimeBetweenEvents);
+            throw new IllegalArgumentException("The minimal time between events should be positive, but is: " + minTimeBetweenEvents);
         }
 
         this.minTimeBetweenEvents = minTimeBetweenEvents;
@@ -200,26 +201,21 @@ public class CloudSim implements Simulation {
     public double start() {
         if(alreadyRunOnce){
             throw new UnsupportedOperationException(
-                "You can't run a simulation that has already run previously. If you've paused the simulation and want to resume it, you should call resume().");
+                "You can't run a simulation that has already run previously. " +
+                "If you've paused the simulation and want to resume it, call the resume() method.");
         }
 
-        Log.printConcatLine("Starting CloudSim Plus ", VERSION);
+        logger.info("Starting CloudSim Plus {}", VERSION);
         startEntitiesIfNotRunning();
         this.alreadyRunOnce = true;
 
-        while (running) {
-            runClockTickAndProcessFutureEventQueue();
-            if(abortRequested){
-                printMessage("\n================== Simulation aborted under request at time "+ clock +" ==================");
-                return clock;
-            }
-
-            if (terminateSimulationUnderRequest()) {
-                break;
-            }
-
-            checkIfSimulationPauseRequested();
+        if(!eventLoop()){
+            return clock;
         }
+
+        notifyEndOfSimulationToEntities();
+        running = false;
+        logger.info("Simulation: No more future events{}", System.lineSeparator());
 
         finishSimulation();
         printSimulationFinished();
@@ -227,17 +223,58 @@ public class CloudSim implements Simulation {
         return clock;
     }
 
+    /**
+     * Keeps looking for new events to process, until the simulation naturally finishes,
+     * is requested to finish at a given time or is aborted.
+     *
+     * @return true if the simulation was finished due to its natural end or
+     *         under request to finish at a specific time;
+     *         false if it was aborted.
+     */
+    private boolean eventLoop() {
+        while (runClockTickAndProcessFutureEvents() || waitSimulationClockToReachTerminationTime()) {
+            if(abortRequested){
+                logger.info("{}================== Simulation aborted under request at time {} ==================", System.lineSeparator(), clock);
+                return false;
+            }
+
+            if (isTimeToTerminateSimulationUnderRequest()) {
+                setClock(terminationTime);
+                return true;
+            }
+
+            checkIfSimulationPauseRequested();
+        }
+
+        return true;
+    }
+
+    /**
+     * Notifies entities that simulation is ending,
+     * enabling them to send and process their last events.
+     * Then, waits such events to be received and processed.
+     */
+    private void notifyEndOfSimulationToEntities() {
+        entities.stream()
+            .filter(CloudSimEntity::isAlive)
+            .forEach(e -> sendNow(e, CloudSimTags.END_OF_SIMULATION));
+        logger.info("{}: Processing last events before simulation shutdown.", clock);
+
+        while (runClockTickAndProcessFutureEvents()) {/**/}
+    }
+
     private void printSimulationFinished() {
-        final String msg1 = "Simulation finished at time "+ clock;
+        final String msg1 = String.format("Simulation finished at time %.2f", clock);
         final String extra = future.isEmpty() ? "" : ", before completing,";
         final String msg2 = isTimeToTerminateSimulationUnderRequest()
                                 ? extra + " in reason of an explicit request to terminate() or terminateAt()"
                                 : "";
 
-        Log.printFormattedLine("\n================== %s%s ==================\n", msg1, msg2);
+        logger.info("{}================== {}{} =================={}", System.lineSeparator(), msg1, msg2, System.lineSeparator());
     }
 
-    private boolean isTimeToTerminateSimulationUnderRequest() {
+    @Override
+    public boolean isTimeToTerminateSimulationUnderRequest() {
         return isTerminationTimeSet() && clock >= terminationTime;
     }
 
@@ -325,7 +362,6 @@ public class CloudSim implements Simulation {
     @Override
     public void addEntity(final CloudSimEntity e) {
         if (running) {
-            //@todo src 1, dest 0? What did it mean? Probably nothing.
             final SimEvent evt = new CloudSimEvent(this, SimEvent.Type.CREATE, clock, e);
             future.addEvent(evt);
         }
@@ -339,29 +375,33 @@ public class CloudSim implements Simulation {
     /**
      * Run one tick of the simulation, processing and removing the
      * events in the {@link #future future event queue}.
+     * @return true if some event was processed, false otherwise
      */
-    private void runClockTickAndProcessFutureEventQueue() {
+    private boolean runClockTickAndProcessFutureEvents() {
         executeRunnableEntities();
         if (!future.isEmpty()) {
             future.stream().findFirst().ifPresent(this::processFutureEventsHappeningAtSameTimeOfTheFirstOne);
-            return;
+            return true;
         }
 
+        return false;
+    }
+
+    private boolean waitSimulationClockToReachTerminationTime() {
         if(isTerminationTimeSet()){
-            Log.printFormattedLine(
-                "%.2f: Simulation: Waiting more events or the clock to reach %.2f (the termination time set).",
-                clock, terminationTime);
             final double increment = minDatacentersSchedulingInterval();
             final String info = increment == minTimeBetweenEvents
-                                                ? "using getMinTimeBetweenEvents() since a Datacenter schedulingInterval was not set"
-                                                : "Datacenter.getSchedulingInterval()";
-            Log.printFormattedLine("       Checking new events in %.2f seconds (%s)", increment, info);
+                ? "using getMinTimeBetweenEvents() since a Datacenter schedulingInterval was not set"
+                : "Datacenter.getSchedulingInterval()";
+
+            logger.info(
+                "{}: Simulation: Waiting more events or the clock to reach {} (the termination time set).{}Checking new events in {} seconds ({})",
+                clock, terminationTime, System.lineSeparator(),
+                increment, info);
             setClock(clock + increment);
+            return true;
         }
-        else {
-            running = false;
-            printMessage("Simulation: No more future events");
-        }
+        return false;
     }
 
     /**
@@ -385,9 +425,11 @@ public class CloudSim implements Simulation {
         processEvent(firstEvent);
         future.remove(firstEvent);
 
-        final List<SimEvent> eventsToProcess = future.stream()
-            .filter(e -> e.eventTime() == firstEvent.eventTime())
-            .collect(toList());
+        final List<SimEvent> eventsToProcess =
+            future
+                .stream()
+                .filter(e -> e.eventTime() == firstEvent.eventTime())
+                .collect(toList());
 
         for(final SimEvent evt: eventsToProcess) {
             processEvent(evt);
@@ -400,11 +442,14 @@ public class CloudSim implements Simulation {
      * and execute them.
      */
     private void executeRunnableEntities() {
-        final List<SimEntity> runnableEntities = entities.stream()
-                .filter(ent -> ent.getState() == SimEntity.State.RUNNABLE)
-                .collect(toList());
+        entities
+            .stream()
+            .filter(ent -> ent.getState() == SimEntity.State.RUNNABLE)
+            .forEach(SimEntity::run);
+    }
 
-        runnableEntities.forEach(SimEntity::run);
+    private void sendNow(final SimEntity dest, final int tag) {
+        sendNow(cis, dest, tag, null);
     }
 
     @Override
@@ -583,7 +628,7 @@ public class CloudSim implements Simulation {
      */
     private void addEntityDynamically(final SimEntity e) {
         Objects.requireNonNull(e);
-        printMessage("Adding: " + e.getName());
+        logger.trace("Adding: {}", e.getName());
         e.start();
     }
 
@@ -632,7 +677,7 @@ public class CloudSim implements Simulation {
 
         running = true;
         entities.forEach(SimEntity::start);
-        printMessage("Entities started.");
+        logger.info("Entities started.");
     }
 
     @Override
@@ -679,16 +724,6 @@ public class CloudSim implements Simulation {
         final SimEvent evt = new CloudSimEvent(this, SimEvent.Type.HOLD_DONE, clock + delay, src);
         future.addEvent(evt);
         src.setState(SimEntity.State.HOLDING);
-    }
-
-    private boolean terminateSimulationUnderRequest() {
-        if(!isTimeToTerminateSimulationUnderRequest()){
-            return false;
-        }
-
-        terminate();
-        setClock(terminationTime);
-        return true;
     }
 
     private void checkIfSimulationPauseRequested() {
@@ -751,7 +786,8 @@ public class CloudSim implements Simulation {
         return future.isEmpty() && clock >= pauseAt;
     }
 
-    private boolean isTerminationTimeSet() {
+    @Override
+    public boolean isTerminationTimeSet() {
         return terminationTime > 0.0;
     }
 
@@ -763,29 +799,19 @@ public class CloudSim implements Simulation {
      * Finishes execution of running entities before terminating the simulation.
      */
     private void finishSimulation() {
+        final List<SimEntity> entitiesAlive = entities.stream().filter(CloudSimEntity::isAlive).collect(toList());
         // Allow all entities to exit their body method
         if (!abortRequested) {
-            entities.stream()
-                .filter(e -> e.getState() != SimEntity.State.FINISHED)
-                .forEach(SimEntity::run);
+            entitiesAlive.forEach(SimEntity::run);
         }
 
-        entities.forEach(SimEntity::shutdownEntity);
+        entitiesAlive.forEach(SimEntity::shutdownEntity);
         running = false;
     }
 
     @Override
     public void abort() {
         abortRequested = true;
-    }
-
-    /**
-     * Prints a message about the progress of the simulation.
-     *
-     * @param message the message
-     */
-    private void printMessage(final String message) {
-        Log.printLine(message);
     }
 
     @Override
