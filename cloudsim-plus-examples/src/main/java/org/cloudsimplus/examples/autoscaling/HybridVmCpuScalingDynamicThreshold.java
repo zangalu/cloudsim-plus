@@ -42,7 +42,6 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.resources.Processor;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.util.MathUtil;
 import org.cloudbus.cloudsim.util.ResourceLoader;
 import org.cloudbus.cloudsim.utilizationmodels.*;
@@ -186,7 +185,7 @@ public class HybridVmCpuScalingDynamicThreshold {
         //destrotyHiddleVms();
 
         broker0.getVmExecList().forEach(vm -> {
-            Log.printFormatted(
+            System.out.printf(
                 "\t\tTime %6.1f: Vm %d CPU Usage: %6.2f%% (%2d vCPUs. Running Cloudlets: #%02d) Cloudlet waiting: %s History Entries: %d\n",
                 evt.getTime(), vm.getId(), vm.getCpuPercentUsage()*100.0,
                 vm.getNumberOfPes(),
@@ -496,7 +495,7 @@ public class HybridVmCpuScalingDynamicThreshold {
     private void submitNewVmsAndCloudletsToBroker(CloudletVmEventInfo eventInfo) {
         final int numberOfNewVms = 2;
         final int numberOfCloudletsByVm = 4;
-        Log.printFormattedLine("\n\t#Cloudlet %d finished. Submitting %d new VMs to the broker\n",
+        System.out.printf("\n\t#Cloudlet %d finished. Submitting %d new VMs to the broker\n",
             eventInfo.getCloudlet().getId(), numberOfNewVms);
 
         createAndSubmitVmsAndCloudlets(numberOfNewVms);
@@ -514,7 +513,7 @@ public class HybridVmCpuScalingDynamicThreshold {
 
     private void createAndSubmitVmsAndCloudlets(int vmsToCreate) {
 
-        Log.printFormattedLine("\n\t#Cloudlet finished. Submitting new VMs to the broker\n");
+        System.out.printf("\n\t#Cloudlet finished. Submitting new VMs to the broker\n");
         List<Vm> newVmList = new ArrayList<>();
         List<Cloudlet> newCloudletList = new ArrayList<>(vmsToCreate);
         Vm newAvailableVm;

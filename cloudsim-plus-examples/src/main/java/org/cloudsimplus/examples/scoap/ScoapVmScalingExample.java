@@ -44,7 +44,6 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.scoap.*;
-import org.cloudbus.cloudsim.util.Log;
 import org.cloudbus.cloudsim.util.ResourceLoader;
 import org.cloudbus.cloudsim.util.WorkloadFileReader;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
@@ -321,7 +320,7 @@ public class ScoapVmScalingExample {
         final long time = (long) eventInfo.getTime();
         if (time % CLOUDLETS_CREATION_INTERVAL == 0 && time <= 50) {
             final int numberOfCloudlets = 4;
-            Log.printFormattedLine("\t#Creating %d Cloudlets at time %d.", numberOfCloudlets, time);
+            System.out.printf("\t#Creating %d Cloudlets at time %d.", numberOfCloudlets, time);
             List<Cloudlet> newCloudlets = new ArrayList<>(numberOfCloudlets);
             for (int i = 0; i < numberOfCloudlets; i++) {
                 Cloudlet cloudlet = createCloudlet();
@@ -408,7 +407,9 @@ public class ScoapVmScalingExample {
 
 
     private boolean thresholdsToBeActivated(Vm vm){
-        return vm.getCurrentAllocatedBw() < arrivalRate;
+        //return vm.getCurrentAllocatedBw() < arrivalRate;
+        //TODO
+        return true;
     }
 
 

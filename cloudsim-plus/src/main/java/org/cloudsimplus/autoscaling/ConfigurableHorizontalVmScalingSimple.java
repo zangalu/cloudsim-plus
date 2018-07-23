@@ -25,7 +25,7 @@ package org.cloudsimplus.autoscaling;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.core.CloudSimTags;
-import org.cloudbus.cloudsim.util.Log;
+
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudsimplus.listeners.VmHostEventInfo;
 
@@ -164,7 +164,7 @@ public class ConfigurableHorizontalVmScalingSimple extends VmScalingAbstract imp
             return false;
         }
 
-        Log.printFormattedLine(
+        System.out.printf(
             "\t%.2f: %s%d: Requesting destruction of Vm %d in order to balance load.",
             time, getClass().getSimpleName(), getVm().getId());
 
