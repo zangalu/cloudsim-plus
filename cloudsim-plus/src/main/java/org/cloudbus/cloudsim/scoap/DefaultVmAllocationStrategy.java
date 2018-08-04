@@ -5,6 +5,8 @@ import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisionerAbstract;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerSpaceShared;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
@@ -29,11 +31,12 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
     private static final int VM_RAM = 1200;
 
     @Override
-    public void createAndSubmitVmsAndCloudlets(DatacenterBroker broker, List<Cloudlet> cloudletList, List<Vm> hiddleVmsList, List<Vm> vmList, RequestsArrivalGenerator arrivalGenerator, ArrayList<Threshold> thresholds, Threshold currentThreshold, Simulation simulation, int simulationTime) {
+    public Threshold createAndSubmitVmsAndCloudlets(DatacenterBroker broker, List<Cloudlet> cloudletList, List<Vm> hiddleVmsList, List<Vm> vmList, RequestsArrivalGenerator arrivalGenerator, ArrayList<Threshold> thresholds, Threshold currentThreshold, Simulation simulation, int simulationTime) {
 
         List<Vm> newVmList = new ArrayList<>();
         List<Cloudlet> newCloudletList = new ArrayList<>();
         Vm newAvailableVm;
+        Threshold newThreshold = currentThreshold;
 
         Optional<Vm> availableVm = broker.getVmWaitingList().stream().filter(vm -> vm.getCpuPercentUsage()<0.7).findAny();
 
@@ -55,18 +58,27 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         }
         // create new vm according to static plan
         //se workload gestito dalle VM attive < del current workload
-        else if(sumCapacity(broker)<thresholdStrategy(thresholds,currentThreshold, arrivalGenerator) && hiddleVmsList.size()==0){
-            System.out.println("Create new VM");
-            newVmList = createListOfScalableVms();
-            vmList.addAll(newVmList);
-            for(Vm vm : newVmList) {
-                Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
-                newCloudletList.add(cloudlet);
+
+        else {
+            newThreshold = thresholdStrategy(thresholds, currentThreshold, arrivalGenerator);
+            double totalCapacity = sumCapacity(broker);
+            if(totalCapacity<newThreshold.getWorkLoad() && hiddleVmsList.size()==0){
+                System.out.println("Create new VM");
+                newVmList = createListOfScalableVms();
+                vmList.addAll(newVmList);
+                for(Vm vm : newVmList) {
+                    Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
+                    newCloudletList.add(cloudlet);
+                }
+                broker.submitVmList(newVmList);
+                broker.submitCloudletList(newCloudletList);
+                cloudletList.addAll(newCloudletList);
             }
-            broker.submitVmList(newVmList);
-            broker.submitCloudletList(newCloudletList);
-            cloudletList.addAll(newCloudletList);
+            if(totalCapacity>newThreshold.getWorkLoad()){
+                destroyHiddleVms(null, broker, hiddleVmsList, currentThreshold, simulation);
+            }
         }
+        return newThreshold;
 
     }
 
@@ -109,7 +121,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         return totalCapacity;
     }
 
-    private double thresholdStrategy(ArrayList<Threshold> thresholds, final Threshold currentThreshold, RequestsArrivalGenerator arrivalGenerator) {
+    private Threshold thresholdStrategy(ArrayList<Threshold> thresholds, final Threshold currentThreshold, RequestsArrivalGenerator arrivalGenerator) {
 
         Threshold localThreshold = currentThreshold;
         OptionalInt indexOpt = IntStream.range(0, thresholds.size())
@@ -117,7 +129,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
             .findFirst();
 
         int index = indexOpt.getAsInt();
-        System.out.println("INDICE -->"+indexOpt.getAsInt());
+        System.out.println("INDICE PRIMA -->"+indexOpt.getAsInt());
 
         if(index < thresholds.size()-1 && arrivalGenerator.getInstantWorkload() > currentThreshold.getWorkLoad()){
             localThreshold = thresholds.get(indexOpt.getAsInt()+1);
@@ -127,8 +139,16 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
             localThreshold = thresholds.get(indexOpt.getAsInt()-1);
         }
 
-        System.out.println("Current threshold "+currentThreshold.getWorkLoad());
-        return localThreshold.getWorkLoad();
+        Threshold finalLocalThreshold = localThreshold;
+        indexOpt = IntStream.range(0, thresholds.size())
+            .filter(i -> finalLocalThreshold.equals(thresholds.get(i)))
+            .findFirst();
+
+        index = indexOpt.getAsInt();
+        System.out.println("INDICE DOPO -->"+indexOpt.getAsInt());
+        System.out.println("Instant workload" +arrivalGenerator.getInstantWorkload());
+        System.out.println("Current threshold "+localThreshold.getWorkLoad());
+        return localThreshold;
 
     }
 
@@ -179,7 +199,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
     private Vm createVm() {
         final int id = createdVmsProgressionID++;
 
-        final Vm vm = new VmSimple(id, 20, VM_PES)
+        final Vm vm = new VmSimple(id, 50, VM_PES)
             .setRam(VM_RAM).setBw(1000).setSize(10000)
             .setCloudletScheduler(new CloudletSchedulerSpaceShared());
 
@@ -187,8 +207,20 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         return vm;
     }
 
-    private void destroyHiddleVms(CloudletVmEventInfo eventInfo, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation) {
+    private void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation) {
 
+        System.out.println("Destroyng VM !!!!");
+        if (null != event) {
+
+            ResourceProvisionerAbstract resourceProvisioner = new ResourceProvisionerSimple();
+            resourceProvisioner.deallocateResourceForVm(event.getVm());
+
+            System.out.println("Destroyng VM at execution termination " + event.getVm());
+        }
+
+        for(Vm vm : broker.getVmWaitingList()) {
+            hiddleVmsList.add(vm);
+        }
 
         for(Vm vm : broker.getVmExecList()) {
 
@@ -215,7 +247,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
     }
 
     private Vm findVmToRemove(List<Vm> hiddleVmsList) {
-        return hiddleVmsList.stream().filter(vm -> vm.getMips() == 100).findFirst().get();
+        return hiddleVmsList.stream().filter(vm -> vm.getMips() == 50).findFirst().get();
     }
 
 }

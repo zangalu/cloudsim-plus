@@ -6,7 +6,6 @@ import java.util.Queue;
 public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGenerator
 {
 
-    Queue queue;
     private Queue<Double> requests;
     private Queue<Integer> workLoadQueue;
     double currentTime, lambdaSwitchTimestamp, nextArrival,timeStamp, workload;
@@ -55,7 +54,6 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
     {
 
         System.out.println("WORKLOAD QUEUE SIZE --> "+workLoadQueue.size()+" !!!!!");
-        System.out.println("WORKLOAD  --> "+workload+" !!!!!");
         return workload;
     }
 
