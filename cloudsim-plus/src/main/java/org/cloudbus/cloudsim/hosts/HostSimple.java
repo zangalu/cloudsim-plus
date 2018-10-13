@@ -6,12 +6,16 @@
  */
 package org.cloudbus.cloudsim.hosts;
 
+import org.cloudbus.cloudsim.core.ChangeableId;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.power.models.PowerModel;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 import org.cloudbus.cloudsim.resources.*;
 import org.cloudbus.cloudsim.schedulers.vm.VmScheduler;
+import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerSpaceShared;
+import org.cloudbus.cloudsim.vms.UtilizationHistory;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmStateHistoryEntry;
 import org.cloudsimplus.listeners.EventListener;
@@ -20,9 +24,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.Map.Entry;
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.*;
 
 /**
  * A Host class that implements the most basic features of a Physical Machine
@@ -37,22 +48,18 @@ import static java.util.stream.Collectors.toList;
  * @since CloudSim Toolkit 1.0
  */
 public class HostSimple implements Host {
-    private static final Logger logger = LoggerFactory.getLogger(HostSimple.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(HostSimple.class.getSimpleName());
 
-    /**
-     * @see #getStateHistory()
-     */
+    /** @see #getStateHistory() */
     private final List<HostStateHistoryEntry> stateHistory;
+
+    /**@see #getPowerModel() */
     private PowerModel powerModel;
 
-    /**
-     * @see #getId()
-     */
-    private int id;
+    /** @see #getId() */
+    private long id;
 
-    /**
-     * @see #isFailed()
-     */
+    /** @see #isFailed() */
     private boolean failed;
 
     private boolean active;
@@ -62,59 +69,37 @@ public class HostSimple implements Host {
 
     private final Bandwidth bw;
 
-    /**
-     * @see #getStorage()
-     */
+    /** @see #getStorage() */
     private Storage storage;
 
-    /**
-     * @see #getRamProvisioner()
-     */
+    /** @see #getRamProvisioner() */
     private ResourceProvisioner ramProvisioner;
 
-    /**
-     * @see #getBwProvisioner()
-     */
+    /** @see #getBwProvisioner() */
     private ResourceProvisioner bwProvisioner;
 
-    /**
-     * @see #getVmScheduler()
-     */
+    /** @see #getVmScheduler() */
     private VmScheduler vmScheduler;
 
-    /**
-     * @see #getVmList()
-     */
+    /** @see #getVmList() */
     private final List<Vm> vmList = new ArrayList<>();
 
-    /**
-     * @see #getPeList()
-     */
+    /** @see #getPeList() */
     private List<Pe> peList;
 
-    /**
-     * @see #getVmsMigratingIn()
-     */
+    /** @see #getVmsMigratingIn() */
     private final Set<Vm> vmsMigratingIn;
 
-    /**
-     * @see #getVmsMigratingOut()
-     */
+    /** @see #getVmsMigratingOut() */
     private final Set<Vm> vmsMigratingOut;
 
-    /**
-     * @see #getDatacenter()
-     */
+    /** @see #getDatacenter() */
     private Datacenter datacenter;
 
-    /**
-     * @see Host#removeOnUpdateProcessingListener(EventListener)
-     */
+    /** @see Host#removeOnUpdateProcessingListener(EventListener) */
     private final Set<EventListener<HostUpdatesVmsProcessingEventInfo>> onUpdateProcessingListeners;
 
-    /**
-     * @see #getSimulation()
-     */
+    /** @see #getSimulation() */
     private Simulation simulation;
 
     /**
@@ -124,15 +109,24 @@ public class HostSimple implements Host {
      * @see #getResource(Class)
      */
     private List<ResourceManageable> resources;
+    
     private List<ResourceProvisioner> provisioners;
     private final List<Vm> vmCreatedList;
+
     /**
      * The previous utilization mips.
      */
     private double previousUtilizationMips;
 
+    /** @see #getStartTime() */
+    private double startTime;
+
+    /** @see #getShutdownTime() */
+    private double shutdownTime;
+
     /**
-     * Creates a Host without a pre-defined ID.
+     * Creates a Host without a pre-defined ID and using a {@link ResourceProvisionerSimple}
+     * RAM and Bandwidth. It also sets a {@link VmSchedulerSpaceShared} as default.
      * The ID is automatically set when a List of Hosts is attached
      * to a {@link Datacenter}.
      *
@@ -140,7 +134,11 @@ public class HostSimple implements Host {
      * @param bw the Bandwidth (BW) capacity in Megabits/s
      * @param storage the storage capacity in Megabytes
      * @param peList the host's {@link Pe} list
-     * @see #setId(int)
+     *
+     * @see ChangeableId#setId(long)
+     * @see #setRamProvisioner(ResourceProvisioner)
+     * @see #setBwProvisioner(ResourceProvisioner)
+     * @see #setVmScheduler(VmScheduler)
      */
     public HostSimple(final long ram, final long bw, final long storage, final List<Pe> peList) {
         this.setId(-1);
@@ -150,12 +148,13 @@ public class HostSimple implements Host {
         this.ram = new Ram(ram);
         this.bw = new Bandwidth(bw);
         this.setStorage(storage);
-        this.setRamProvisioner(ResourceProvisioner.NULL);
-        this.setBwProvisioner(ResourceProvisioner.NULL);
+        this.setRamProvisioner(new ResourceProvisionerSimple());
+        this.setBwProvisioner(new ResourceProvisionerSimple());
 
-        this.setVmScheduler(VmScheduler.NULL);
+        this.setVmScheduler(new VmSchedulerSpaceShared());
         this.setPeList(peList);
         this.setFailed(false);
+        this.shutdownTime = -1;
         this.setDatacenter(Datacenter.NULL);
         this.onUpdateProcessingListeners = new HashSet<>();
         this.resources = new ArrayList<>();
@@ -164,7 +163,7 @@ public class HostSimple implements Host {
         this.vmsMigratingIn = new HashSet<>();
         this.vmsMigratingOut = new HashSet<>();
         this.powerModel = PowerModel.NULL;
-        stateHistory = new LinkedList<>();
+        this.stateHistory = new LinkedList<>();
     }
 
     /**
@@ -297,7 +296,7 @@ public class HostSimple implements Host {
     {
         final String migration = inMigration ? "VM Migration" : "VM Creation";
         final String msg = pmResource.getAvailableResource() > 0 ? "just "+pmResource.getAvailableResource()+" " + resourceUnit : "no amount";
-        logger.error(
+        LOGGER.error(
             "{}: {}: [{}] Allocation of {} to {} failed due to lack of {}. Required {} but there is {} available.",
             simulation.clock(), getClass().getSimpleName(), migration, vm, this,
             pmResource.getClass().getSimpleName(), vmRequestedResource.getCapacity(), msg);
@@ -318,8 +317,11 @@ public class HostSimple implements Host {
 
     @Override
     public boolean isSuitableForVm(final Vm vm) {
-        return  active &&
-            vmScheduler.isSuitableForVm(vm, vm.getCurrentRequestedMips()) &&
+        return active && hasEnoughResources(vm);
+    }
+
+    private boolean hasEnoughResources(final Vm vm) {
+        return vmScheduler.isSuitableForVm(vm, vm.getCurrentRequestedMips()) &&
             ramProvisioner.isSuitableForVm(vm, vm.getCurrentRequestedRam()) &&
             bwProvisioner.isSuitableForVm(vm, vm.getCurrentRequestedBw()) &&
             storage.isAmountAvailable(vm.getStorage());
@@ -349,8 +351,7 @@ public class HostSimple implements Host {
     }
 
     private void destroyVmInternal(final Vm vm) {
-        Objects.requireNonNull(vm);
-        deallocateResourcesOfVm(vm);
+        deallocateResourcesOfVm(requireNonNull(vm));
         vmList.remove(vm);
     }
 
@@ -457,12 +458,12 @@ public class HostSimple implements Host {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
     @Override
-    public final void setId(int id) {
+    public final void setId(long id) {
         this.id = id;
     }
 
@@ -505,11 +506,35 @@ public class HostSimple implements Host {
 
     @Override
     public final Host setVmScheduler(final VmScheduler vmScheduler) {
-        Objects.requireNonNull(vmScheduler);
-
+        this.vmScheduler = requireNonNull(vmScheduler);
         vmScheduler.setHost(this);
-        this.vmScheduler = vmScheduler;
         return this;
+    }
+
+    @Override
+    public double getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public void setStartTime(final double startTime) {
+        if(startTime < 0){
+            throw new IllegalArgumentException("Host start time cannot be negative");
+        }
+        this.startTime = startTime;
+    }
+
+    @Override
+    public double getShutdownTime() {
+        return shutdownTime;
+    }
+
+    @Override
+    public void setShutdownTime(final double shutdownTime) {
+        if(shutdownTime < 0){
+            throw new IllegalArgumentException("Host shutdown time cannot be negative");
+        }
+        this.shutdownTime = shutdownTime;
     }
 
     @Override
@@ -524,11 +549,11 @@ public class HostSimple implements Host {
      * @return
      */
     protected final Host setPeList(final List<Pe> peList) {
-        Objects.requireNonNull(peList);
+        requireNonNull(peList);
         checkSimulationIsRunningAndAttemptedToChangeHost("List of PE");
         this.peList = peList;
 
-        int peId = this.peList.stream().filter(pe -> pe.getId() > 0).mapToInt(Pe::getId).max().orElse(-1);
+        long peId = this.peList.stream().filter(pe -> pe.getId() > 0).mapToLong(Pe::getId).max().orElse(-1);
         final List<Pe> pesWithoutIds = this.peList.stream().filter(pe -> pe.getId() < 0).collect(toList());
         for(final Pe pe: pesWithoutIds){
             pe.setId(++peId);
@@ -548,13 +573,11 @@ public class HostSimple implements Host {
     }
 
     protected void addVmToList(final Vm vm){
-        Objects.requireNonNull(vm);
-        vmList.add(vm);
+        vmList.add(requireNonNull(vm));
     }
 
     protected void addVmToCreatedList(final Vm vm){
-        Objects.requireNonNull(vm);
-        vmCreatedList.add(vm);
+        vmCreatedList.add(requireNonNull(vm));
     }
 
     @Override
@@ -651,8 +674,7 @@ public class HostSimple implements Host {
 
     @Override
     public Host addOnUpdateProcessingListener(final EventListener<HostUpdatesVmsProcessingEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onUpdateProcessingListeners.add(listener);
+        this.onUpdateProcessingListeners.add(requireNonNull(listener));
         return this;
     }
 
@@ -713,7 +735,7 @@ public class HostSimple implements Host {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = Long.hashCode(id);
         result = 31 * result + simulation.hashCode();
         return result;
     }
@@ -734,7 +756,7 @@ public class HostSimple implements Host {
 
         return provisioners
             .stream()
-            .filter(r -> r.getResource().isObjectSubClassOf(resourceClass))
+            .filter(provisioner -> provisioner.getResource().isObjectSubClassOf(resourceClass))
             .findFirst()
             .orElse(ResourceProvisioner.NULL);
     }
@@ -789,24 +811,80 @@ public class HostSimple implements Host {
     }
 
     @Override
-    public double[] getUtilizationHistory() {
-        final double[] utilizationHistory = new double[getMaxNumberOfVmHistoryEntries()];
-        final double totalMipsCapacity = getTotalMipsCapacity();
-        for (final Vm vm : this.vmCreatedList) {
-            final List<Double> history = vm.getUtilizationHistory().getHistory();
-            for (int i = 0; i < history.size(); i++) {
-                utilizationHistory[i] += history.get(i) * vm.getTotalMipsCapacity() / totalMipsCapacity;
-            }
-        }
-        return utilizationHistory;
+    public SortedMap<Double, DoubleSummaryStatistics> getUtilizationHistory() {
+        //Gets a Stream containing the utilization entries for every Vm inside the Host
+        final Stream<Entry<Double, Double>> utilizationEntriesStream = this.vmCreatedList
+            .stream()
+            .map(Vm::getUtilizationHistory)
+            .map(this::remapUtilizationHistory)
+            .flatMap(vmUtilization -> vmUtilization.entrySet().stream());
+
+        //Groups the CPU utilization entries by the time the values were collected
+        return utilizationEntriesStream
+                    .collect(
+                        groupingBy(Entry::getKey, TreeMap::new, summarizingDouble(Entry::getValue))
+                    );
     }
 
-    private int getMaxNumberOfVmHistoryEntries() {
-        return vmCreatedList
-            .stream()
-            .map(vm -> vm.getUtilizationHistory().getHistory().size())
-            .mapToInt(size -> size)
-            .max().orElse(0);
+    @Override
+    public SortedMap<Double, Double> getUtilizationHistorySum() {
+        /*Remaps the value of an entry inside the Utilization History map.*/
+        final Function<Entry<Double, DoubleSummaryStatistics>, Double> valueMapper = entry -> entry.getValue().getSum();
+
+        return getUtilizationHistory()
+                    .entrySet()
+                    .stream()
+                    .collect(toMap(Entry::getKey, valueMapper, this::mergeFunction, TreeMap::new));
+    }
+
+    /**
+     * Remaps the entire Vm's {@link UtilizationHistory} by updating the CPU utilization value in each entry
+     * to correspond to the percentage of the Host CPU capacity that Vm is using.
+     *
+     * @param utilizationHistory the VM {@link UtilizationHistory} with the history entries
+     * @return
+     */
+    private SortedMap<Double, Double> remapUtilizationHistory(final UtilizationHistory utilizationHistory) {
+        return utilizationHistory
+                    .getHistory()
+                    .entrySet()
+                    .stream()
+                    .collect(
+                        toMap(Entry::getKey, vmUtilizationMapper(utilizationHistory), this::mergeFunction, TreeMap::new)
+                    );
+    }
+
+    /**
+     * A merge {@link BinaryOperator} used to resolve conflicts when remapping the values of the utilization history map
+     * using the {@link Collectors#toMap(Function, Function, BinaryOperator, Supplier)}.
+     *
+     * If there are two values for the same key, the last value is used.
+     * However, since we are just remapping an existing map, there won't be such a situation.
+     *
+     * @param usage1 the 1st CPU utilization value found for a key
+     * @param usage2 the 2dn CPU utilization value found for the same key
+     * @return the higher value between the given two ones
+     *
+     * @see #getUtilizationHistorySum()
+     * @see #remapUtilizationHistory(UtilizationHistory)
+     */
+    private double mergeFunction(final double usage1, final double usage2) {
+        return Math.max(usage1, usage2);
+    }
+
+    /**
+     * Receives a Vm {@link UtilizationHistory} and returns a {@link Function} that
+     * requires a map entry from the history (representing a VM's CPU utilization for a given time),
+     * and returns the percentage of the Host CPU capacity that Vm is using at that time.
+     * This way, the value that represents how much of the VM's CPU is being used
+     * will be converted to how much that VM is using from the Host's CPU.
+     *
+     * @param utilizationHistory the VM {@link UtilizationHistory} with the history entries
+     * @return
+     */
+    private Function<Entry<Double, Double>, Double> vmUtilizationMapper(final UtilizationHistory utilizationHistory) {
+        final double totalMipsCapacity = getTotalMipsCapacity();
+        return entry -> entry.getValue() * utilizationHistory.getVm().getTotalMipsCapacity() / totalMipsCapacity;
     }
 
     @Override
@@ -816,7 +894,7 @@ public class HostSimple implements Host {
 
     @Override
     public Host setPowerModel(final PowerModel powerModel) {
-        Objects.requireNonNull(powerModel);
+        requireNonNull(powerModel);
         if(powerModel.getHost() != null && powerModel.getHost() != Host.NULL && !powerModel.getHost().equals(this)){
             throw new IllegalStateException("The given PowerModel is already assigned to another Host. Each Host must have its own PowerModel instance.");
         }
@@ -873,7 +951,7 @@ public class HostSimple implements Host {
     private double addVmResourceUseToHistoryIfNotMigratingIn(final Vm vm, final double currentTime) {
         double totalAllocatedMips = getVmScheduler().getTotalAllocatedMipsForVm(vm);
         if (getVmsMigratingIn().contains(vm)) {
-            logger.info("{}: {}: {} is migrating in", getSimulation().clock(), this, vm);
+            LOGGER.info("{}: {}: {} is migrating in", getSimulation().clock(), this, vm);
             return totalAllocatedMips;
         }
 
@@ -881,7 +959,7 @@ public class HostSimple implements Host {
         if (totalAllocatedMips + 0.1 < totalRequestedMips) {
             final String reason = getVmsMigratingOut().contains(vm) ? "migration overhead" : "capacity unavailability";
             final long notAllocatedMipsByPe = (long)((totalRequestedMips - totalAllocatedMips)/vm.getNumberOfPes());
-            logger.error(
+            LOGGER.error(
                 "{}: {}: {} MIPS not allocated for each one of the {} PEs from {} due to {}.",
                 getSimulation().clock(), this, notAllocatedMipsByPe, vm.getNumberOfPes(), vm, reason);
         }
@@ -894,7 +972,7 @@ public class HostSimple implements Host {
         vm.addStateHistoryEntry(entry);
 
         if (vm.isInMigration()) {
-            logger.info("{}: {}: {} is migrating out ", getSimulation().clock(), this, vm);
+            LOGGER.info("{}: {}: {} is migrating out ", getSimulation().clock(), this, vm);
             totalAllocatedMips /= getVmScheduler().getMaxCpuUsagePercentDuringOutMigration();
         }
 
@@ -947,4 +1025,5 @@ public class HostSimple implements Host {
     public List<HostStateHistoryEntry> getStateHistory() {
         return Collections.unmodifiableList(stateHistory);
     }
+
 }

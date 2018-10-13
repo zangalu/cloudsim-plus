@@ -14,7 +14,7 @@ import org.cloudbus.cloudsim.vms.VmSimple;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.cloudbus.cloudsim.vms.VmSimpleTest.createVm;
+import static org.cloudbus.cloudsim.vms.VmTestUtil.createVm;
 import static org.junit.Assert.*;
 
 /**
@@ -47,7 +47,7 @@ public class ResourceProvisionerSimpleTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testCreateProvisioner_null() {
+    public void testCreateProvisionerWhenResourceNull() {
         createSimpleProvisioner(null);
     }
 
@@ -63,14 +63,14 @@ public class ResourceProvisionerSimpleTest {
 
     @Test
     public void testGetTotalAllocatedResource() {
-        final ResourceProvisioner p = createSimpleProvisioner();
-        assertEquals(p.getCapacity(), p.getAvailableResource());
-        assertEquals(0, p.getTotalAllocatedResource());
+        final ResourceProvisioner provisioner = createSimpleProvisioner();
+        assertEquals(provisioner.getCapacity(), provisioner.getAvailableResource());
+        assertEquals(0, provisioner.getTotalAllocatedResource());
 
         final VmSimple vm = createVm(1, CAPACITY);
         final long allocatedResource = HALF_CAPACITY;
-        p.allocateResourceForVm(vm, allocatedResource);
-        assertEquals(allocatedResource, p.getTotalAllocatedResource());
+        provisioner.allocateResourceForVm(vm, allocatedResource);
+        assertEquals(allocatedResource, provisioner.getTotalAllocatedResource());
     }
 
     @Test

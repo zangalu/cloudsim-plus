@@ -27,8 +27,8 @@ import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.resources.*;
 import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudsimplus.autoscaling.resources.ResourceScalingGradual;
 import org.cloudsimplus.autoscaling.resources.ResourceScaling;
+import org.cloudsimplus.autoscaling.resources.ResourceScalingGradual;
 import org.cloudsimplus.autoscaling.resources.ResourceScalingInstantaneous;
 import org.cloudsimplus.listeners.VmHostEventInfo;
 
@@ -49,8 +49,8 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
     private ResourceScaling resourceScaling;
     private double scalingFactor;
     private Class<? extends ResourceManageable> resourceClassToScale;
-    private Function<Vm, Double> upperUtilizationThresholdFunction;
-    private Function<Vm, Double> lowerUtilizationThresholdFunction;
+    private Function<Vm, Double> upperThresholdFunction;
+    private Function<Vm, Double> lowerThresholdFunction;
 
     /**
      * Creates a VerticalVmScalingSimple with a {@link ResourceScalingGradual} scaling type.
@@ -68,33 +68,33 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
     public VerticalVmScalingSimple(final Class<? extends ResourceManageable> resourceClassToScale, final double scalingFactor){
         super();
         this.setResourceScaling(new ResourceScalingGradual());
-        this.lowerUtilizationThresholdFunction = VerticalVmScaling.NULL.getLowerThresholdFunction();
-        this.upperUtilizationThresholdFunction = VerticalVmScaling.NULL.getUpperThresholdFunction();
+        this.lowerThresholdFunction = VerticalVmScaling.NULL.getLowerThresholdFunction();
+        this.upperThresholdFunction = VerticalVmScaling.NULL.getUpperThresholdFunction();
         this.setResourceClass(resourceClassToScale);
         this.setScalingFactor(scalingFactor);
     }
 
     @Override
     public Function<Vm, Double> getUpperThresholdFunction() {
-        return upperUtilizationThresholdFunction;
+        return upperThresholdFunction;
     }
 
     @Override
     public final VerticalVmScaling setUpperThresholdFunction(final Function<Vm, Double> upperThresholdFunction) {
-        validateFunctions(lowerUtilizationThresholdFunction, upperThresholdFunction);
-        this.upperUtilizationThresholdFunction = upperThresholdFunction;
+        validateFunctions(lowerThresholdFunction, upperThresholdFunction);
+        this.upperThresholdFunction = upperThresholdFunction;
         return this;
     }
 
     @Override
     public Function<Vm, Double> getLowerThresholdFunction() {
-        return lowerUtilizationThresholdFunction;
+        return lowerThresholdFunction;
     }
 
     @Override
     public final VerticalVmScaling setLowerThresholdFunction(final Function<Vm, Double> lowerThresholdFunction) {
-        validateFunctions(lowerThresholdFunction, upperUtilizationThresholdFunction);
-        this.lowerUtilizationThresholdFunction = lowerThresholdFunction;
+        validateFunctions(lowerThresholdFunction, upperThresholdFunction);
+        this.lowerThresholdFunction = lowerThresholdFunction;
         return this;
     }
 
@@ -107,8 +107,7 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
      */
     @Override
     public final VerticalVmScaling setResourceScaling(final ResourceScaling resourceScaling) {
-        Objects.requireNonNull(resourceScaling);
-        this.resourceScaling = resourceScaling;
+        this.resourceScaling = Objects.requireNonNull(resourceScaling);
         return this;
     }
 
@@ -145,8 +144,7 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
 
     @Override
     public final VerticalVmScaling setResourceClass(final Class<? extends ResourceManageable> resourceClass) {
-        Objects.requireNonNull(resourceClass);
-        this.resourceClassToScale = resourceClass;
+        this.resourceClassToScale = Objects.requireNonNull(resourceClass);
         if(Pe.class.equals(this.resourceClassToScale)){
             this.resourceClassToScale = Processor.class;
         }
@@ -171,12 +169,12 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
 
     @Override
     public boolean isVmUnderloaded() {
-        return getResource().getPercentUtilization() < lowerUtilizationThresholdFunction.apply(getVm());
+        return getResource().getPercentUtilization() < lowerThresholdFunction.apply(getVm());
     }
 
     @Override
     public boolean isVmOverloaded() {
-        return getResource().getPercentUtilization() > upperUtilizationThresholdFunction.apply(getVm());
+        return getResource().getPercentUtilization() > upperThresholdFunction.apply(getVm());
     }
 
     @Override
@@ -211,9 +209,9 @@ public class VerticalVmScalingSimple extends VmScalingAbstract implements Vertic
     @Override
     public Function<Vm, Double> getResourceUsageThresholdFunction(){
         if(isVmUnderloaded()) {
-            return lowerUtilizationThresholdFunction;
+            return lowerThresholdFunction;
         } else if(isVmOverloaded()) {
-            return upperUtilizationThresholdFunction;
+            return upperThresholdFunction;
         }
 
         return vm -> 0.0;

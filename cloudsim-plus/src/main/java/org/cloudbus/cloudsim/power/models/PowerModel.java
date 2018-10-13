@@ -15,7 +15,8 @@ import org.cloudbus.cloudsim.hosts.Host;
  * <b>This is the fundamental class to enable power-aware Hosts.
  * However, a Host just provides power usage data if a PowerModel is set using the
  * {@link Host#setPowerModel(PowerModel)}.</b>
- *
+ * The power consumption data is return in Watt-Second (Ws),
+ * which is just in a different scale than the usual Kilowatt-Hour (kWh).
  *
  * <p>The interface implements the Null Object
  * Design Pattern in order to start avoiding {@link NullPointerException} when
@@ -26,7 +27,7 @@ import org.cloudbus.cloudsim.hosts.Host;
  * power package please cite the following paper:</p>
  *
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and
  * Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of
  * Virtual Machines in Cloud Data Centers", Concurrency and Computation:

@@ -2,12 +2,13 @@ package org.cloudbus.cloudsim.cloudlets;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
-import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.vms.VmSimpleTest;
-import org.cloudsimplus.listeners.EventListener;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.cloudbus.cloudsim.vms.Vm;
+import org.cloudbus.cloudsim.vms.VmTestUtil;
+import org.cloudsimplus.listeners.EventListener;
 import org.easymock.EasyMock;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -22,9 +23,9 @@ public class CloudletTest {
         assertFalse(cloudlet.isBindToVm());
         cloudlet.setVm(Vm.NULL);
         assertFalse(cloudlet.isBindToVm());
-        cloudlet.setVm(VmSimpleTest.createVm(0, 1));
+        cloudlet.setVm(VmTestUtil.createVm(0, 1));
         assertTrue(cloudlet.isBindToVm());
-        cloudlet.setVm(VmSimpleTest.createVm(1, 1));
+        cloudlet.setVm(VmTestUtil.createVm(1, 1));
         assertTrue(cloudlet.isBindToVm());
     }
 
@@ -95,15 +96,15 @@ public class CloudletTest {
         assertEquals(0, Cloudlet.NULL.getUtilizationOfCpu(0), 0);
         assertEquals(0, Cloudlet.NULL.getUtilizationOfRam(0), 0);
 
-        final UtilizationModel um = EasyMock.createMock(UtilizationModel.class);
-        EasyMock.replay(um);
-        Cloudlet.NULL.setUtilizationModelBw(um);
+        final UtilizationModel model = EasyMock.createMock(UtilizationModel.class);
+        EasyMock.replay(model);
+        Cloudlet.NULL.setUtilizationModelBw(model);
         assertSame(UtilizationModel.NULL, Cloudlet.NULL.getUtilizationModelBw());
 
-        Cloudlet.NULL.setUtilizationModelCpu(um);
+        Cloudlet.NULL.setUtilizationModelCpu(model);
         assertSame(UtilizationModel.NULL, Cloudlet.NULL.getUtilizationModelCpu());
 
-        Cloudlet.NULL.setUtilizationModelRam(um);
+        Cloudlet.NULL.setUtilizationModelRam(model);
         assertSame(UtilizationModel.NULL, Cloudlet.NULL.getUtilizationModelRam());
     }
 

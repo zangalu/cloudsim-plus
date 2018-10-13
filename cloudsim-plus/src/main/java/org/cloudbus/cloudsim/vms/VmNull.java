@@ -26,8 +26,8 @@ import java.util.List;
  * @see Vm#NULL
  */
 final class VmNull implements Vm {
-    @Override public void setId(int id) {/**/}
-    @Override public int getId() {
+    @Override public void setId(long id) {/**/}
+    @Override public long getId() {
         return -1;
     }
     @Override public double getSubmissionDelay() {
@@ -142,7 +142,7 @@ final class VmNull implements Vm {
         return this;
     }
     @Override public void setHost(Host host) {/**/}
-    @Override public void setInMigration(boolean inMigration) {/**/}
+    @Override public void setInMigration(boolean migrating) {/**/}
     @Override public Vm setRam(long ramCapacity) {
         return this;
     }
@@ -155,14 +155,12 @@ final class VmNull implements Vm {
     @Override public Vm setCloudletScheduler(CloudletScheduler cloudletScheduler) {
         return this;
     }
-    @Override public int compareTo(Vm o) {
-        return 0;
-    }
+    @Override public int compareTo(Vm vm) { return 0; }
     @Override public double getTotalMipsCapacity() {
         return 0.0;
     }
-    @Override public void allocateResource(Class<? extends ResourceManageable> c, long amount) {/**/}
-    @Override public void deallocateResource(Class<? extends ResourceManageable> c) {/**/}
+    @Override public void allocateResource(Class<? extends ResourceManageable> clazz, long amount) {/**/}
+    @Override public void deallocateResource(Class<? extends ResourceManageable> clazz) {/**/}
     @Override public void setFailed(boolean failed) {/**/}
     @Override public boolean isFailed() {
         return true;
@@ -180,10 +178,10 @@ final class VmNull implements Vm {
     @Override public HorizontalVmScaling getHorizontalScaling() {
         return HorizontalVmScaling.NULL;
     }
-    @Override public Vm setHorizontalScaling(HorizontalVmScaling h) throws IllegalArgumentException { return this; }
-    @Override public Vm setRamVerticalScaling(VerticalVmScaling v) throws IllegalArgumentException { return this; }
-    @Override public Vm setBwVerticalScaling(VerticalVmScaling v) throws IllegalArgumentException { return this; }
-    @Override public Vm setPeVerticalScaling(VerticalVmScaling peVerticalScaling) throws IllegalArgumentException { return this; }
+    @Override public Vm setHorizontalScaling(HorizontalVmScaling scaling) throws IllegalArgumentException { return this; }
+    @Override public Vm setRamVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException { return this; }
+    @Override public Vm setBwVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException { return this; }
+    @Override public Vm setPeVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException { return this; }
     @Override public VerticalVmScaling getRamVerticalScaling() {
         return VerticalVmScaling.NULL;
     }

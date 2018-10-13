@@ -10,7 +10,7 @@ PowerModel
 
    Provides a model for power consumption of hosts, depending on utilization of a critical system component, such as CPU. This is the fundamental class to enable power-aware Hosts.
    However, a Host just provides power usage data if a PowerModel is set using the
-   .
+   . The power consumption data is return in Watt-Second (Ws), which is just in a different scale than the usual Kilowatt-Hour (kWh).
 
    The interface implements the Null Object Design Pattern in order to start avoiding \ :java:ref:`NullPointerException`\  when using the \ :java:ref:`PowerModel.NULL`\  object instead of attributing \ ``null``\  to \ :java:ref:`PowerModel`\  variables.
 
@@ -18,7 +18,7 @@ PowerModel
 
    ..
 
-   * \ `Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24, Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012 <http://dx.doi.org/10.1002/cpe.1867>`_\
+   * \ `Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24, Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012 <https://doi.org/10.1002/cpe.1867>`_\
 
    :author: Anton Beloglazov, Manoel Campos da Silva Filho
 

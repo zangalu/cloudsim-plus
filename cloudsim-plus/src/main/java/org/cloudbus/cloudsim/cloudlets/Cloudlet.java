@@ -7,6 +7,7 @@
 package org.cloudbus.cloudsim.cloudlets;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
+import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.CustomerEntity;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.core.UniquelyIdentifiable;
@@ -17,6 +18,7 @@ import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.traces.google.GoogleTaskEventsTraceReader;
 
 import java.util.List;
 
@@ -33,10 +35,10 @@ import java.util.List;
  * @since CloudSim Plus 1.0
  */
 public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, CustomerEntity {
-  /**
-   * Status of Cloudlets
-   */
-  enum Status {
+    /**
+     * Status of Cloudlets
+     */
+    enum Status {
         /**
          * The Cloudlet has been just instantiated but not assigned to a Datacenter yet.
          */
@@ -48,9 +50,19 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
         READY,
 
         /**
-         * The Cloudlet has moved to a Vm.
+         * The Cloudlet has moved to a Vm but it is in the waiting queue.
          */
         QUEUED,
+
+        /**
+         * The Cloudlet is in the waiting queue but it won't be automatically moved
+         * to the execution list (even if there are available PEs) until
+         * its status is changed to {@link #QUEUED}.
+         * This status is used specifically for Cloudlets created from a
+         * trace file, such as a {@link GoogleTaskEventsTraceReader Google Cluster trace},
+         * that explicitly defines when tasks must start running.
+         */
+        FROZEN,
 
         /**
          * The Cloudlet is in execution in a Vm.
@@ -194,7 +206,6 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      * Gets the execution status of this Cloudlet.
      *
      * @return the Cloudlet status
-     *
      */
     Status getStatus();
 
@@ -218,7 +229,6 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
     double registerArrivalInDatacenter();
 
     /**
-     *
      * @return true if the cloudlet has even been assigned to a Datacenter
      * in order to run, false otherwise.
      */
@@ -309,6 +319,30 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
     double getArrivalTime(Datacenter datacenter);
 
     /**
+     * Gets the id of the job that this Cloudlet belongs to, if any.
+     * This field is just used for classification.
+     * If there is an supposed job that multiple Cloudlets belong to,
+     * one can set the job id for all Cloudlets of that job
+     * in order to classify them.
+     * Besides classification, this field doesn't have any effect.
+     *
+     * @return the job id or {@link #NOT_ASSIGNED} if the Cloudlet doesn't belong to a job
+     */
+    long getJobId();
+
+    /**
+     * Sets the id of the job that this Cloudlet belongs to, if any.
+     * This field is just used for classification.
+     * If there is an supposed job that multiple Cloudlets belong to,
+     * one can set the job id for all Cloudlets of that job
+     * in order to classify them.
+     * Besides classification, this field doesn't have any effect.
+     *
+     * @param jobId the job id to set
+     */
+    void setJobId(long jobId);
+
+    /**
      * Gets the priority of this Cloudlet for scheduling inside a Vm.
      * Each {@link CloudletScheduler} implementation can define if it will
      * use this attribute to impose execution priorities or not.
@@ -380,7 +414,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of CPU at the current simulation time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * set for the {@link #getUtilizationModelCpu() CPU utilizaton model}.
      *
      * @return the utilization value
@@ -390,7 +424,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of CPU at a given time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * defined for the {@link #getUtilizationModelCpu()}.
      *
      * @param time the time to get the utilization
@@ -401,7 +435,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of RAM at the current simulation time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * set for the {@link #getUtilizationModelRam() RAM utilizaton model}.
      *
      * @return the utilization value
@@ -411,7 +445,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of RAM at a given time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * defined for the {@link #getUtilizationModelRam()} ()}.
      *
      * @param time the time to get the utilization
@@ -422,7 +456,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of Bandwidth at the current simulation time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * set for the {@link #getUtilizationModelBw() BW utilizaton model}.
      *
      * @return the utilization value
@@ -432,7 +466,7 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
 
     /**
      * Gets the utilization of Bandwidth at a given time, that is defined in
-     * percentage or absolute values, depending of the {@link UtilizationModel#getUnit()}
+     * percentage (in scale from [0 to 1]) or absolute values, depending of the {@link UtilizationModel#getUnit()}
      * defined for the {@link #getUtilizationModelBw()} ()}.
      *
      * @param time the time to get the utilization
@@ -562,7 +596,6 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      *
      * @param utilizationModel the new utilization model for BW, CPU and RAM
      * @return
-     *
      * @see #setUtilizationModelBw(UtilizationModel)
      * @see #setUtilizationModelCpu(UtilizationModel)
      * @see #setUtilizationModelRam(UtilizationModel)
@@ -601,6 +634,11 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      * Gets the execution length of this Cloudlet (in Million Instructions (MI))
      * that will be executed in each defined PE.
      *
+     * <p>In case the length is a negative value, it means
+     * the Cloudlet doesn't have a defined length, this way,
+     * it keeps running until a {@link CloudSimTags#CLOUDLET_FINISH}
+     * message is sent to the {@link DatacenterBroker}.</p>
+     *
      * <p>According to this length and the power of the VM processor (in
      * Million Instruction Per Second - MIPS) where the cloudlet will be run,
      * the cloudlet will take a given time to finish processing. For instance,
@@ -619,6 +657,20 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
     /**
      * Sets the execution length of this Cloudlet (in Million Instructions (MI))
      * that will be executed in each defined PE.
+     *
+     * <p>In case the length is a negative value, it means
+     * the Cloudlet doesn't have a defined length, this way,
+     * it keeps running until a {@link CloudSimTags#CLOUDLET_FINISH}
+     * message is sent to the {@link DatacenterBroker}.</p>
+
+     * <p>According to this length and the power of the VM processor (in
+     * Million Instruction Per Second - MIPS) where the cloudlet will be run,
+     * the cloudlet will take a given time to finish processing. For instance,
+     * for a cloudlet of 10000 MI running on a processor of 2000 MIPS, the
+     * cloudlet will spend 5 seconds using the processor in order to be
+     * completed (that may be uninterrupted or not, depending on the scheduling
+     * policy).
+     * </p>
      *
      * @param length the length (in MI) of this Cloudlet to be executed in a Vm
      * @return
@@ -640,7 +692,6 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      * </p>
      *
      * @return the total length of this Cloudlet (in MI)
-     *
      * @see #getNumberOfPes()
      * @see #getLength()
      */
@@ -688,10 +739,10 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      * This value is set by the Datacenter before departure or sending back to
      * the original Cloudlet's owner.
      *
-     * @param wallTime the time of this Cloudlet resides in a Datacenter
-     * (from arrival time until departure time).
+     * @param wallTime      the time of this Cloudlet resides in a Datacenter
+     *                      (from arrival time until departure time).
      * @param actualCpuTime the total execution time of this Cloudlet in a
-     * Datacenter.
+     *                      Datacenter.
      * @return true if the submission time is valid and
      * the cloudlet has already being assigned to a Datacenter for execution
      */
@@ -747,17 +798,19 @@ public interface Cloudlet extends UniquelyIdentifiable, Comparable<Cloudlet>, Cu
      * Notifies all registered listeners about the update on Cloudlet processing.
      *
      * <p><b>This method is used just internally and must not be called directly.</b></p>
+     *
      * @param time the time the event happened
      */
     void notifyOnUpdateProcessingListeners(double time);
 
     /**
      * Gets the CloudSim instance that represents the simulation the Entity is related to.
+     *
      * @return
      */
     Simulation getSimulation();
 
-   /**
+    /**
      * Gets the {@link DatacenterBroker} that represents the owner of this Cloudlet.
      *
      * @return the broker or <tt>{@link DatacenterBroker#NULL}</tt> if a broker has not been set yet

@@ -8,6 +8,10 @@
 
 .. java:import:: org.cloudbus.cloudsim.util MathUtil
 
+.. java:import:: java.util List
+
+.. java:import:: java.util Optional
+
 .. java:import:: java.util.function Predicate
 
 CloudletSchedulerCompletelyFair
@@ -48,14 +52,14 @@ CloudletSchedulerCompletelyFair
 
    :author: Manoel Campos da Silva Filho
 
-   **See also:** \ `Inside the Linux 2.6 Completely Fair Scheduler <http://www.ibm.com/developerworks/library/l-completely-fair-scheduler/>`_\, \ `Learn Linux, 101: Process execution priorities <http://www.ibm.com/developerworks/library/l-lpic1-103-6/index.html>`_\, \ `Towards achieving fairness in the Linux scheduler <http://dx.doi.org/10.1145/1400097.1400102>`_\, \ `The Linux scheduler <http://dx.doi.org/10.1145/10.1145/2901318.2901326>`_\, \ `kernel.org: CFS Scheduler Design <https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt>`_\, \ `Linux Scheduler FAQ <https://oakbytes.wordpress.com/linux-scheduler/>`_\
+   **See also:** \ `Inside the Linux 2.6 Completely Fair Scheduler <http://www.ibm.com/developerworks/library/l-completely-fair-scheduler/>`_\, \ `Learn Linux, 101: Process execution priorities <http://www.ibm.com/developerworks/library/l-lpic1-103-6/index.html>`_\, \ `Towards achieving fairness in the Linux scheduler <https://doi.org/10.1145/1400097.1400102>`_\, \ `The Linux scheduler <https://doi.org/10.1145/10.1145/2901318.2901326>`_\, \ `kernel.org: CFS Scheduler Design <https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt>`_\, \ `Linux Scheduler FAQ <https://oakbytes.wordpress.com/linux-scheduler/>`_\
 
 Methods
 -------
-canAddCloudletToExecutionList
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+canExecuteCloudletInternal
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean canAddCloudletToExecutionList(CloudletExecution cloudlet)
+.. java:method:: @Override protected boolean canExecuteCloudletInternal(CloudletExecution cloudlet)
    :outertype: CloudletSchedulerCompletelyFair
 
    Checks if a Cloudlet can be submitted to the execution list. This scheduler, different from its time-shared parent, only adds submitted Cloudlets to the execution list if there is enough free PEs. Otherwise, such Cloudlets are added to the waiting list, really enabling time-sharing between running Cloudlets. By this way, some Cloudlets have to be preempted to allow other ones to be executed.
@@ -66,15 +70,16 @@ canAddCloudletToExecutionList
 cloudletSubmitInternal
 ^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override protected double cloudletSubmitInternal(CloudletExecution ce, double fileTransferTime)
+.. java:method:: @Override protected double cloudletSubmitInternal(CloudletExecution cle, double fileTransferTime)
    :outertype: CloudletSchedulerCompletelyFair
 
    {@inheritDoc}
 
    It also sets the initial virtual runtime for the given Cloudlet in order to define how long the Cloudlet has executed yet. See \ :java:ref:`computeCloudletInitialVirtualRuntime(CloudletExecution)`\  for more details.
 
-   :param ce: {@inheritDoc}
+   :param cle: {@inheritDoc}
    :param fileTransferTime: {@inheritDoc}
+   :return: {@inheritDoc}
 
 computeCloudletTimeSlice
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -116,14 +121,14 @@ getCloudletExecList
 getCloudletNiceness
 ^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: protected double getCloudletNiceness(CloudletExecution cl)
+.. java:method:: protected double getCloudletNiceness(CloudletExecution cloudlet)
    :outertype: CloudletSchedulerCompletelyFair
 
    Gets the nice value from a Cloudlet based on its priority. The nice value is the opposite of the priority.
 
    As "niceness" is a terminology defined by specific schedulers (such as Linux Schedulers), it is not defined inside the Cloudlet.
 
-   :param cl: Cloudlet to get the nice value
+   :param cloudlet: Cloudlet to get the nice value
    :return: the cloudlet niceness
 
    **See also:** \ `Man Pages: Nice values for Linux processes <http://man7.org/linux/man-pages/man1/nice.1.html>`_\
@@ -187,7 +192,7 @@ moveNextCloudletsFromWaitingToExecList
 .. java:method:: @Override protected void moveNextCloudletsFromWaitingToExecList()
    :outertype: CloudletSchedulerCompletelyFair
 
-   Checks which Cloudlets in the execution list has the virtual runtime equals to its allocated time slice and preempt them, getting the most priority Cloudlets in the waiting list (that is those ones in the beginning of the list).
+   Checks which Cloudlets in the execution list have the virtual runtime equals to their allocated time slice and preempt them, getting the most priority Cloudlets in the waiting list (i.e., those ones in the beginning of the list).
 
    **See also:** :java:ref:`.preemptExecCloudletsWithExpiredVRuntimeAndMoveToWaitingList()`
 
@@ -218,7 +223,7 @@ setMinimumGranularity
 updateCloudletProcessing
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public long updateCloudletProcessing(CloudletExecution ce, double currentTime)
+.. java:method:: @Override public long updateCloudletProcessing(CloudletExecution cle, double currentTime)
    :outertype: CloudletSchedulerCompletelyFair
 
 updateProcessing

@@ -49,13 +49,13 @@ abstract class NetworkVmExampleAbstract {
 
     public static final int  HOST_MIPS = 1000;
     public static final int  HOST_PES = 8;
-    public static final int  HOST_RAM = 2048; // MEGABYTE
-    public static final long HOST_STORAGE = 1000000; // MEGABYTE
+    public static final int  HOST_RAM = 2048; // MEGA
+    public static final long HOST_STORAGE = 1000000; // MEGA
     public static final long HOST_BW = 10000;
 
     public static final int  VM_MIPS = 1000;
-    public static final long VM_SIZE = 10000; // image size (MEGABYTE)
-    public static final int  VM_RAM = 512; // MEGABYTE
+    public static final long VM_SIZE = 10000; // image size (Megabyte)
+    public static final int  VM_RAM = 512; // MEGA
     public static final long VM_BW = 1000;
     public static final int  VM_PES_NUMBER = HOST_PES / MAX_VMS_PER_HOST;
 
@@ -73,6 +73,7 @@ abstract class NetworkVmExampleAbstract {
     public static final long NETCLOUDLET_RAM = 100;
     private static final long PACKET_DATA_LENGTH_IN_BYTES = 1000;
     private static final long NUMBER_OF_PACKETS_TO_SEND = 100;
+    private static final int SCHEDULING_INTERVAL = 5;
 
     private final CloudSim simulation;
 
@@ -185,7 +186,7 @@ abstract class NetworkVmExampleAbstract {
         NetworkDatacenter dc =
                 new NetworkDatacenter(
                         simulation, hostList, new VmAllocationPolicySimple());
-        dc.setSchedulingInterval(5);
+        dc.setSchedulingInterval(SCHEDULING_INTERVAL);
         dc.getCharacteristics()
             .setCostPerSecond(COST)
             .setCostPerMem(COST_PER_MEM)
@@ -196,9 +197,9 @@ abstract class NetworkVmExampleAbstract {
         return dc;
     }
 
-    protected List<Pe> createPEs(final int numberOfPEs, final long mips) {
-        List<Pe> peList = new ArrayList<>();
-        for (int i = 0; i < numberOfPEs; i++) {
+    protected List<Pe> createPEs(final int pesNumber, final long mips) {
+        final List<Pe> peList = new ArrayList<>();
+        for (int i = 0; i < pesNumber; i++) {
             peList.add(new PeSimple(mips, new PeProvisionerSimple()));
         }
         return peList;
@@ -208,7 +209,7 @@ abstract class NetworkVmExampleAbstract {
      * Creates internal Datacenter network.
      * @param datacenter Datacenter where the network will be created
      */
-    protected void createNetwork(NetworkDatacenter datacenter) {
+    protected void createNetwork(final NetworkDatacenter datacenter) {
         EdgeSwitch[] edgeSwitches = new EdgeSwitch[1];
         for (int i = 0; i < edgeSwitches.length; i++) {
             edgeSwitches[i] = new EdgeSwitch(simulation, datacenter);
@@ -216,10 +217,28 @@ abstract class NetworkVmExampleAbstract {
         }
 
         for (NetworkHost host : datacenter.<NetworkHost>getHostList()) {
-            int switchNum = host.getId() / edgeSwitches[0].getPorts();
+            final int switchNum = getSwitchIndex(host, edgeSwitches[0].getPorts());
             edgeSwitches[switchNum].connectHost(host);
             host.setEdgeSwitch(edgeSwitches[switchNum]);
         }
+    }
+
+    /**
+     * Gets the index of a switch where a Host will be connected,
+     * considering the number of ports the switches have.
+     * Ensures that each set of N Hosts is connected to the same switch
+     * (where N is defined as the number of switch's ports).
+     * Since the host ID is long but the switch array index is int,
+     * the module operation is used safely convert a long to int
+     * For instance, if the id is 2147483648 (higher than the max int value 2147483647),
+     * it will be returned 0. For 2147483649 it will be 1 and so on.
+     *
+     * @param host the Host to get the index of the switch to connect to
+     * @param switchPorts the number of ports (N) the switches where the Host will be connected have
+     * @return the index of the switch to connect the host
+     */
+    public static final int getSwitchIndex(final NetworkHost host, final int switchPorts) {
+        return Math.round(host.getId() % Integer.MAX_VALUE) / switchPorts;
     }
 
     /**
@@ -335,7 +354,7 @@ abstract class NetworkVmExampleAbstract {
         CloudletReceiveTask task = new CloudletReceiveTask(
                 cloudlet.getTasks().size(), sourceCloudlet.getVm());
         task.setMemory(NETCLOUDLET_RAM);
-        task.setNumberOfExpectedPacketsToReceive(NUMBER_OF_PACKETS_TO_SEND);
+        task.setExpectedPacketsToReceive(NUMBER_OF_PACKETS_TO_SEND);
         cloudlet.addTask(task);
     }
 }

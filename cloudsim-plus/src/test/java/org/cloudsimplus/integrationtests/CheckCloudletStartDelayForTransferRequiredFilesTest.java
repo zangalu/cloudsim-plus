@@ -40,9 +40,9 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -93,7 +93,7 @@ public final class CheckCloudletStartDelayForTransferRequiredFilesTest {
 	        .createDatacenter(
 	            new HostBuilder()
 	                .setVmSchedulerClass(VmSchedulerSpaceShared.class)
-	                .setRam(4000).setBw(400000)
+	                .setRam(4000).setBandwidth(400000)
 	                .setPes(HOST_PES).setMips(HOST_MIPS)
 	                .createOneHost()
 	                .getHosts()
@@ -103,7 +103,7 @@ public final class CheckCloudletStartDelayForTransferRequiredFilesTest {
         final BrokerBuilderDecorator brokerBuilder = scenario.getBrokerBuilder().createBroker();
 	    this.broker = brokerBuilder.getBroker();
         brokerBuilder.getVmBuilder()
-                .setRam(1000).setBw(100000)
+                .setRam(1000).setBandwidth(100000)
                 .setPes(VM_PES).setMips(VM_MIPS).setSize(50000)
                 .setCloudletSchedulerSupplier(CloudletSchedulerSpaceShared::new)
                 .createAndSubmitOneVm();
@@ -138,10 +138,9 @@ public final class CheckCloudletStartDelayForTransferRequiredFilesTest {
 	 * by the created cloudlet.
 	 */
 	private void createListOfFiles() {
-		files = new ArrayList<>();
-		for(int i = 0; i < NUMBER_OF_FILES_TO_CREATE; i++) {
-			files.add(new File(String.format("file%d", i), FILE_SIZE_MB));
-		}
+		files = IntStream.range(0, NUMBER_OF_FILES_TO_CREATE)
+                         .mapToObj(i -> new File(String.format("file%d", i), FILE_SIZE_MB))
+                         .collect(Collectors.toList());
 	}
 
 	@Test

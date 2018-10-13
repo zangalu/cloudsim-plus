@@ -25,13 +25,7 @@ Methods
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override public int compareTo(SimEvent o)
-   :outertype: SimEventNull
-
-eventTime
-^^^^^^^^^
-
-.. java:method:: @Override public double eventTime()
+.. java:method:: @Override public int compareTo(SimEvent evt)
    :outertype: SimEventNull
 
 getData
@@ -110,6 +104,12 @@ setSerial
 ^^^^^^^^^
 
 .. java:method:: @Override public void setSerial(long serial)
+   :outertype: SimEventNull
+
+setSimulation
+^^^^^^^^^^^^^
+
+.. java:method:: @Override public SimEvent setSimulation(Simulation simulation)
    :outertype: SimEventNull
 
 setSource

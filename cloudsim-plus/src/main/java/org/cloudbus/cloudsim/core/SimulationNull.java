@@ -6,7 +6,10 @@ import org.cloudbus.cloudsim.network.topologies.NetworkTopology;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 /**
@@ -19,19 +22,17 @@ import java.util.function.Predicate;
 final class SimulationNull implements Simulation {
     @Override public boolean isTerminationTimeSet() { return false; }
     @Override public void abort() {/**/}
-    @Override public void addEntity(CloudSimEntity e) {/**/}
-    @Override public SimEvent cancel(SimEntity src, Predicate<SimEvent> p) {
+    @Override public void addEntity(CloudSimEntity entity) {/**/}
+    @Override public SimEvent cancel(SimEntity src, Predicate<SimEvent> predicate) {
         return SimEvent.NULL;
     }
-    @Override public boolean cancelAll(SimEntity src, Predicate<SimEvent> p) {
+    @Override public boolean cancelAll(SimEntity src, Predicate<SimEvent> predicate) {
         return false;
     }
     @Override public double clock() { return 0.0; }
     @Override public double clockInMinutes() { return 0.0; }
     @Override public double clockInHours() { return 0.0; }
-    @Override public SimEvent findFirstDeferred(SimEntity dest, Predicate<SimEvent> p) {
-        return SimEvent.NULL;
-    }
+    @Override public SimEvent findFirstDeferred(SimEntity dest, Predicate<SimEvent> predicate) { return SimEvent.NULL; }
     @Override public Calendar getCalendar() {
         return Calendar.getInstance();
     }
@@ -39,9 +40,9 @@ final class SimulationNull implements Simulation {
         return null;
     }
     @Override public Set<Datacenter> getDatacenterList() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
-    @Override public List<SimEntity> getEntityList() { return Collections.EMPTY_LIST; }
+    @Override public List<SimEntity> getEntityList() { return Collections.emptyList(); }
     @Override public double getMinTimeBetweenEvents() {
         return 0;
     }
@@ -51,10 +52,11 @@ final class SimulationNull implements Simulation {
     @Override public boolean removeOnEventProcessingListener(EventListener<SimEvent> listener) {
         return false;
     }
-    @Override public Simulation addOnSimulationPausedListener(EventListener<EventInfo> listener) {
+    @Override public Simulation addOnSimulationPauseListener(EventListener<EventInfo> listener) {
         return this;
     }
-    @Override public boolean removeOnSimulationPausedListener(EventListener<EventInfo> listener) {
+    @Override public Simulation addOnSimulationStartListener(EventListener<EventInfo> listener) { return this; }
+    @Override public boolean removeOnSimulationPauseListener(EventListener<EventInfo> listener) {
         return false;
     }
     @Override public void holdEntity(SimEntity src, long delay) {/**/}
@@ -74,10 +76,10 @@ final class SimulationNull implements Simulation {
     @Override public boolean isRunning() {
         return false;
     }
-    @Override public SimEvent select(SimEntity dest, Predicate<SimEvent> p) {
-        return SimEvent.NULL;
-    }
+    @Override public SimEvent select(SimEntity dest, Predicate<SimEvent> predicate) { return SimEvent.NULL; }
+    @Override public void send(SimEvent evt) {/**/}
     @Override public void send(SimEntity src, SimEntity dest, double delay, int tag, Object data) {/**/}
+    @Override public void sendFirst(SimEvent evt) {/**/}
     @Override public void sendFirst(SimEntity src, SimEntity dest, double delay, int tag, Object data) {/**/}
     @Override public void sendNow(SimEntity src, SimEntity dest, int tag, Object data) {/**/}
     @Override public Simulation addOnEventProcessingListener(EventListener<SimEvent> listener) {
@@ -97,13 +99,11 @@ final class SimulationNull implements Simulation {
     @Override public boolean terminateAt(double time) {
         return false;
     }
-    @Override public void wait(CloudSimEntity src, Predicate<SimEvent> p) {/**/}
-    @Override public long waiting(SimEntity dest, Predicate<SimEvent> p) {
+    @Override public void wait(CloudSimEntity src, Predicate<SimEvent> predicate) {/**/}
+    @Override public long waiting(SimEntity dest, Predicate<SimEvent> predicate) {
         return 0;
     }
-    @Override public NetworkTopology getNetworkTopology() {
-        return NetworkTopology.NULL;
-    }
+    @Override public NetworkTopology getNetworkTopology() { return NetworkTopology.NULL; }
     @Override public void setNetworkTopology(NetworkTopology networkTopology) {/**/}
     @Override public long getNumberOfFutureEvents(Predicate<SimEvent> predicate) { return 0; }
 }

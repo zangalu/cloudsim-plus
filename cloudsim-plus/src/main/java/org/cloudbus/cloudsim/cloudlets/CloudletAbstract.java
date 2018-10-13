@@ -8,6 +8,7 @@
 package org.cloudbus.cloudsim.cloudlets;
 
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
+import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.core.UniquelyIdentifiable;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
@@ -17,6 +18,8 @@ import org.cloudsimplus.listeners.CloudletVmEventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
 import java.util.*;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A base class for {@link Cloudlet} implementations.
@@ -29,7 +32,11 @@ public abstract class CloudletAbstract implements Cloudlet {
     /**
      * @see #getId()
      */
-    private int id;
+    private long id;
+
+    /** @see #getJobId() */
+    private long jobId;
+
     /**
      * The list of every {@link Datacenter} where the cloudlet has been executed.
      * In case it starts and finishes executing in a single Datacenter, without
@@ -126,12 +133,11 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     /**
      * Creates a Cloudlet with no priority and file size and output size equal to 1.
-     *
-     * @param cloudletId     id of the Cloudlet
-     * @param length the length or size (in MI) of this cloudlet to be executed in a VM
+     *  @param id     id of the Cloudlet
+     * @param length the length or size (in MI) of this cloudlet to be executed in a VM (check out {@link #setLength(long)})
      * @param pesNumber      number of PEs that Cloudlet will require
      */
-    public CloudletAbstract(final int cloudletId, final long length, final long pesNumber) {
+    public CloudletAbstract(final long id, final long length, final long pesNumber) {
         /*
         Normally, a Cloudlet is only executed on a Datacenter without being
         migrated to others. Hence, to reduce memory consumption, set the
@@ -140,7 +146,9 @@ public abstract class CloudletAbstract implements Cloudlet {
         this.datacenterExecutionList = new ArrayList<>(2);
         this.requiredFiles = new LinkedList<>();
 
-        this.id = cloudletId;
+        this.setId(id);
+        this.setJobId(NOT_ASSIGNED);
+
         this.netServiceLevel = 0;
         this.execStartTime = 0.0;
         this.status = Status.INSTANTIATED;
@@ -171,7 +179,7 @@ public abstract class CloudletAbstract implements Cloudlet {
      * Creates a Cloudlet with no priority or id. The id is defined when the Cloudlet is submitted to
      * a {@link DatacenterBroker}. The file size and output size is defined as 1.
      *
-     * @param length the length or size (in MI) of this cloudlet to be executed in a VM
+     * @param length the length or size (in MI) of this cloudlet to be executed in a VM (check out {@link #setLength(long)})
      * @param pesNumber number of PEs that Cloudlet will require
      */
     public CloudletAbstract(final long length, final int pesNumber) {
@@ -182,7 +190,7 @@ public abstract class CloudletAbstract implements Cloudlet {
      * Creates a Cloudlet with no priority or id. The id is defined when the Cloudlet is submitted to
      * a {@link DatacenterBroker}. The file size and output size is defined as 1.
      *
-     * @param length the length or size (in MI) of this cloudlet to be executed in a VM
+     * @param length the length or size (in MI) of this cloudlet to be executed in a VM (check out {@link #setLength(long)})
      * @param pesNumber number of PEs that Cloudlet will require
      */
     public CloudletAbstract(final long length, final long pesNumber) {
@@ -207,8 +215,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public Cloudlet addOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onUpdateProcessingListeners.add(listener);
+        this.onUpdateProcessingListeners.add(requireNonNull(listener));
         return this;
     }
 
@@ -219,8 +226,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public Cloudlet addOnFinishListener(EventListener<CloudletVmEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onFinishListeners.add(listener);
+        this.onFinishListeners.add(requireNonNull(listener));
         return this;
     }
 
@@ -231,13 +237,13 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public void notifyOnUpdateProcessingListeners(double time) {
-        onUpdateProcessingListeners.forEach(l -> l.update(CloudletVmEventInfo.of(l, time, this)));
+        onUpdateProcessingListeners.forEach(listener -> listener.update(CloudletVmEventInfo.of(listener, time, this)));
     }
 
     @Override
     public final Cloudlet setLength(final long length) {
-        if (length <= 0) {
-            throw new IllegalArgumentException("Cloudlet length has to be greater than zero.");
+        if (length == 0) {
+            throw new IllegalArgumentException("Cloudlet length cannot be zero.");
         }
 
         this.length = length;
@@ -305,7 +311,15 @@ public abstract class CloudletAbstract implements Cloudlet {
             return 0;
         }
 
-        return Math.min(getLastExecutionInDatacenterInfo().getFinishedSoFar(), getLength());
+        if(getLength() > 0) {
+            return Math.min(getLastExecutionInDatacenterInfo().getFinishedSoFar(), absLength());
+        }
+
+        /**
+         * If the length is negative, it means the Cloudlet doesn't have a defined length.
+         * This way, it keeps running and increasing the executed length
+         * until a {@link CloudSimTags#CLOUDLET_FINISH} message is sent to the broker. */
+        return getLastExecutionInDatacenterInfo().getFinishedSoFar();
     }
 
     @Override
@@ -314,7 +328,11 @@ public abstract class CloudletAbstract implements Cloudlet {
             return false;
         }
 
-        return getLastExecutionInDatacenterInfo().getFinishedSoFar() >= getLength();
+        /**
+         * If length is negative, it means it is undefined.
+         * Check {@link CloudSimTags#CLOUDLET_FINISH} for details.
+         */
+        return getLength() > 0 && getLastExecutionInDatacenterInfo().getFinishedSoFar() >= getLength();
     }
 
     @Override
@@ -323,8 +341,15 @@ public abstract class CloudletAbstract implements Cloudlet {
             return false;
         }
 
-
-        final long maxLengthToAdd = Math.min(partialFinishedMI, getLength()-getFinishedLengthSoFar());
+        /**
+         * If the Cloudlet has a defined length (a positive value), then, the partial
+         * finished length cannot be greater than the actual total length.
+         * If the Cloudlet has a negative length, it means it doesn't have a defined
+         * length, so that its length increases indefinitely until
+         * a {@link CloudSimTags#CLOUDLET_FINISH} message is sent to the broker. */
+        final long maxLengthToAdd = getLength() < 0 ?
+                                    partialFinishedMI :
+                                    Math.min(partialFinishedMI, absLength()-getFinishedLengthSoFar());
         getLastExecutionInDatacenterInfo().addFinishedSoFar(maxLengthToAdd);
         notifyListenersIfCloudletIsFinished();
         return true;
@@ -338,15 +363,14 @@ public abstract class CloudletAbstract implements Cloudlet {
      */
     private void notifyListenersIfCloudletIsFinished() {
         if (isFinished()) {
-            onFinishListeners.forEach(l -> l.update(CloudletVmEventInfo.of(l, this)));
+            onFinishListeners.forEach(listener -> listener.update(CloudletVmEventInfo.of(listener, this)));
             onFinishListeners.clear();
         }
     }
 
     @Override
     public final Cloudlet setBroker(final DatacenterBroker broker) {
-        Objects.requireNonNull(broker);
-        this.broker = broker;
+        this.broker = requireNonNull(broker);
         return this;
     }
 
@@ -421,6 +445,17 @@ public abstract class CloudletAbstract implements Cloudlet {
         return length;
     }
 
+    /**
+     * Gets the absolute value of the length (without the signal).
+     * Check out {@link #getLength()} for details.
+     * @return
+     */
+    protected long absLength(){
+        /*Since the getLength is overridden by classes such as the NetworkCloudlet,
+        * we have to call the method instead of directly using the length attribute.*/
+        return Math.abs(getLength());
+    }
+
     @Override
     public long getTotalLength() {
         return length * numberOfPes;
@@ -474,7 +509,7 @@ public abstract class CloudletAbstract implements Cloudlet {
      * @pre dc >= 0
      * @post $none
      */
-    private CloudletDatacenterExecution getDatacenterInfo(final int datacenterId) {
+    private CloudletDatacenterExecution getDatacenterInfo(final long datacenterId) {
         return datacenterExecutionList.stream()
             .filter(info -> info.getDatacenter().getId() == datacenterId)
             .findFirst().orElse(CloudletDatacenterExecution.NULL);
@@ -513,13 +548,23 @@ public abstract class CloudletAbstract implements Cloudlet {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
     @Override
-    public void setId(int id) {
+    public final void setId(final long id) {
         this.id = id;
+    }
+
+    @Override
+    public long getJobId() {
+        return jobId;
+    }
+
+    @Override
+    public final void setJobId(final long jobId) {
+        this.jobId = jobId;
     }
 
     @Override
@@ -568,13 +613,12 @@ public abstract class CloudletAbstract implements Cloudlet {
      * @param requiredFiles the new list of required files
      */
     public final void setRequiredFiles(final List<String> requiredFiles) {
-        Objects.requireNonNull(requiredFiles);
-        this.requiredFiles = requiredFiles;
+        this.requiredFiles = requireNonNull(requiredFiles);
     }
 
     @Override
     public boolean addRequiredFile(final String fileName) {
-        if (getRequiredFiles().stream().anyMatch(s -> s.equals(fileName))) {
+        if (getRequiredFiles().stream().anyMatch(reqFile -> reqFile.equals(fileName))) {
             return false;
         }
 
@@ -617,8 +661,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public final Cloudlet setUtilizationModelCpu(final UtilizationModel utilizationModelCpu) {
-        Objects.requireNonNull(utilizationModelCpu);
-        this.utilizationModelCpu = utilizationModelCpu;
+        this.utilizationModelCpu = requireNonNull(utilizationModelCpu);
         return this;
     }
 
@@ -629,8 +672,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public final Cloudlet setUtilizationModelRam(final UtilizationModel utilizationModelRam) {
-        Objects.requireNonNull(utilizationModelRam);
-        this.utilizationModelRam = utilizationModelRam;
+        this.utilizationModelRam = requireNonNull(utilizationModelRam);
         return this;
     }
 
@@ -641,8 +683,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public final Cloudlet setUtilizationModelBw(final UtilizationModel utilizationModelBw) {
-        Objects.requireNonNull(utilizationModelBw);
-        this.utilizationModelBw = utilizationModelBw;
+        this.utilizationModelBw = requireNonNull(utilizationModelBw);
         return this;
     }
 
@@ -802,7 +843,7 @@ public abstract class CloudletAbstract implements Cloudlet {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = Long.hashCode(id);
         result = 31 * result + broker.hashCode();
         return result;
     }

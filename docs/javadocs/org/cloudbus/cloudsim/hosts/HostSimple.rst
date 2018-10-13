@@ -1,3 +1,5 @@
+.. java:import:: org.cloudbus.cloudsim.core ChangeableId
+
 .. java:import:: org.cloudbus.cloudsim.core Simulation
 
 .. java:import:: org.cloudbus.cloudsim.datacenters Datacenter
@@ -6,7 +8,13 @@
 
 .. java:import:: org.cloudbus.cloudsim.provisioners ResourceProvisioner
 
+.. java:import:: org.cloudbus.cloudsim.provisioners ResourceProvisionerSimple
+
 .. java:import:: org.cloudbus.cloudsim.schedulers.vm VmScheduler
+
+.. java:import:: org.cloudbus.cloudsim.schedulers.vm VmSchedulerSpaceShared
+
+.. java:import:: org.cloudbus.cloudsim.vms UtilizationHistory
 
 .. java:import:: org.cloudbus.cloudsim.vms Vm
 
@@ -20,7 +28,17 @@
 
 .. java:import:: org.slf4j LoggerFactory
 
+.. java:import:: java.util.function BinaryOperator
+
+.. java:import:: java.util.function Function
+
 .. java:import:: java.util.function Predicate
+
+.. java:import:: java.util.function Supplier
+
+.. java:import:: java.util.stream Collectors
+
+.. java:import:: java.util.stream Stream
 
 HostSimple
 ==========
@@ -42,14 +60,14 @@ HostSimple
 .. java:constructor:: public HostSimple(long ram, long bw, long storage, List<Pe> peList)
    :outertype: HostSimple
 
-   Creates a Host without a pre-defined ID. The ID is automatically set when a List of Hosts is attached to a \ :java:ref:`Datacenter`\ .
+   Creates a Host without a pre-defined ID and using a \ :java:ref:`ResourceProvisionerSimple`\  RAM and Bandwidth. It also sets a \ :java:ref:`VmSchedulerSpaceShared`\  as default. The ID is automatically set when a List of Hosts is attached to a \ :java:ref:`Datacenter`\ .
 
    :param ram: the RAM capacity in Megabytes
    :param bw: the Bandwidth (BW) capacity in Megabits/s
    :param storage: the storage capacity in Megabytes
    :param peList: the host's \ :java:ref:`Pe`\  list
 
-   **See also:** :java:ref:`.setId(int)`
+   **See also:** :java:ref:`ChangeableId.setId(long)`, :java:ref:`.setRamProvisioner(ResourceProvisioner)`, :java:ref:`.setBwProvisioner(ResourceProvisioner)`, :java:ref:`.setVmScheduler(VmScheduler)`
 
 HostSimple
 ^^^^^^^^^^
@@ -237,7 +255,7 @@ getFreePeList
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: HostSimple
 
 getMaxAvailableMips
@@ -324,10 +342,22 @@ getResources
 .. java:method:: @Override public List<ResourceManageable> getResources()
    :outertype: HostSimple
 
+getShutdownTime
+^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public double getShutdownTime()
+   :outertype: HostSimple
+
 getSimulation
 ^^^^^^^^^^^^^
 
 .. java:method:: @Override public Simulation getSimulation()
+   :outertype: HostSimple
+
+getStartTime
+^^^^^^^^^^^^
+
+.. java:method:: @Override public double getStartTime()
    :outertype: HostSimple
 
 getStateHistory
@@ -357,7 +387,13 @@ getTotalMipsCapacity
 getUtilizationHistory
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double[] getUtilizationHistory()
+.. java:method:: @Override public SortedMap<Double, DoubleSummaryStatistics> getUtilizationHistory()
+   :outertype: HostSimple
+
+getUtilizationHistorySum
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public SortedMap<Double, Double> getUtilizationHistorySum()
    :outertype: HostSimple
 
 getUtilizationOfBw
@@ -513,7 +549,7 @@ setFailed
 setId
 ^^^^^
 
-.. java:method:: @Override public final void setId(int id)
+.. java:method:: @Override public final void setId(long id)
    :outertype: HostSimple
 
 setPeList
@@ -538,10 +574,22 @@ setRamProvisioner
 .. java:method:: @Override public final Host setRamProvisioner(ResourceProvisioner ramProvisioner)
    :outertype: HostSimple
 
+setShutdownTime
+^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public void setShutdownTime(double shutdownTime)
+   :outertype: HostSimple
+
 setSimulation
 ^^^^^^^^^^^^^
 
 .. java:method:: @Override public final Host setSimulation(Simulation simulation)
+   :outertype: HostSimple
+
+setStartTime
+^^^^^^^^^^^^
+
+.. java:method:: @Override public void setStartTime(double startTime)
    :outertype: HostSimple
 
 setVmScheduler

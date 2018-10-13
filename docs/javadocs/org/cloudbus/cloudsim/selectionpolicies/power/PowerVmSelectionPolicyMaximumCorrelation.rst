@@ -1,16 +1,18 @@
-.. java:import:: java.util LinkedList
-
-.. java:import:: java.util List
-
 .. java:import:: org.apache.commons.math3.linear Array2DRowRealMatrix
 
 .. java:import:: org.cloudbus.cloudsim.hosts Host
 
-.. java:import:: org.cloudbus.cloudsim.vms Vm
-
 .. java:import:: org.cloudbus.cloudsim.util MathUtil
 
 .. java:import:: org.cloudbus.cloudsim.vms UtilizationHistory
+
+.. java:import:: org.cloudbus.cloudsim.vms Vm
+
+.. java:import:: java.util LinkedList
+
+.. java:import:: java.util List
+
+.. java:import:: java.util Map
 
 PowerVmSelectionPolicyMaximumCorrelation
 ========================================
@@ -26,7 +28,7 @@ PowerVmSelectionPolicyMaximumCorrelation
 
    ..
 
-   * \ `Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24, Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012 <http://dx.doi.org/10.1002/cpe.1867>`_\
+   * \ `Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24, Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012 <https://doi.org/10.1002/cpe.1867>`_\
 
    :author: Anton Beloglazov
 
@@ -71,7 +73,7 @@ getMinUtilizationHistorySize
 .. java:method:: protected int getMinUtilizationHistorySize(List<Vm> vmList)
    :outertype: PowerVmSelectionPolicyMaximumCorrelation
 
-   Gets the min CPU utilization percentage history size among a list of VMs.
+   Gets the min CPU utilization percentage history size between a list of VMs.
 
    :param vmList: the VM list
    :return: the min CPU utilization percentage history size of the VM list

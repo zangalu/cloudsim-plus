@@ -16,7 +16,7 @@ package org.cloudbus.cloudsim.power.models;
  * the following paper:</p>
  *
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in
  * Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24,
  * Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012</a></li>
@@ -52,6 +52,6 @@ public abstract class PowerModelSpecPower extends PowerModelAbstract {
          * where 10 means 100% of utilization.
 	 * @return the power consumption for the given utilization percentage
 	 */
-	protected abstract double getPowerData(final int index);
+	protected abstract double getPowerData(int index);
 
 }

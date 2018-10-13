@@ -52,7 +52,7 @@ import static org.junit.Assert.assertEquals;
  * @author Manoel Campos da Silva Filho
  */
 public final class CheckHostAvailableMipsDynamicUtilizationTest {
-    private static final Logger logger = LoggerFactory.getLogger(CheckHostAvailableMipsDynamicUtilizationTest.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckHostAvailableMipsDynamicUtilizationTest.class.getSimpleName());
 
     private static final int HOST_MIPS = 1000;
     private static final int HOST_PES = 2;
@@ -79,7 +79,7 @@ public final class CheckHostAvailableMipsDynamicUtilizationTest {
         final double expectedAvailableHostMips =
                HOST_MIPS * HOST_PES * utilizationModel.getUtilization(evt.getTime());
 
-        logger.info(
+        LOGGER.info(
             "- onUpdateVmProcessing at time {}: {} available mips: {} expected availability: {}",
             evt.getTime(), evt.getHost(), evt.getHost().getAvailableMips(), expectedAvailableHostMips);
 
@@ -94,7 +94,7 @@ public final class CheckHostAvailableMipsDynamicUtilizationTest {
         scenario.getDatacenterBuilder().setSchedulingInterval(2).createDatacenter(
                 new HostBuilder()
                     .setVmSchedulerClass(VmSchedulerSpaceShared.class)
-                    .setRam(4000).setBw(400000)
+                    .setRam(4000).setBandwidth(400000)
                     .setPes(HOST_PES).setMips(HOST_MIPS)
                     .setOnUpdateVmsProcessingListener(this::onUpdateVmsProcessing)
                     .createOneHost()
@@ -104,13 +104,13 @@ public final class CheckHostAvailableMipsDynamicUtilizationTest {
         final BrokerBuilderDecorator brokerBuilder = scenario.getBrokerBuilder().createBroker();
 
         brokerBuilder.getVmBuilder()
-                .setRam(1000).setBw(100000)
+                .setRam(1000).setBandwidth(100000)
                 .setPes(VM_PES).setMips(VM_MIPS).setSize(50000)
                 .setCloudletSchedulerSupplier(CloudletSchedulerTimeShared::new)
                 .createAndSubmitVms(NUMBER_OF_VMS);
 
-        utilizationModel = new UtilizationModelDynamic()
-                            .setUtilizationUpdateFunction(um -> um.getUtilization() + um.getTimeSpan()*0.25);
+        utilizationModel = new UtilizationModelDynamic();
+        utilizationModel.setUtilizationUpdateFunction(instance -> instance.getUtilization() + instance.getTimeSpan()*0.25);
         brokerBuilder.getCloudletBuilder()
                 .setLength(CLOUDLET_LENGTH)
                 .setUtilizationModelCpu(utilizationModel)

@@ -6,18 +6,19 @@
  */
 package org.cloudbus.cloudsim.brokers;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
+import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.core.SimEntity;
 import org.cloudsimplus.listeners.DatacenterBrokerEventInfo;
 import org.cloudsimplus.listeners.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Represents a broker acting on behalf of a cloud customer.
@@ -33,6 +34,8 @@ import org.cloudsimplus.listeners.EventListener;
  * @since CloudSim Plus 1.0
  */
 public interface DatacenterBroker extends SimEntity {
+    Logger LOGGER = LoggerFactory.getLogger(DatacenterBroker.class.getSimpleName());
+
     /**
      * An attribute that implements the Null Object Design Pattern for {@link DatacenterBroker}
      * objects.
@@ -283,7 +286,7 @@ public interface DatacenterBroker extends SimEntity {
      * Gets a <b>read-only</b> list of cloudlets created inside some Vm.
      * @return the list of created Cloudlets
      */
-    Set<Cloudlet> getCloudletCreatedList();
+    List<Cloudlet> getCloudletCreatedList();
 
     /**
      * Adds an {@link EventListener} that will be notified every time
@@ -371,4 +374,6 @@ public interface DatacenterBroker extends SimEntity {
      * no suitable VM was found
      */
     Vm defaultVmMapper(Cloudlet cloudlet);
+
+    List<Cloudlet> getCloudletSubmittedList();
 }

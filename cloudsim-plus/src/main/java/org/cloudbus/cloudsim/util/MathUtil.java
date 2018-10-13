@@ -8,13 +8,14 @@
 
 package org.cloudbus.cloudsim.util;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * A class containing multiple convenient math functions.
@@ -49,7 +50,7 @@ public final class MathUtil {
      * @param list the list of numbers
      * @return the median
      */
-    public static double median(final List<Double> list) {
+    public static double median(final Collection<Double> list) {
         return getStatistics(list).getPercentile(50);
     }
 
@@ -69,7 +70,7 @@ public final class MathUtil {
      * @param list the list of numbers. Must not be null.
      * @return descriptive statistics for the list of numbers.
      */
-    public static DescriptiveStatistics getStatistics(final List<Double> list) {
+    public static DescriptiveStatistics getStatistics(final Collection<Double> list) {
         final DescriptiveStatistics stats = new DescriptiveStatistics();
         list.forEach(stats::addValue);
         return stats;
@@ -93,7 +94,7 @@ public final class MathUtil {
      * @return the average
      */
     public static double mean(final List<Double> list) {
-        return list.stream().mapToDouble(n->n).average().orElse(0);
+        return list.stream().mapToDouble(number->number).average().orElse(0);
     }
 
     /**
@@ -103,19 +104,18 @@ public final class MathUtil {
      * @return the variance
      */
     public static double variance(final List<Double> list) {
-        long n = 0;
+        long count = 0;
         double mean = mean(list);
-        double s = 0.0;
+        double deltaSum = 0.0;
 
         for(final double x : list) {
-            n++;
+            count++;
             final double delta = x - mean;
-            mean += delta / n;
-            s += delta * (x - mean);
+            mean += delta / count;
+            deltaSum += delta * (x - mean);
         }
-        // if you want to calculate std deviation
-        // of a sample change this to (s/(n-1))
-        return s / (n - 1);
+
+        return deltaSum / (count - 1);
     }
 
     /**
@@ -129,7 +129,7 @@ public final class MathUtil {
     }
 
     /**
-     * Gets the Median absolute deviation (MAD) from a array of numbers.
+     * Gets the Median Absolute Deviation (MAD) from a array of numbers.
      *
      * @param data the array of numbers
      * @return the mad
@@ -149,16 +149,17 @@ public final class MathUtil {
     }
 
     /**
-     * Gets the Interquartile Range (IQR) from an array of numbers.
+     * Gets the <a href="https://en.wikipedia.org/wiki/Interquartile_range">Interquartile Range (IQR)</a>
+     * from an array of numbers.
      *
      * @param data the array of numbers
      * @return the IQR
      */
     public static double iqr(final double... data) {
         Arrays.sort(data);
-        final int q1 = (int) Math.round(0.25 * (data.length + 1)) - 1;
-        final int q3 = (int) Math.round(0.75 * (data.length + 1)) - 1;
-        return data[q3] - data[q1];
+        final int quartile1 = (int) Math.round(0.25 * (data.length + 1)) - 1;
+        final int quartile3 = (int) Math.round(0.75 * (data.length + 1)) - 1;
+        return data[quartile3] - data[quartile1];
     }
 
     /**
@@ -190,7 +191,7 @@ public final class MathUtil {
             x[i] = i + 1;
         }
 
-        return createWeigthedLinearRegression(x, y, getTricubeWeights(y.length))
+        return createWeightedLinearRegression(x, y, getTricubeWeights(y.length))
                 .regress().getParameterEstimates();
     }
 
@@ -210,26 +211,28 @@ public final class MathUtil {
         return regression;
     }
 
-    private static SimpleRegression createWeigthedLinearRegression(
-        final double[] x, final double[] y, final double[] weigths)
+    private static SimpleRegression createWeightedLinearRegression(
+        final double[] x,
+        final double[] y,
+        final double[] weights)
     {
-        final double[] xW = new double[x.length];
-        final double[] yW = new double[y.length];
+        final double[] weightedX = new double[x.length];
+        final double[] weightedY = new double[y.length];
 
-        final long numZeroWeigths = Arrays.stream(weigths).filter(weigth -> weigth <= 0).count();
+        final long numZeroWeigths = Arrays.stream(weights).filter(weigth -> weigth <= 0).count();
 
         for (int i = 0; i < x.length; i++) {
-            if (numZeroWeigths >= 0.4 * weigths.length) {
+            if (numZeroWeigths >= 0.4 * weights.length) {
                 // See: http://www.ncsu.edu/crsc/events/ugw07/Presentations/Crooks_Qiao/Crooks_Qiao_Alt_Presentation.pdf
-                xW[i] = Math.sqrt(weigths[i]) * x[i];
-                yW[i] = Math.sqrt(weigths[i]) * y[i];
+                weightedX[i] = Math.sqrt(weights[i]) * x[i];
+                weightedY[i] = Math.sqrt(weights[i]) * y[i];
             } else {
-                xW[i] = x[i];
-                yW[i] = y[i];
+                weightedX[i] = x[i];
+                weightedY[i] = y[i];
             }
         }
 
-        return createLinearRegression(xW, yW);
+        return createLinearRegression(weightedX, weightedY);
     }
 
     /**
@@ -239,22 +242,20 @@ public final class MathUtil {
      * @return the robust loess parameter estimates
      */
     public static double[] getRobustLoessParameterEstimates(final double... y) {
-        final int n = y.length;
-        final double[] x = new double[n];
-        for (int i = 0; i < n; i++) {
+        final double[] x = new double[y.length];
+        for (int i = 0; i < y.length; i++) {
             x[i] = i + 1;
         }
-        final SimpleRegression tricubeRegression = createWeigthedLinearRegression(x,
-            y, getTricubeWeights(n));
-        final double[] residuals = new double[n];
-        for (int i = 0; i < n; i++) {
+        final SimpleRegression tricubeRegression =
+                createWeightedLinearRegression(x, y, getTricubeWeights(y.length));
+        final double[] residuals = new double[y.length];
+        for (int i = 0; i < y.length; i++) {
             residuals[i] = y[i] - tricubeRegression.predict(x[i]);
         }
-        final SimpleRegression tricubeBySqrRegression = createWeigthedLinearRegression(
-            x, y, getTricubeBisquareWeights(residuals));
+        final SimpleRegression tricubeBySqrRegression =
+                createWeightedLinearRegression(x, y, getTricubeBisquareWeights(residuals));
 
-        final double[] estimates = tricubeBySqrRegression.regress()
-            .getParameterEstimates();
+        final double[] estimates = tricubeBySqrRegression.regress().getParameterEstimates();
         if (Double.isNaN(estimates[0]) || Double.isNaN(estimates[1])) {
             return tricubeRegression.regress().getParameterEstimates();
         }
@@ -264,13 +265,13 @@ public final class MathUtil {
     /**
      * Gets the tricube weigths.
      *
-     * @param n the number of weights
+     * @param weightsNumber the number of weights
      * @return an array of tricube weigths with n elements
      */
-    public static double[] getTricubeWeights(final int n) {
-        final double[] weights = new double[n];
-        final double top = n - 1; //spread
-        for (int i = 2; i < n; i++) {
+    public static double[] getTricubeWeights(final int weightsNumber) {
+        final double[] weights = new double[weightsNumber];
+        final double top = weightsNumber - 1; //spread
+        for (int i = 2; i < weightsNumber; i++) {
             final double k = Math.pow(1 - Math.pow((top - i) / top, 3), 3);
             weights[i] = k > 0 ? 1 / k : Double.MAX_VALUE;
         }
@@ -286,11 +287,10 @@ public final class MathUtil {
      * @return the tricube bisquare weigths
      */
     public static double[] getTricubeBisquareWeights(final double... residuals) {
-        final int n = residuals.length;
-        final double[] weights = getTricubeWeights(n);
-        final double[] weights2 = new double[n];
+        final double[] weights = getTricubeWeights(residuals.length);
+        final double[] weights2 = new double[residuals.length];
         final double s6 = median(abs(residuals)) * 6;
-        for (int i = 2; i < n; i++) {
+        for (int i = 2; i < residuals.length; i++) {
             final double k = Math.pow(1 - Math.pow(residuals[i] / s6, 2), 2);
             weights2[i] = k > 0 ? (1 / k) * weights[i] : Double.MAX_VALUE;
         }
@@ -335,11 +335,35 @@ public final class MathUtil {
      * converts a double to an int value which can be used by
      * a Comparator.</p>
      *
-     * @param d the double value to convert
+     * @param value the double value to convert
      * @return zero if the double value is zero, a negative int if the double is negative,
      * or a positive int if the double is positive.
      */
-    public static int doubleToInt(final double d){
-        return (int)(d < 0 ? Math.floor(d) : Math.ceil(d));
+    public static int doubleToInt(final double value){
+        return (int)(value < 0 ? Math.floor(value) : Math.ceil(value));
     }
+
+    /**
+     * Checks if two double numbers are equals, considering a precision error or 0.01.
+     * That is, if the different between the two numbers are lower or equal to 0.01, they are considered equal.
+     * @param first the first number to check
+     * @param second the second number to check
+     * @return true if the numbers are equal considering the precision error
+     */
+    public static boolean same(final double first, final double second){
+        return same(first,second, 0.01);
+    }
+
+    /**
+     * Checks if two double numbers are equals, considering a given precision error.
+     * That is, if the different between the two numbers are lower or equal to the precision error, they are considered equal.
+     * @param first the first number to check
+     * @param second the second number to check
+     * @param precisionError the precision error used to compare the numbers
+     * @return true if the numbers are equal considering the precision error
+     */
+    public static boolean same(final double first, final double second, final double precisionError){
+        return Math.abs(first-second) <= precisionError;
+    }
+
 }

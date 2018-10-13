@@ -188,38 +188,6 @@ getCpuPercentUsage
 
    :return: total utilization percentage for the current time, in scale from 0 to 1
 
-getCurrentAllocatedBw
-^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method::  long getCurrentAllocatedBw()
-   :outertype: Vm
-
-   Gets the current allocated bw.
-
-   :return: the current allocated bw
-
-getCurrentAllocatedRam
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method::  long getCurrentAllocatedRam()
-   :outertype: Vm
-
-   Gets the current allocated ram.
-
-   :return: the current allocated ram
-
-getCurrentAllocatedSize
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method::  long getCurrentAllocatedSize()
-   :outertype: Vm
-
-   Gets the current allocated storage size.
-
-   :return: the current allocated size
-
-   **See also:** :java:ref:`.getStorage()`
-
 getCurrentRequestedBw
 ^^^^^^^^^^^^^^^^^^^^^
 
@@ -709,12 +677,12 @@ setHost
 setInMigration
 ^^^^^^^^^^^^^^
 
-.. java:method::  void setInMigration(boolean inMigration)
+.. java:method::  void setInMigration(boolean migrating)
    :outertype: Vm
 
    Defines if the VM is in migration process or not.
 
-   :param inMigration: true to indicate the VM is migrating into a Host, false otherwise
+   :param migrating: true to indicate the VM is migrating into a Host, false otherwise
 
 setPeVerticalScaling
 ^^^^^^^^^^^^^^^^^^^^

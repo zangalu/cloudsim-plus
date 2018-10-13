@@ -1,3 +1,5 @@
+.. java:import:: org.cloudbus.cloudsim.cloudlets CloudletSimple
+
 .. java:import:: java.util ArrayList
 
 .. java:import:: java.util Collections
@@ -5,10 +7,6 @@
 .. java:import:: java.util List
 
 .. java:import:: java.util Optional
-
-.. java:import:: java.util.function Predicate
-
-.. java:import:: org.cloudbus.cloudsim.cloudlets CloudletSimple
 
 NetworkCloudlet
 ===============
@@ -24,7 +22,7 @@ NetworkCloudlet
 
    ..
 
-   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <http://dx.doi.org/10.1109/UCC.2011.24>`_\
+   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <https://doi.org/10.1109/UCC.2011.24>`_\
 
    :author: Saurabh Kumar Garg, Manoel Campos da Silva Filho
 
@@ -33,13 +31,13 @@ Constructors
 NetworkCloudlet
 ^^^^^^^^^^^^^^^
 
-.. java:constructor:: public NetworkCloudlet(int id, long cloudletLength, int pesNumber)
+.. java:constructor:: public NetworkCloudlet(int id, long length, int pesNumber)
    :outertype: NetworkCloudlet
 
    Creates a NetworkCloudlet with no priority and file size and output size equal to 1.
 
    :param id: the unique ID of this cloudlet
-   :param cloudletLength: the length or size (in MI) of this cloudlet to be executed in a VM
+   :param length: the length or size (in MI) of this cloudlet to be executed in a VM (check out \ :java:ref:`setLength(long)`\ )
    :param pesNumber: the pes number
 
 Methods

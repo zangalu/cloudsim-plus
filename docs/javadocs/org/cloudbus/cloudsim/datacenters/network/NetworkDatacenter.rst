@@ -8,8 +8,6 @@
 
 .. java:import:: org.cloudbus.cloudsim.hosts Host
 
-.. java:import:: org.cloudbus.cloudsim.network.switches AbstractSwitch
-
 .. java:import:: org.cloudbus.cloudsim.network.switches EdgeSwitch
 
 .. java:import:: org.cloudbus.cloudsim.network.switches Switch
@@ -34,7 +32,7 @@ NetworkDatacenter
 
    ..
 
-   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <http://dx.doi.org/10.1109/UCC.2011.24>`_\
+   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <https://doi.org/10.1109/UCC.2011.24>`_\
 
    :author: Saurabh Kumar Garg, Manoel Campos da Silva Filho
 
@@ -58,12 +56,12 @@ Methods
 addSwitch
 ^^^^^^^^^
 
-.. java:method:: public void addSwitch(Switch sw)
+.. java:method:: public void addSwitch(Switch swt)
    :outertype: NetworkDatacenter
 
-   Adds a \ :java:ref:`AbstractSwitch`\  to the Datacenter.
+   Adds a \ :java:ref:`Switch`\  to the Datacenter.
 
-   :param sw: the AbstractSwitch to be added
+   :param swt: the Switch to be added
 
 getEdgeSwitch
 ^^^^^^^^^^^^^

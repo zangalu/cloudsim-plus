@@ -1,5 +1,6 @@
 package org.cloudbus.cloudsim.resources;
 
+import org.apache.commons.lang3.StringUtils;
 import org.cloudbus.cloudsim.distributions.ContinuousDistribution;
 import org.cloudbus.cloudsim.distributions.ExponentialDistr;
 import org.junit.Test;
@@ -15,7 +16,7 @@ import static org.junit.Assert.*;
  * @author Manoel Campos da Silva Filho
  */
 public class HarddriveStorageTest {
-    private static final String RESERVED_FILE_WITHOUT_PREVIOUS_SPACE = "The reserved file was added but its space was not previously reserved.";
+    private static final String NO_PREVIOUS_SPACE = "The reserved file was added but its space was not previously reserved.";
     private static final int CAPACITY = 1000;
     private static final int FILE_SIZE = 100;
     private static final int TOTAL_FILES_TO_CREATE = 5;
@@ -23,27 +24,27 @@ public class HarddriveStorageTest {
     private static final String FILE1 = "file1.txt";
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNewHarddriveStorage_onlyWhiteSpacesName() {
+    public void testNewHarddriveStorageWhenOnlyWhiteSpacesName() {
         new HarddriveStorage("   ", CAPACITY);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNewHarddriveStorage_emptyName() {
+    public void testNewHarddriveStorageWhenEmptyName() {
         new HarddriveStorage("", CAPACITY);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNewHarddriveStorage_nullName() {
+    public void testNewHarddriveStorageWheNullName() {
         new HarddriveStorage(null, CAPACITY);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNewHarddriveStorage_negativeSize() {
+    public void testNewHarddriveStorageWhenNegativeSize() {
         new HarddriveStorage(-1);
     }
 
     @Test
-    public void testNewHarddriveStorage_zeroSize() {
+    public void testNewHarddriveStorageWhenZeroSize() {
         final int expResult = 0;
         final HarddriveStorage hd = new HarddriveStorage(expResult);
         assertEquals(expResult, hd.getCapacity());
@@ -85,7 +86,7 @@ public class HarddriveStorageTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testGetNumStoredFile_Null() {
+    public void testGetNumStoredFileWhenNullList() {
         final HarddriveStorage instance = createHardDrive();
 
         assertEquals(0, instance.addFile((List<File>) null), 0.0);
@@ -180,7 +181,7 @@ public class HarddriveStorageTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testAddFile_Null() {
+    public void testAddFileWhenNullFile() {
         final HarddriveStorage instance = createHardDrive(1);
         assertEquals(0, instance.addReservedFile(null), 0.0);
     }
@@ -199,11 +200,11 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testAddReservedFile_spaceNotPreReserved() {
+    public void testAddReservedFileWhenSpaceNotPreReserved() {
         final HarddriveStorage instance = createHardDrive(CAPACITY);
         try{
             instance.addReservedFile(new File(FILE1, 100));
-            fail(RESERVED_FILE_WITHOUT_PREVIOUS_SPACE);
+            fail(NO_PREVIOUS_SPACE);
         } catch(Exception e){
             /*if the exception was thrown, indicates that the file
             was accordingly not added.
@@ -213,7 +214,7 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testAddReservedFile_tryToAddAlreadAddedReservedFile() {
+    public void testAddReservedFileWhenFileAlreadyAdded() {
         final HarddriveStorage instance = createHardDrive(CAPACITY);
         final File file = new File(FILE1, 100);
         instance.reserveSpace(file.getSize());
@@ -237,7 +238,7 @@ public class HarddriveStorageTest {
         final File file = createNumberedFile(1, fileSize);
         try{
             instance.addReservedFile(file);
-            fail(RESERVED_FILE_WITHOUT_PREVIOUS_SPACE);
+            fail(NO_PREVIOUS_SPACE);
         } catch(Exception e){
             /*if the exception was thrown, indicates that the file
             was accordingly not added.
@@ -298,7 +299,7 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testHasPotentialAvailableSpace_invalidValue() {
+    public void testHasPotentialAvailableSpaceWhenInvalidValue() {
         final HarddriveStorage instance = createHardDrive();
         assertFalse(instance.hasPotentialAvailableSpace(0));
         assertFalse(instance.hasPotentialAvailableSpace(-1));
@@ -354,12 +355,12 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testSetAvgSeekTime_double() {
+    public void testSetAvgSeekTimeWhenDouble() {
         testSetAvgSeekTime(null);
     }
 
     @Test
-    public void testSetAvgSeekTime_double_ContinuousDistribution() {
+    public void testSetAvgSeekTimeWhenDoubleContinuousDistribution() {
         final double anyValue = 2.4;
         testSetAvgSeekTime(new ExponentialDistr(anyValue));
     }
@@ -370,7 +371,7 @@ public class HarddriveStorageTest {
      * @param gen A random number generator. The parameter can be
      * null in order to use the simpler version of the setAvgSeekTime.
      */
-    private void testSetAvgSeekTime(ContinuousDistribution gen) {
+    private void testSetAvgSeekTime(final ContinuousDistribution gen) {
         final HarddriveStorage instance = createHardDrive();
         final double seekTime = 1;
         assertTrue(setAvgSeekTime(instance, seekTime, gen));
@@ -394,15 +395,15 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testGetFile_addFile() {
+    public void testGetFileAfterAddFile() {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
         //try to add the same files
         assertFalse(instance.addFile(fileList)>0);
 
         //try to add already existing files, one by one
-        fileList.forEach(f -> assertFalse(instance.addFile(f)>0));
-        fileList.forEach(f -> assertEquals(f, instance.getFile(f.getName())));
+        fileList.forEach(file -> assertFalse(instance.addFile(file)>0));
+        fileList.forEach(file -> assertEquals(file, instance.getFile(file.getName())));
         assertEquals(null, instance.getFile(INEXISTENT_FILE));
     }
 
@@ -415,7 +416,7 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testGetFile_invalidFile() {
+    public void testGetFileWhenInvalidFile() {
         final HarddriveStorage instance = createHardDrive();
         assertEquals(null, instance.getFile("   "));
         assertEquals(null, instance.getFile(""));
@@ -439,38 +440,38 @@ public class HarddriveStorageTest {
         final List<String> fileNameList = new ArrayList<>();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
 
-        fileList.forEach(f -> fileNameList.add(f.getName()));
+        fileList.forEach(file -> fileNameList.add(file.getName()));
         assertEquals(fileNameList, instance.getFileNameList());
     }
 
     @Test
-    public void testDeleteFile_String() {
+    public void testDeleteFileWheParamString() {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
 
-        fileList.forEach(f ->  assertEquals(f, instance.deleteFile(f.getName())));
+        fileList.forEach(file ->  assertEquals(file, instance.deleteFile(file.getName())));
 
         assertEquals(null, instance.deleteFile(""));
         assertEquals(null, instance.deleteFile(INEXISTENT_FILE));
     }
 
     @Test
-    public void testDeleteFile_File() {
+    public void testDeleteFileWhenParamIsFile() {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
 
-        fileList.forEach(f-> assertTrue(instance.deleteFile(f)>0));
+        fileList.forEach(file -> assertTrue(instance.deleteFile(file)>0));
 
         final File nullFile = null;
         assertEquals(0.0, instance.deleteFile(nullFile), 0.0);
     }
 
     @Test
-    public void testContains_String() {
+    public void testContainsWhenParamString() {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
 
-        fileList.forEach(f -> assertTrue(instance.contains(f.getName())));
+        fileList.forEach(file -> assertTrue(instance.contains(file.getName())));
 
         assertFalse(instance.contains(INEXISTENT_FILE));
         final String nullStr = null;
@@ -479,11 +480,11 @@ public class HarddriveStorageTest {
     }
 
     @Test
-    public void testContains_File() {
+    public void testContainsWhenParamIsFile() {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
 
-        fileList.forEach(f -> assertTrue(instance.contains(f)));
+        fileList.forEach(file -> assertTrue(instance.contains(file)));
 
         assertFalse(instance.contains(new File(INEXISTENT_FILE, FILE_SIZE)));
         final File nullFile = null;
@@ -495,7 +496,8 @@ public class HarddriveStorageTest {
         final HarddriveStorage instance = createHardDrive();
         final List<File> fileList = createListOfFilesAndAddToHardDrive(instance);
         for(final File file: fileList){
-            final String oldName = file.getName(), newName = String.format("renamed-%s", oldName);
+            final String oldName = file.getName();
+            final String newName = String.format("renamed-%s", oldName);
             assertTrue(instance.contains(oldName));
             assertTrue(instance.renameFile(file, newName));
             assertFalse(instance.contains(oldName));
@@ -540,7 +542,7 @@ public class HarddriveStorageTest {
     }
 
     private HarddriveStorage createHardDrive(final long capacity, final String name) {
-        if(name == null || name.trim().isEmpty()) {
+        if(StringUtils.isBlank(name)) {
             return new HarddriveStorage(capacity);
         }
 

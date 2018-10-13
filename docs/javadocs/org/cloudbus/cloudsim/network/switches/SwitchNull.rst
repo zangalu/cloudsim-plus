@@ -55,7 +55,7 @@ addPacketToBeSentToUplinkSwitch
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override public int compareTo(SimEntity o)
+.. java:method:: @Override public int compareTo(SimEntity entity)
    :outertype: SwitchNull
 
 connectHost
@@ -85,7 +85,7 @@ getDownlinkBandwidth
 getDownlinkSwitchPacketList
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public List<HostPacket> getDownlinkSwitchPacketList(Switch s)
+.. java:method:: @Override public List<HostPacket> getDownlinkSwitchPacketList(Switch swt)
    :outertype: SwitchNull
 
 getDownlinkSwitches
@@ -109,7 +109,7 @@ getHostPacketList
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: SwitchNull
 
 getLevel
@@ -148,6 +148,12 @@ getSimulation
 .. java:method:: @Override public Simulation getSimulation()
    :outertype: SwitchNull
 
+getState
+^^^^^^^^
+
+.. java:method:: @Override public State getState()
+   :outertype: SwitchNull
+
 getSwitchingDelay
 ^^^^^^^^^^^^^^^^^
 
@@ -163,7 +169,7 @@ getUplinkBandwidth
 getUplinkSwitchPacketList
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public List<HostPacket> getUplinkSwitchPacketList(Switch s)
+.. java:method:: @Override public List<HostPacket> getUplinkSwitchPacketList(Switch swt)
    :outertype: SwitchNull
 
 getUplinkSwitchPacketMap
@@ -199,7 +205,7 @@ isStarted
 processEvent
 ^^^^^^^^^^^^
 
-.. java:method:: @Override public void processEvent(SimEvent ev)
+.. java:method:: @Override public void processEvent(SimEvent evt)
    :outertype: SwitchNull
 
 run
@@ -211,7 +217,25 @@ run
 schedule
 ^^^^^^^^
 
-.. java:method:: @Override public void schedule(SimEntity dest, double delay, int tag)
+.. java:method:: @Override public boolean schedule(SimEvent evt)
+   :outertype: SwitchNull
+
+schedule
+^^^^^^^^
+
+.. java:method:: @Override public boolean schedule(SimEntity dest, double delay, int tag, Object data)
+   :outertype: SwitchNull
+
+schedule
+^^^^^^^^
+
+.. java:method:: @Override public boolean schedule(double delay, int tag, Object data)
+   :outertype: SwitchNull
+
+schedule
+^^^^^^^^
+
+.. java:method:: @Override public boolean schedule(SimEntity dest, double delay, int tag)
    :outertype: SwitchNull
 
 setDatacenter
@@ -224,12 +248,6 @@ setDownlinkBandwidth
 ^^^^^^^^^^^^^^^^^^^^
 
 .. java:method:: @Override public void setDownlinkBandwidth(double downlinkBandwidth)
-   :outertype: SwitchNull
-
-setLog
-^^^^^^
-
-.. java:method:: @Override public void setLog(boolean log)
    :outertype: SwitchNull
 
 setName

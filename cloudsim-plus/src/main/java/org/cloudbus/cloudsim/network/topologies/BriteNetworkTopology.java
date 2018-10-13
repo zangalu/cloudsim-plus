@@ -35,9 +35,10 @@ import java.util.Map;
  * @author Rodrigo N. Calheiros
  * @author Anton Beloglazov
  * @since CloudSim Toolkit 1.0
+ * @see #getInstance(String)
  */
 public final class BriteNetworkTopology implements NetworkTopology {
-    private static final Logger logger = LoggerFactory.getLogger(BriteNetworkTopology.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(BriteNetworkTopology.class.getSimpleName());
 
     /**
      * The BRITE id to use for the next node to be created in the network.
@@ -59,14 +60,26 @@ public final class BriteNetworkTopology implements NetworkTopology {
     private TopologicalGraph graph;
 
     /**
-     * The map between CloudSim entities and BRITE entities. Each key is a
-     * CloudSim entity ID and each value the corresponding BRITE entity ID.
+     * The map between CloudSim entities and BRITE entities.
+     * Each key is a CloudSim entity ID and each value the corresponding BRITE entity ID.
      */
-    private Map<Integer, Integer> map;
+    private Map<Long, Integer> map;
 
     /**
-     * Creates a network topology
-     *
+     * Instantiates a Network Topology from a file inside the <b>application's resource directory</b>.
+     * @param fileName the <b>relative name</b> of the BRITE file
+     * @return the BriteNetworkTopology instance.
+     */
+    public static BriteNetworkTopology getInstance(final String fileName){
+        final InputStreamReader reader = new InputStreamReader(ResourceLoader.getInputStream(BriteNetworkTopology.class, fileName));
+        return new BriteNetworkTopology(reader);
+    }
+
+    /**
+     * Instantiates a Network Topology.
+     * @see #BriteNetworkTopology(String)
+     * @see #BriteNetworkTopology(InputStreamReader)
+     * @see #getInstance(String)
      */
     public BriteNetworkTopology() {
         map = new HashMap<>();
@@ -76,35 +89,35 @@ public final class BriteNetworkTopology implements NetworkTopology {
     }
 
     /**
-     * Creates a network topology if the file exists and can be successfully
+     * Instantiates a Network Topology if a given file exists and can be successfully
      * parsed. File is written in the BRITE format and contains
      * topological information on simulation entities.
      *
      * @param filePath the path of the BRITE file
-     * @pre fileName != null
-     * @post $none
+     * @see #BriteNetworkTopology()
+     * @see #BriteNetworkTopology(InputStreamReader)
+     * @see #getInstance(String)
      */
     public BriteNetworkTopology(final String filePath) {
         this(ResourceLoader.getFileReader(filePath));
-        logger.info("Topology file: {}", filePath);
-    }
-
-    private BriteNetworkTopology(final InputStreamReader streamReader) {
-        this();
-        // try to find the file
-        final TopologyReaderBrite reader = new TopologyReaderBrite();
-        graph = reader.readGraphFile(streamReader);
-        generateMatrices();
+        LOGGER.info("Topology file: {}", filePath);
     }
 
     /**
-     * Instantiates a new Network Topology a file inside the <b>application's resource directory</b>.
-     * @param fileName the <b>relative name</b> of the BRITE file
-     * @return the BriteNetworkTopology instance.
+     * Creates a network topology from a given input stream reader.
+     * The file is written in the BRITE format and contains
+     * topological information on simulation entities.
+     *
+     * @param streamReader the reader to read the topology file
+     * @see #BriteNetworkTopology()
+     * @see #BriteNetworkTopology(InputStreamReader)
+     * @see #getInstance(String)
      */
-    public static BriteNetworkTopology getInstance(final String fileName){
-        final InputStreamReader reader = new InputStreamReader(ResourceLoader.getInputStream(BriteNetworkTopology.class, fileName));
-        return new BriteNetworkTopology(reader);
+    private BriteNetworkTopology(final InputStreamReader streamReader) {
+        this();
+        final TopologyReaderBrite reader = new TopologyReaderBrite();
+        graph = reader.readGraphFile(streamReader);
+        generateMatrices();
     }
 
     /**
@@ -153,7 +166,7 @@ public final class BriteNetworkTopology implements NetworkTopology {
 
 
     @Override
-    public void addLink(final int srcId, final int destId, final double bw, final double lat) {
+    public void addLink(final long srcId, final long destId, final double bandwidth, final double latency) {
         if (getTopologycalGraph() == null) {
             graph = new TopologicalGraph();
         }
@@ -176,24 +189,24 @@ public final class BriteNetworkTopology implements NetworkTopology {
         }
 
         // generate a new link
-        getTopologycalGraph().addLink(new TopologicalLink(map.get(srcId), map.get(destId), (float) lat, (float) bw));
+        getTopologycalGraph().addLink(new TopologicalLink(map.get(srcId), map.get(destId), (float) latency, (float) bandwidth));
 
         generateMatrices();
     }
 
     @Override
-    public void mapNode(final int cloudSimEntityID, final int briteID) {
+    public void mapNode(final long cloudSimEntityID, final int briteID) {
         if (!networkEnabled) {
             return;
         }
 
         if (map.containsKey(cloudSimEntityID)) {
-            logger.warn("Network mapping: CloudSim entity {} already mapped.", cloudSimEntityID);
+            LOGGER.warn("Network mapping: CloudSim entity {} already mapped.", cloudSimEntityID);
             return;
         }
 
         if (map.containsValue(briteID)) {
-            logger.warn("BRITE node {} already in use.", briteID);
+            LOGGER.warn("BRITE node {} already in use.", briteID);
             return;
         }
 
@@ -201,7 +214,7 @@ public final class BriteNetworkTopology implements NetworkTopology {
     }
 
     @Override
-    public void unmapNode(final int cloudSimEntityID) {
+    public void unmapNode(final long cloudSimEntityID) {
         if (!networkEnabled) {
             return;
         }
@@ -210,7 +223,7 @@ public final class BriteNetworkTopology implements NetworkTopology {
     }
 
     @Override
-    public double getDelay(final int srcID, final int destID) {
+    public double getDelay(final long srcID, final long destID) {
         if (!networkEnabled) {
             return 0.0;
         }

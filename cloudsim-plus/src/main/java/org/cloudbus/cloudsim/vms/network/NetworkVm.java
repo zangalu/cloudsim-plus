@@ -25,7 +25,7 @@ import java.util.List;
  * <p>Please refer to following publication for more details:
  * <ul>
  * <li>
- * <a href="http://dx.doi.org/10.1109/UCC.2011.24">
+ * <a href="https://doi.org/10.1109/UCC.2011.24">
  * Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel
  * Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM
  * International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS
@@ -44,7 +44,7 @@ public class NetworkVm extends VmSimple {
     private double finishTime;
 
     /**
-     * Creates a NetworkVm with 1024 MEGABYTE of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGABYTE of Storage Size.
+     * Creates a NetworkVm with 1024 MEGA of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGA of Storage Size.
      *
      * To change these values, use the respective setters. While the Vm {@link #isCreated()
      * is not created inside a Host}, such values can be changed freely.
@@ -59,7 +59,7 @@ public class NetworkVm extends VmSimple {
     }
 
     /**
-     * Creates a NetworkVm with 1024 MEGABYTE of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGABYTE of Storage Size.
+     * Creates a NetworkVm with 1024 MEGA of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGA of Storage Size.
      * To change these values, use the respective setters. While the Vm {@link #isCreated()
      * is not created inside a Host}, such values can be changed freely.
      *

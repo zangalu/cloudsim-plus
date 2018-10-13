@@ -6,6 +6,7 @@
  */
 package org.cloudbus.cloudsim.vms;
 
+import org.apache.commons.lang3.StringUtils;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.Simulation;
@@ -24,6 +25,7 @@ import org.cloudsimplus.listeners.VmHostEventInfo;
 import java.util.*;
 import java.util.stream.LongStream;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -39,7 +41,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class VmSimple implements Vm {
     /** @see #getUtilizationHistory() */
-    protected final UtilizationHistory utilizationHistory;
+    private final UtilizationHistory utilizationHistory;
 
     /** @see #getStateHistory() */
     private final List<VmStateHistoryEntry> stateHistory;
@@ -50,7 +52,7 @@ public class VmSimple implements Vm {
     /**
      * @see #getId()
      */
-    private int id;
+    private long id;
 
     private DatacenterBroker broker;
 
@@ -122,7 +124,7 @@ public class VmSimple implements Vm {
     private double lastBusyTime;
 
     /**
-     * Creates a Vm with 1024 MEGABYTE of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGABYTE of Storage Size.
+     * Creates a Vm with 1024 MEGA of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGA of Storage Size.
      *
      * To change these values, use the respective setters. While the Vm {@link #isCreated()
      * is being instantiated}, such values can be changed freely.
@@ -130,10 +132,6 @@ public class VmSimple implements Vm {
      * @param id unique ID of the VM
      * @param mipsCapacity the mips capacity of each Vm {@link Pe}
      * @param numberOfPes amount of {@link Pe} (CPU cores)
-     *
-     * @pre id >= 0
-     * @pre numberOfPes > 0
-     * @post $none
      */
     public VmSimple(final int id, final long mipsCapacity, final long numberOfPes) {
         this.resources = new ArrayList<>(4);
@@ -173,7 +171,7 @@ public class VmSimple implements Vm {
     }
 
     /**
-     * Creates a Vm with 1024 MEGABYTE of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGABYTE of Storage Size.
+     * Creates a Vm with 1024 MEGA of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGA of Storage Size.
      * To change these values, use the respective setters. While the Vm {@link #isCreated()
      * is being instantiated}, such values can be changed freely.
      *
@@ -187,9 +185,8 @@ public class VmSimple implements Vm {
         this(-1, mipsCapacity, numberOfPes);
     }
 
-
     /**
-     * Creates a Vm with 1024 MEGABYTE of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGABYTE of Storage Size.
+     * Creates a Vm with 1024 MEGA of RAM, 1000 Megabits/s of Bandwidth and 1024 MEGA of Storage Size.
      *
      * To change these values, use the respective setters. While the Vm {@link #isCreated()
      * is being instantiated}, such values can be changed freely.
@@ -201,10 +198,6 @@ public class VmSimple implements Vm {
      * @param id unique ID of the VM
      * @param mipsCapacity the mips capacity of each Vm {@link Pe}
      * @param numberOfPes amount of {@link Pe} (CPU cores)
-     *
-     * @pre id >= 0
-     * @pre numberOfPes > 0
-     * @post $none
      */
     public VmSimple(final int id, final double mipsCapacity, final long numberOfPes) {
         this(id, (long)mipsCapacity, numberOfPes);
@@ -212,16 +205,28 @@ public class VmSimple implements Vm {
 
     @Override
     public double updateProcessing(final double currentTime, final List<Double> mipsShare) {
-        Objects.requireNonNull(mipsShare);
+        requireNonNull(mipsShare);
 
         if(!cloudletScheduler.getCloudletExecList().isEmpty()){
             this.lastBusyTime = getSimulation().clock();
         }
-        final double nextSimulationTime = cloudletScheduler.updateProcessing(currentTime, mipsShare);
+        final double nextEventDelay = cloudletScheduler.updateProcessing(currentTime, mipsShare);
         notifyOnUpdateProcessingListeners();
 
+        /* If the current time is some value with the decimals greater than .0
+         * (such as 45.1) and the next event delay is any integer number such as 5,
+         * then the next simulation time will be 50.1.
+         * Since usually Cloudlets finish at integer times, if there is
+         * a Cloudlet finishing at time 50, this update will be skipped
+         * and the simulation will only be updated at time 50.1.
+         * This small difference stops the simulator to collect utilization data
+         * to keep in the history. Since at time 50 the Cloudlet is still running,
+         * there is some CPU utilization. At time 50.1 the utilization will
+         * be reduced due to the completion of the Cloudlet.
+         * This way, the CPU utilization at time 50 is not collected. */
+        final double decimals = currentTime - (int) currentTime;
         utilizationHistory.addUtilizationHistory(currentTime);
-        return nextSimulationTime;
+        return nextEventDelay - decimals;
     }
 
     @Override
@@ -246,12 +251,12 @@ public class VmSimple implements Vm {
 
     @Override
     public double getCurrentRequestedMaxMips() {
-        return getCurrentRequestedMips().stream().mapToDouble(m->m).max().orElse(0.0);
+        return getCurrentRequestedMips().stream().mapToDouble(mips->mips).max().orElse(0.0);
     }
 
     @Override
     public double getCurrentRequestedTotalMips() {
-        return getCurrentRequestedMips().stream().mapToDouble(m->m).sum();
+        return getCurrentRequestedMips().stream().mapToDouble(mips->mips).sum();
     }
 
     @Override
@@ -294,7 +299,7 @@ public class VmSimple implements Vm {
     }
 
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -305,14 +310,13 @@ public class VmSimple implements Vm {
      * @todo The uniqueness of VM id for a given user is not being ensured
      */
     @Override
-    public final void setId(int id) {
+    public final void setId(long id) {
         this.id = id;
     }
 
     @Override
     public final Vm setBroker(final DatacenterBroker broker) {
-        Objects.requireNonNull(broker);
-        this.broker = broker;
+        this.broker = requireNonNull(broker);
         return this;
     }
 
@@ -419,8 +423,7 @@ public class VmSimple implements Vm {
      * @param ram the Ram resource to set
      */
     private void setRam(final Ram ram) {
-        Objects.requireNonNull(ram);
-        this.ram = ram;
+        this.ram = requireNonNull(ram);
     }
 
     @Override
@@ -443,8 +446,7 @@ public class VmSimple implements Vm {
      * @param bw the Bandwidth resource to set
      */
     private void setBw(final Bandwidth bw){
-        Objects.requireNonNull(bw);
-        this.bw = bw;
+        this.bw = requireNonNull(bw);
     }
 
     @Override
@@ -466,8 +468,7 @@ public class VmSimple implements Vm {
      * @param storage the RawStorage resource to set
      */
     private void setStorage(final Storage storage){
-        Objects.requireNonNull(storage);
-        this.storage = storage;
+        this.storage = requireNonNull(storage);
     }
 
     @Override
@@ -513,7 +514,7 @@ public class VmSimple implements Vm {
 
     @Override
     public final Vm setCloudletScheduler(final CloudletScheduler cloudletScheduler) {
-        Objects.requireNonNull(cloudletScheduler);
+        requireNonNull(cloudletScheduler);
         if(isCreated()){
             throw new UnsupportedOperationException("CloudletScheduler can just be changed when the Vm was not created inside a Host yet.");
         }
@@ -529,8 +530,8 @@ public class VmSimple implements Vm {
     }
 
     @Override
-    public final void setInMigration(final boolean inMigration) {
-        this.inMigration = inMigration;
+    public final void setInMigration(final boolean migrating) {
+        this.inMigration = migrating;
     }
 
     @Override
@@ -593,57 +594,53 @@ public class VmSimple implements Vm {
 
     @Override
     public Vm addOnHostAllocationListener(final EventListener<VmHostEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onHostAllocationListeners.add(listener);
+        this.onHostAllocationListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
     public Vm addOnHostDeallocationListener(final EventListener<VmHostEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onHostDeallocationListeners.add(listener);
+        this.onHostDeallocationListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
     public boolean removeOnHostAllocationListener(final EventListener<VmHostEventInfo> listener) {
-        return onHostAllocationListeners.remove(listener);
+        return onHostAllocationListeners.remove(requireNonNull(listener));
     }
 
     @Override
     public boolean removeOnHostDeallocationListener(final EventListener<VmHostEventInfo> listener) {
-        return onHostDeallocationListeners.remove(listener);
+        return onHostDeallocationListeners.remove(requireNonNull(listener));
     }
 
     @Override
     public String toString() {
-        final String desc = description.trim().isEmpty() ? "" : String.format(" (%s)", description);
+        final String desc = StringUtils.isBlank(description) ? "" : String.format(" (%s)", description);
         final String brokerName = broker == DatacenterBroker.NULL ? "" : "/Broker " + broker.getId();
         return String.format("Vm %d%s%s", getId(), brokerName, desc);
     }
 
     @Override
     public Vm addOnCreationFailureListener(final EventListener<VmDatacenterEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onCreationFailureListeners.add(listener);
+        this.onCreationFailureListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
     public boolean removeOnCreationFailureListener(final EventListener<VmDatacenterEventInfo> listener) {
-        return onCreationFailureListeners.remove(listener);
+        return onCreationFailureListeners.remove(requireNonNull(listener));
     }
 
     @Override
     public Vm addOnUpdateProcessingListener(final EventListener<VmHostEventInfo> listener) {
-        Objects.requireNonNull(listener);
-        this.onUpdateProcessingListeners.add(listener);
+        this.onUpdateProcessingListeners.add(requireNonNull(listener));
         return this;
     }
 
     @Override
     public boolean removeOnUpdateProcessingListener(final EventListener<VmHostEventInfo> listener) {
-        return onUpdateProcessingListeners.remove(listener);
+        return onUpdateProcessingListeners.remove(requireNonNull(listener));
     }
 
     /**
@@ -670,7 +667,7 @@ public class VmSimple implements Vm {
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = Long.hashCode(id);
         result = 31 * result + broker.hashCode();
         return result;
     }
@@ -715,7 +712,7 @@ public class VmSimple implements Vm {
 
     @Override
     public void notifyOnHostDeallocationListeners(final Host deallocatedHost) {
-        Objects.requireNonNull(deallocatedHost);
+        requireNonNull(deallocatedHost);
         onHostDeallocationListeners.forEach(l -> l.update(VmHostEventInfo.of(l,this, deallocatedHost)));
     }
 
@@ -728,7 +725,7 @@ public class VmSimple implements Vm {
 
     @Override
     public void notifyOnCreationFailureListeners(final Datacenter failedDatacenter) {
-        Objects.requireNonNull(failedDatacenter);
+        requireNonNull(failedDatacenter);
         onCreationFailureListeners.forEach(l -> l.update(VmDatacenterEventInfo.of(l,this, failedDatacenter)));
     }
 
@@ -778,7 +775,7 @@ public class VmSimple implements Vm {
     }
 
     private <T extends VmScaling> T validateAndConfigureVmScaling(final T vmScaling) {
-        Objects.requireNonNull(vmScaling);
+        requireNonNull(vmScaling);
         if(vmScaling.getVm() != null && vmScaling.getVm() != Vm.NULL && vmScaling.getVm() != this){
             final String name = vmScaling.getClass().getSimpleName();
             throw new IllegalArgumentException(

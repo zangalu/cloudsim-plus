@@ -23,6 +23,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.LongStream;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -40,7 +41,8 @@ import static java.util.stream.Collectors.toList;
  * @since CloudSim Toolkit 1.0
  */
 public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
-    private static final Logger logger = LoggerFactory.getLogger(VmAllocationPolicyAbstract.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VmAllocationPolicyAbstract.class.getSimpleName());
+
     private BiFunction<VmAllocationPolicy, Vm, Optional<Host>> findHostForVmFunction;
 
     /**
@@ -63,15 +65,16 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
      */
     private Map<Vm, Long> usedPes;
 
+
     /**
-     * Creates a new VmAllocationPolicy.
+     * Creates a VmAllocationPolicy.
      */
     public VmAllocationPolicyAbstract() {
         this(null);
     }
 
     /**
-     * Creates a new VmAllocationPolicy, changing the {@link BiFunction} to select a Host for a Vm.
+     * Creates a VmAllocationPolicy, changing the {@link BiFunction} to select a Host for a Vm.
      * @param findHostForVmFunction a {@link BiFunction} to select a Host for a given Vm.
      * @see VmAllocationPolicy#setFindHostForVmFunction(BiFunction)
      */
@@ -96,8 +99,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
      */
     @Override
     public final void setDatacenter(final Datacenter datacenter){
-        Objects.requireNonNull(datacenter);
-        addPesFromHostsToFreePesList(datacenter);
+        addPesFromHostsToFreePesList(requireNonNull(datacenter));
         this.datacenter = datacenter;
     }
 
@@ -110,7 +112,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
      * @param datacenter the Datacenter to get Hosts from
      */
     private void addPesFromHostsToFreePesList(final Datacenter datacenter) {
-        Objects.requireNonNull(datacenter);
+        requireNonNull(datacenter);
         if(datacenter == Datacenter.NULL || datacenter != this.datacenter) {
             setHostFreePesMap(new HashMap<>(datacenter.getHostList().size()));
             setUsedPes(new HashMap<>());
@@ -120,19 +122,20 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
     }
 
     /**
-     * Gets the number of free PEs from a given Host
-     * and adds these numbers to the {@link #getHostFreePesMap() list of free PEs}.
+     * Gets the number of working PEs from a given Host
+     * and adds this number to the {@link #getHostFreePesMap() list of free PEs}.
      * Before the Host starts being used, the number of free PEs is
      * the same as the number of working PEs.
      */
-    private void addPesFromHost(final Host host) {
-        hostFreePesMap.putIfAbsent(host, host.getNumberOfWorkingPes());
+    public void addPesFromHost(final Host host) {
+        final long workingPes = host.getNumberOfWorkingPes();
+        hostFreePesMap.compute(host, (mapHost, freePes) -> freePes == null ? workingPes : Math.min(freePes, workingPes));
     }
 
     /**
-     * Gets a map with the number of free PEs for each host from {@link #getHostList()}.
+     * Gets a map with the number of free and working PEs for each host from {@link #getHostList()}.
      *
-     * @return a Map where each key is a host and each value is the number of free PEs of that host.
+     * @return a Map where each key is a host and each value is the number of free and working PEs of that host.
      */
     protected final Map<Host, Long> getHostFreePesMap() {
         return hostFreePesMap;
@@ -173,8 +176,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
      * @param usedPes the used pes
      */
     protected final void setUsedPes(final Map<Vm, Long> usedPes) {
-        Objects.requireNonNull(usedPes);
-        this.usedPes = usedPes;
+        this.usedPes = requireNonNull(usedPes);
     }
 
     @Override
@@ -291,7 +293,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
             return false;
         }
 
-        logger.info(
+        LOGGER.info(
             "{}: {}: {} more {} allocated to {}: new capacity is {}. Current resource usage is {}%",
             scaling.getVm().getSimulation().clock(),
             scaling.getClass().getSimpleName(),
@@ -305,7 +307,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
         final Class<? extends ResourceManageable> resourceClass = scaling.getResourceClass();
         final ResourceManageable hostResource = scaling.getVm().getHost().getResource(resourceClass);
         final double extraAmountToAllocate = scaling.getResourceAmountToScale();
-        logger.warn(
+        LOGGER.warn(
             "{}: {}: {} requested more {} of {} capacity but the {} has just {} of available {}",
             scaling.getVm().getSimulation().clock(),
             scaling.getClass().getSimpleName(),
@@ -328,7 +330,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
         final ResourceProvisioner provisioner = scaling.getVm().getHost().getProvisioner(resourceClass);
         final double newTotalVmResource = vmResource.getCapacity() - amountToDeallocate;
         if(!provisioner.allocateResourceForVm(scaling.getVm(), newTotalVmResource)){
-            logger.error(
+            LOGGER.error(
                 "{}: {}: {} requested to reduce {} capacity by {} but an unexpected error occurred and the resource was not resized",
                 scaling.getVm().getSimulation().clock(),
                 scaling.getClass().getSimpleName(),
@@ -337,7 +339,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
             return false;
         }
 
-        logger.info(
+        LOGGER.info(
             "{}: {}: {} {} deallocated from {}: new capacity is {}. Current resource usage is {}%",
             scaling.getVm().getSimulation().clock(),
             scaling.getClass().getSimpleName(),
@@ -356,7 +358,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
     @Override
     public boolean allocateHostForVm(final Vm vm) {
         if(getHostList().isEmpty()){
-            logger.warn(
+            LOGGER.warn(
                 "{}: {}: {} could not be allocated because there isn't any Host for Datacenter {}",
                 vm.getSimulation().clock(), vm, getDatacenter().getId());
             return false;
@@ -377,7 +379,7 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
             return allocateHostForVm(vm, optional.get());
         }
 
-        logger.warn("{}: {}: No suitable host found for {} in {}", vm.getSimulation().clock(), getClass().getSimpleName(), vm, datacenter);
+        LOGGER.warn("{}: {}: No suitable host found for {} in {}", vm.getSimulation().clock(), getClass().getSimpleName(), vm, datacenter);
         return false;
     }
 
@@ -389,14 +391,14 @@ public abstract class VmAllocationPolicyAbstract implements VmAllocationPolicy {
             addUsedPes(vm);
             getHostFreePesMap().compute(host, (h, previousFreePes) -> previousFreePes - vm.getNumberOfPes());
 
-            logger.info(
+            LOGGER.info(
                 "{}: {}: {} has been allocated to {}",
                 vm.getSimulation().clock(), getClass().getSimpleName(), vm, host);
 
             return true;
         }
 
-        logger.error("{}: Creation of {} on {} failed", vm.getSimulation().clock(), vm, host);
+        LOGGER.error("{}: Creation of {} on {} failed", vm.getSimulation().clock(), vm, host);
         return false;
     }
 

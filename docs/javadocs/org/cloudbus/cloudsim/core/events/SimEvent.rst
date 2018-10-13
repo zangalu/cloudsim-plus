@@ -35,16 +35,8 @@ Methods
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override  int compareTo(SimEvent o)
+.. java:method:: @Override  int compareTo(SimEvent evt)
    :outertype: SimEvent
-
-eventTime
-^^^^^^^^^
-
-.. java:method::  double eventTime()
-   :outertype: SimEvent
-
-   Gets the simulation time that this event was scheduled.
 
 getData
 ^^^^^^^
@@ -139,6 +131,16 @@ setSerial
    Sets the serial number that defines the order of received events when multiple events are generated at the same time.
 
    :param serial: the serial value to set
+
+setSimulation
+^^^^^^^^^^^^^
+
+.. java:method::  SimEvent setSimulation(Simulation simulation)
+   :outertype: SimEvent
+
+   Sets the simulation the event belongs to
+
+   :param simulation: the simulation instance to set
 
 setSource
 ^^^^^^^^^

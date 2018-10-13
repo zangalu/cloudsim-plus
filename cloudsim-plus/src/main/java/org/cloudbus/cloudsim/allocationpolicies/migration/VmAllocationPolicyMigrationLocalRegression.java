@@ -11,8 +11,12 @@ package org.cloudbus.cloudsim.allocationpolicies.migration;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.resources.Resource;
 import org.cloudbus.cloudsim.selectionpolicies.power.PowerVmSelectionPolicy;
-import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.util.MathUtil;
+import org.cloudbus.cloudsim.vms.Vm;
+
+import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.Map;
 
 /**
  * A VM allocation policy that uses Local Regression (LR) to predict host utilization (load)
@@ -23,7 +27,7 @@ import org.cloudbus.cloudsim.util.MathUtil;
  * <p>If you are using any algorithms, policies or workload included in the power package please cite
  * the following paper:
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in
  * Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24,
  * Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012</a>
@@ -112,16 +116,21 @@ public class VmAllocationPolicyMigrationLocalRegression extends VmAllocationPoli
      */
     @Override
     public double computeHostUtilizationMeasure(final Host host) throws IllegalArgumentException{
-        final double[] utilizationHistory = host.getUtilizationHistory();
         final int length = 10; // we use 10 to make the regression responsive enough to latest values
-        if (utilizationHistory.length < length) {
+
+        final Comparator<Map.Entry<Double, DoubleSummaryStatistics>> keyComparator = Comparator.comparingDouble(Map.Entry::getKey);
+        final double[] utilizationHistoryReversed = host.getUtilizationHistory()
+            .entrySet()
+            .stream()
+            .sorted(keyComparator.reversed())
+            .limit(length)
+            .mapToDouble(entry -> entry.getValue().getSum())
+            .toArray();
+
+        if (utilizationHistoryReversed.length < length) {
             throw new IllegalArgumentException("There is not enough Host history to estimate its utilization using Local Regression");
         }
 
-        final double[] utilizationHistoryReversed = new double[length];
-        for (int i = 0; i < length; i++) {
-            utilizationHistoryReversed[i] = utilizationHistory[length - i - 1];
-        }
         final double[] estimates = getParameterEstimates(utilizationHistoryReversed);
         final double migrationIntervals = Math.ceil(getMaximumVmMigrationTime(host) / getSchedulingInterval());
         return estimates[0] + estimates[1] * (length + migrationIntervals);

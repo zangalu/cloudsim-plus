@@ -12,9 +12,7 @@ import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudsimplus.listeners.HostUpdatesVmsProcessingEventInfo;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A class that implements the Null Object Design Pattern for {@link Host}
@@ -27,15 +25,13 @@ final class HostNull implements Host {
     @Override public List<ResourceManageable> getResources() {
         return Collections.emptyList();
     }
-    @Override public int compareTo(Host o) {
-        return 0;
-    }
+    @Override public int compareTo(Host host) { return 0; }
     @Override public boolean addMigratingInVm(Vm vm) {
         return false;
     }
     @Override public boolean removeVmMigratingIn(Vm vm) { return false; }
     @Override public Set<Vm> getVmsMigratingOut() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
     @Override public boolean addVmMigratingOut(Vm vm) {
         return false;
@@ -62,7 +58,7 @@ final class HostNull implements Host {
     @Override public Datacenter getDatacenter() {
         return Datacenter.NULL;
     }
-    @Override public int getId() {
+    @Override public long getId() {
         return -1;
     }
     @Override public double getMaxAvailableMips() {
@@ -96,7 +92,7 @@ final class HostNull implements Host {
     @Override public Vm getVm(int vmId, int brokerId) {
         return Vm.NULL;
     }
-    @Override public <T extends Vm> List<T> getVmCreatedList() { return Collections.EMPTY_LIST; }
+    @Override public <T extends Vm> List<T> getVmCreatedList() { return Collections.emptyList(); }
     @Override public List<Vm> getVmList() { return Collections.emptyList(); }
     @Override public VmScheduler getVmScheduler() {
         return VmScheduler.NULL;
@@ -104,6 +100,9 @@ final class HostNull implements Host {
     @Override public Host setVmScheduler(VmScheduler vmScheduler) {
         return Host.NULL;
     }
+    @Override public double getStartTime() { return 0; }
+    @Override public void setStartTime(double startTime) {/**/}
+    @Override public double getShutdownTime() { return 0; }
     @Override public boolean isFailed() {
         return false;
     }
@@ -113,7 +112,7 @@ final class HostNull implements Host {
     @Override public boolean isActive() { return false; }
     @Override public Host setActive(boolean active) { return this; }
     @Override public <T extends Vm> Set<T> getVmsMigratingIn() {
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
     @Override public void reallocateMigratingInVms() {/**/}
     @Override public void removeMigratingInVm(Vm vm) {/**/}
@@ -128,8 +127,8 @@ final class HostNull implements Host {
     @Override public void destroyTemporaryVm(Vm vm) {/**/}
     @Override public void destroyVm(Vm vm) {/**/}
     @Override public void destroyAllVms() {/**/}
-    @Override public boolean removeOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> l) { return false; }
-    @Override public Host addOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> l) { return Host.NULL; }
+    @Override public boolean removeOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> listener) { return false; }
+    @Override public Host addOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> listener) { return Host.NULL; }
     @Override public long getAvailableStorage() {
         return 0L;
     }
@@ -142,30 +141,32 @@ final class HostNull implements Host {
     @Override public Host setSimulation(Simulation simulation) {
         return this;
     }
-    @Override public ResourceProvisioner getProvisioner(Class<? extends ResourceManageable> c) { return ResourceProvisioner.NULL; }
+    @Override public ResourceProvisioner getProvisioner(Class<? extends ResourceManageable> clazz) { return ResourceProvisioner.NULL; }
     @Override public long getNumberOfWorkingPes() {
         return 0;
     }
     @Override public String toString() {
         return "Host.NULL";
     }
-    @Override public void setId(int id) {/**/}
+    @Override public void setId(long id) {/**/}
     @Override public double getTotalMipsCapacity() { return 0.0; }
     @Override public long getNumberOfFailedPes() { return 0; }
-    @Override public List<Pe> getWorkingPeList() { return Collections.EMPTY_LIST; }
-    @Override public List<Pe> getBuzyPeList() { return Collections.EMPTY_LIST; }
-    @Override public List<Pe> getFreePeList() { return Collections.EMPTY_LIST; }
+    @Override public List<Pe> getWorkingPeList() { return Collections.emptyList(); }
+    @Override public List<Pe> getBuzyPeList() { return Collections.emptyList(); }
+    @Override public List<Pe> getFreePeList() { return Collections.emptyList(); }
     @Override public double getUtilizationOfCpu() { return 0.0; }
     @Override public double getUtilizationOfCpuMips() { return 0.0; }
     @Override public long getUtilizationOfBw() { return 0; }
     @Override public long getUtilizationOfRam() { return 0; }
-    @Override public double[] getUtilizationHistory() { return new double[0]; }
+    @Override public SortedMap<Double, DoubleSummaryStatistics> getUtilizationHistory() { return Collections.emptySortedMap(); }
+    @Override public SortedMap<Double, Double> getUtilizationHistorySum() { return Collections.emptySortedMap(); }
     @Override public PowerModel getPowerModel() { return PowerModel.NULL; }
     @Override public Host setPowerModel(PowerModel powerModel) { return this; }
     @Override public double getPreviousUtilizationOfCpu() { return 0; }
     @Override public void enableStateHistory() {/**/}
     @Override public void disableStateHistory() {/**/}
     @Override public boolean isStateHistoryEnabled() { return false; }
-    @Override public List<HostStateHistoryEntry> getStateHistory() { return Collections.EMPTY_LIST; }
-    @Override public List<Vm> getFinishedVms() { return Collections.EMPTY_LIST; }
+    @Override public List<HostStateHistoryEntry> getStateHistory() { return Collections.emptyList(); }
+    @Override public List<Vm> getFinishedVms() { return Collections.emptyList(); }
+    @Override public void setShutdownTime(double shutdownTime) {/**/}
 }

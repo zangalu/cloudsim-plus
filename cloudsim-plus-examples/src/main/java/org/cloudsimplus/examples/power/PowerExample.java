@@ -21,8 +21,9 @@
  *     You should have received a copy of the GNU General Public License
  *     along with CloudSim Plus. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cloudsimplus.examples;
+package org.cloudsimplus.examples.power;
 
+import ch.qos.logback.classic.Level;
 import org.cloudbus.cloudsim.allocationpolicies.VmAllocationPolicySimple;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
@@ -33,6 +34,7 @@ import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.hosts.HostSimple;
+import org.cloudbus.cloudsim.power.models.PowerAware;
 import org.cloudbus.cloudsim.power.models.PowerModel;
 import org.cloudbus.cloudsim.power.models.PowerModelLinear;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
@@ -44,16 +46,20 @@ import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmScheduler;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
+import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelDynamic;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
+import org.cloudsimplus.util.Log;
 
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.Map;
 
 /**
- * A example showing how to show Hosts power consumption.
+ * An example to show power consumption of Hosts.
  * Realize that for this goal, you define a {@link PowerModel}
  * for each Host by calling {@code host.setPowerModel(powerModel)}.
  *
@@ -78,6 +84,15 @@ import java.util.List;
  * if VMs utilization history is enabled by calling
  * {@code vm.getUtilizationHistory().enable()}</p>
  *
+ * <p>Each line in the table with CPU utilization and power consumption shows
+ * the data from the time specified in the line up to the time before the value in the next line.
+ * For instance, consider the scheduling interval is 10, the time in the first line is 0 and
+ * it shows 100% CPU utilization and 100 Watt-Sec of power consumption.
+ * Then, the next line contains data for time 10.
+ * That means between time 0 and time 9 (from time 0 to 9 we have 10 samples),
+ * the CPU utilization and power consumption
+ * is the one provided for time 0.</p>
+ *
  * @author Manoel Campos da Silva Filho
  * @since CloudSim Plus 1.2.4
  */
@@ -96,15 +111,17 @@ public class PowerExample {
     private static final int CLOUDLETS = 8;
     private static final int CLOUDLET_PES = 2;
     private static final int CLOUDLET_LENGTH = 50000;
+
     /**
      * Defines the minimum percentage of power a Host uses,
      * even it it's idle.
      */
-    public static final double STATIC_POWER_PERCENT = 0.7;
+    private static final double STATIC_POWER_PERCENT = 0.7;
+
     /**
      * The max number of watt-second (Ws) of power a Host uses.
      */
-    public static final int MAX_POWER = 100;
+    private static final int MAX_POWER_WATTS_SEC = 100;
 
     private final CloudSim simulation;
     private DatacenterBroker broker0;
@@ -113,14 +130,21 @@ public class PowerExample {
     private Datacenter datacenter0;
     private final List<Host> hostList;
 
+    /**
+     * If set to false, consecutive lines with the the same CPU utilization and power consumption
+     * will be shown only once, at the time that such metrics started to return those values.
+     * The last history line is always shown, independent of any condition.
+     */
+    private boolean showAllHostUtilizationHistoryEntries;
+
+
     public static void main(String[] args) {
-        new PowerExample();
+        new PowerExample(true);
     }
 
-    public PowerExample() {
-        /*Enables just some level of log messages.
-          Make sure to import org.cloudsimplus.util.Log;*/
-        //Log.setLevel(ch.qos.logback.classic.Level.WARN);
+    private PowerExample(boolean showAllHostUtilizationHistoryEntries) {
+        Log.setLevel(Level.WARN);
+        this.showAllHostUtilizationHistoryEntries = showAllHostUtilizationHistoryEntries;
 
         simulation = new CloudSim();
         hostList = new ArrayList<>(HOSTS);
@@ -135,10 +159,11 @@ public class PowerExample {
 
         simulation.start();
 
+        System.out.println("------------------------------- SIMULATION FOR SCHEDULING INTERVAL = " + SCHEDULING_INTERVAL+" -------------------------------");
         final List<Cloudlet> finishedCloudlets = broker0.getCloudletFinishedList();
 
         new CloudletsTableBuilder(finishedCloudlets).build();
-        printHostCpuUtilizationAndPowerConsumption();
+        printHostsCpuUtilizationAndPowerConsumption();
     }
 
     /**
@@ -147,36 +172,47 @@ public class PowerExample {
      * {@code vm.getUtilizationHistory().enable()}
      * </p>*
      */
-    private void printHostCpuUtilizationAndPowerConsumption() {
+    private void printHostsCpuUtilizationAndPowerConsumption() {
         System.out.println();
-        for (Host host : hostList) {
-            System.out.printf("Host %d CPU utilization and power consumption\n", host.getId());
-            System.out.println("-------------------------------------------------------------------------------------------");
-            /*
-            Since the utilization history are stored in the reverse chronological order,
-            the values are presented in this way.
-             */
-            final double[] utilizationPercentHistory = host.getUtilizationHistory();
-            double totalPower = 0;
-            double time = simulation.clock();
-            for (int i = 0; i < utilizationPercentHistory.length; i++) {
-                final double utilizationPercent = utilizationPercentHistory[i];
-                /**
-                 * The power consumption is returned in Watt-second,
-                 * but it's measured the continuous consumption before a given time,
-                 * according to the time interval defined by {@link #SCHEDULING_INTERVAL} set to the Datacenter.
-                */
-                final double wattsPerInterval = host.getPowerModel().getPower(utilizationPercent)*SCHEDULING_INTERVAL;
-                totalPower += wattsPerInterval;
-                System.out.printf("\tTime %6.0f | CPU Utilization %6.2f%% | Power Consumption: %8.2f Watt-Second in %d Seconds\n",
-                    time, utilizationPercent*100, wattsPerInterval, SCHEDULING_INTERVAL);
-                time -= SCHEDULING_INTERVAL;
-            }
-            System.out.printf(
-                "Total Host %d Power Consumption in %.0f seconds: %.2f Watt-Second (mean of %.2f Watt-Second) \n",
-                host.getId(), simulation.clock(), totalPower, totalPower/simulation.clock());
-            System.out.println("-------------------------------------------------------------------------------------------\n");
+        for (final Host host : hostList) {
+            printHostCpuUtilizationAndPowerConsumption(host);
         }
+    }
+
+    private void printHostCpuUtilizationAndPowerConsumption(final Host host) {
+        System.out.printf("Host %d CPU utilization and power consumption\n", host.getId());
+        System.out.println("-------------------------------------------------------------------------------------------------------------");
+        final Map<Double, DoubleSummaryStatistics> utilizationPercentHistory = host.getUtilizationHistory();
+        double totalPowerWattsSec = 0;
+        double prevUtilizationPercent = -1, prevWattsPerInterval = -1;
+        //time difference from the current to the previous line in the history
+        double utilizationHistoryTimeInterval;
+        double prevTime=0;
+        for (Map.Entry<Double, DoubleSummaryStatistics> entry : utilizationPercentHistory.entrySet()) {
+            utilizationHistoryTimeInterval = entry.getKey() - prevTime;
+            //The total Host's CPU utilization for the time specified by the map key
+            final double utilizationPercent = entry.getValue().getSum();
+            final double wattsSec = host.getPowerModel().getPower(utilizationPercent);
+            final double wattsPerInterval = wattsSec*utilizationHistoryTimeInterval;
+            totalPowerWattsSec += wattsPerInterval;
+            //only prints when the next utilization is different from the previous one, or it's the first one
+            if(showAllHostUtilizationHistoryEntries || prevUtilizationPercent != utilizationPercent || prevWattsPerInterval != wattsPerInterval) {
+                System.out.printf("\tTime %8.2f | CPU Utilization %6.2f%% | Power Consumption: %8.0f Watt-Sec * %.0f Secs = %.0f Watt-Sec\n",
+                    entry.getKey(), utilizationPercent * 100, wattsSec, utilizationHistoryTimeInterval, wattsPerInterval);
+            }
+            prevUtilizationPercent = utilizationPercent;
+            prevWattsPerInterval = wattsPerInterval;
+            prevTime = entry.getKey();
+        }
+
+        System.out.printf(
+            "Total Host %d Power Consumption in %.0f secs: %.0f Watt-Sec (%.5f KWatt-Hour)\n",
+            host.getId(), simulation.clock(), totalPowerWattsSec, PowerAware.wattsSecToKWattsHour(totalPowerWattsSec));
+        final double powerWattsSecMean = totalPowerWattsSec / simulation.clock();
+        System.out.printf(
+            "Mean %.2f Watt-Sec for %d usage samples (%.5f KWatt-Hour)\n",
+            powerWattsSecMean, utilizationPercentHistory.size(), PowerAware.wattsSecToKWattsHour(powerWattsSecMean));
+        System.out.println("-------------------------------------------------------------------------------------------------------------\n");
     }
 
     /**
@@ -200,7 +236,7 @@ public class PowerExample {
             peList.add(new PeSimple(1000, new PeProvisionerSimple()));
         }
 
-        final PowerModel powerModel = new PowerModelLinear(MAX_POWER, STATIC_POWER_PERCENT);
+        final PowerModel powerModel = new PowerModelLinear(MAX_POWER_WATTS_SEC, STATIC_POWER_PERCENT);
 
         final long ram = 2048; //in Megabytes
         final long bw = 10000; //in Megabits/s
@@ -239,18 +275,21 @@ public class PowerExample {
      */
     private List<Cloudlet> createCloudlets() {
         final List<Cloudlet> list = new ArrayList<>(CLOUDLETS);
-        UtilizationModel utilization = new UtilizationModelFull();
+        final UtilizationModel utilization = new UtilizationModelDynamic(0.2);
         for (int i = 0; i < CLOUDLETS; i++) {
             //Sets half of the cloudlets with the defined length and the other half with the double of it
-            final long length = i < CLOUDLETS/2 ? CLOUDLET_LENGTH : CLOUDLET_LENGTH*2;
+            final long length = i < CLOUDLETS / 2 ? CLOUDLET_LENGTH : CLOUDLET_LENGTH * 2;
             Cloudlet cloudlet =
                 new CloudletSimple(i, length, CLOUDLET_PES)
                     .setFileSize(1024)
                     .setOutputSize(1024)
-                    .setUtilizationModel(utilization);
+                    .setUtilizationModelCpu(new UtilizationModelFull())
+                    .setUtilizationModelRam(utilization)
+                    .setUtilizationModelBw(utilization);
             list.add(cloudlet);
         }
 
         return list;
     }
+
 }

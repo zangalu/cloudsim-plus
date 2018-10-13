@@ -21,7 +21,7 @@ import org.cloudbus.cloudsim.vms.Vm;
  * <p>Please refer to following publication for more details:
  * <ul>
  * <li>
- * <a href="http://dx.doi.org/10.1109/UCC.2011.24">
+ * <a href="https://doi.org/10.1109/UCC.2011.24">
  * Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel
  * Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM
  * International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS
@@ -50,7 +50,7 @@ public class AggregateSwitch extends AbstractSwitch {
      * Default downlink bandwidth of {@link AggregateSwitch} in Megabits/s.
      * It also represents the uplink bandwidth of connected edge Datacenter.
      */
-    public static final long DOWNLINK_BW =  (long) Conversion.MEGABYTE * 100 * 8;
+    public static final long DOWNLINK_BW =  (long) Conversion.MEGA * 100 * 8;
 
     /**
      * Default number of aggregation switch ports that defines the number of
@@ -75,10 +75,10 @@ public class AggregateSwitch extends AbstractSwitch {
     }
 
     @Override
-    protected void processPacketDown(SimEvent ev) {
-        super.processPacketDown(ev);
+    protected void processPacketDown(SimEvent evt) {
+        super.processPacketDown(evt);
 
-        final HostPacket netPkt = (HostPacket) ev.getData();
+        final HostPacket netPkt = (HostPacket) evt.getData();
         final Vm receiverVm = netPkt.getVmPacket().getDestination();
 
         // packet is coming from root so need to be sent to edgelevel swich
@@ -88,10 +88,10 @@ public class AggregateSwitch extends AbstractSwitch {
     }
 
     @Override
-    protected void processPacketUp(SimEvent ev) {
-        super.processPacketUp(ev);
+    protected void processPacketUp(SimEvent evt) {
+        super.processPacketUp(evt);
 
-        final HostPacket netPkt = (HostPacket) ev.getData();
+        final HostPacket netPkt = (HostPacket) evt.getData();
         final Vm receiverVm = netPkt.getVmPacket().getDestination();
 
         // packet is coming from edge level router so need to be sent to
@@ -101,8 +101,8 @@ public class AggregateSwitch extends AbstractSwitch {
         if (findConnectedEdgeSwitch(edgeSwitch)) {
             addPacketToBeSentToDownlinkSwitch(edgeSwitch, netPkt);
         } else { // send to up
-            final Switch sw = getUplinkSwitches().get(0);
-            addPacketToBeSentToUplinkSwitch(sw, netPkt);
+            final Switch uplinkSw = getUplinkSwitches().get(0);
+            addPacketToBeSentToUplinkSwitch(uplinkSw, netPkt);
         }
     }
 

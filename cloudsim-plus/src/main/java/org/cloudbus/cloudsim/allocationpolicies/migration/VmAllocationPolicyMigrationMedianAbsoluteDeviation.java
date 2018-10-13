@@ -20,7 +20,7 @@ import org.cloudbus.cloudsim.util.MathUtil;
  * <p>If you are using any algorithms, policies or workload included in the power package please cite
  * the following paper:
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in
  * Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24,
  * Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012</a>
@@ -31,8 +31,12 @@ import org.cloudbus.cloudsim.util.MathUtil;
  * @since CloudSim Toolkit 3.0
  */
 public class VmAllocationPolicyMigrationMedianAbsoluteDeviation extends VmAllocationPolicyMigrationDynamicUpperThresholdFirstFit {
-    // 12 has been suggested as a safe value
-    private static final int MIN_HISTORY_ENTRIES_TO_COMPUTE_MAD = 12;
+    /**
+     * The minimum number of history entries required to compute
+     * the Median Absolute Deviation (MAD).
+     * 12 has been suggested as a safe value.
+     */
+    private static final int MIN_HISTORY_ENTRIES_FOR_MAD = 12;
 
     /**
      * Creates a VmAllocationPolicyMigrationMedianAbsoluteDeviation
@@ -70,9 +74,9 @@ public class VmAllocationPolicyMigrationMedianAbsoluteDeviation extends VmAlloca
      */
     @Override
     public double computeHostUtilizationMeasure(final Host host) throws IllegalArgumentException {
-        final double[] data = host.getUtilizationHistory();
-        if (MathUtil.countNonZeroBeginning(data) >= MIN_HISTORY_ENTRIES_TO_COMPUTE_MAD) {
-            return MathUtil.mad(data);
+        final double[] cpuUsageArray = host.getUtilizationHistorySum().values().stream().mapToDouble(cpuUsage -> cpuUsage).toArray();
+        if (MathUtil.countNonZeroBeginning(cpuUsageArray) >= MIN_HISTORY_ENTRIES_FOR_MAD) {
+            return MathUtil.mad(cpuUsageArray);
         }
 
         throw new IllegalArgumentException("There is not enough Host history to compute Host utilization MAD");

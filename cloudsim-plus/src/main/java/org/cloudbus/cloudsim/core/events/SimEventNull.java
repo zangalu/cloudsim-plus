@@ -13,13 +13,11 @@ import org.cloudsimplus.listeners.EventListener;
  * @see SimEvent#NULL
  */
 final class SimEventNull implements SimEvent {
+    @Override public SimEvent setSimulation(Simulation simulation) { return this; }
     @Override public Type getType() { return Type.NULL; }
     @Override public SimEntity getDestination() { return SimEntity.NULL; }
     @Override public SimEntity getSource() {
         return SimEntity.NULL;
-    }
-    @Override public double eventTime() {
-        return 0;
     }
     @Override public double getEndWaitingTime() { return 0; }
     @Override public SimEntity scheduledBy() {
@@ -41,7 +39,7 @@ final class SimEventNull implements SimEvent {
         return 0;
     }
     @Override public EventListener<EventInfo> getListener() { return EventListener.NULL; }
-    @Override public int compareTo(SimEvent o) {
+    @Override public int compareTo(SimEvent evt) {
         return 0;
     }
     @Override public long getSerial() {

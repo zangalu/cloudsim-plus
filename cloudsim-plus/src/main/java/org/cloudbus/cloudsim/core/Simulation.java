@@ -6,18 +6,19 @@
  */
 package org.cloudbus.cloudsim.core;
 
-import java.util.*;
-
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.events.SimEvent;
-
-import java.util.function.Predicate;
-
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.network.topologies.NetworkTopology;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * An interface to be implemented by a class that manages simulation
@@ -181,7 +182,9 @@ public interface Simulation {
      * @param listener the event listener to add
      * @return
      */
-    Simulation addOnSimulationPausedListener(EventListener<EventInfo> listener);
+    Simulation addOnSimulationPauseListener(EventListener<EventInfo> listener);
+
+    Simulation addOnSimulationStartListener(EventListener<EventInfo> listener);
 
     /**
      * Removes a listener from the onSimulationPausedListener List.
@@ -189,7 +192,7 @@ public interface Simulation {
      * @param listener the listener to remove
      * @return true if the listener was found and removed, false otherwise
      */
-     boolean removeOnSimulationPausedListener(EventListener<EventInfo> listener);
+     boolean removeOnSimulationPauseListener(EventListener<EventInfo> listener);
 
     /**
      * Adds a {@link EventListener} object that will be notified when any event
@@ -291,8 +294,14 @@ public interface Simulation {
     SimEvent select(SimEntity dest, Predicate<SimEvent> p);
 
     /**
+     * Sends an event where all data required is defined inside the event instance.
+     * @param evt the event to send
+     */
+    void send(SimEvent evt);
+
+    /**
      * Sends an event from one entity to another.
-     *  @param src  entity that scheduled the event
+     * @param src  entity that scheduled the event
      * @param dest  entity that the event will be sent to
      * @param delay How many seconds after the current simulation time the event should be sent
      * @param tag   the {@link SimEvent#getTag() tag} that classifies the event
@@ -301,8 +310,15 @@ public interface Simulation {
     void send(SimEntity src, SimEntity dest, double delay, int tag, Object data);
 
     /**
+     * Sends an event where all data required is defined inside the event instance,
+     * adding it to the beginning of the queue in order to give priority to it.
+     * @param evt the event to send
+     */
+    void sendFirst(SimEvent evt);
+
+    /**
      * Sends an event from one entity to another, adding it to the beginning of the queue in order to give priority to it.
-     *  @param src  entity that scheduled the event
+     * @param src  entity that scheduled the event
      * @param dest  entity that the event will be sent to
      * @param delay How many seconds after the current simulation time the event should be sent
      * @param tag   the {@link SimEvent#getTag() tag} that classifies the event
@@ -313,7 +329,7 @@ public interface Simulation {
     /**
      * Sends an event from one entity to another without delaying
      * the message.
-     *  @param src  entity that scheduled the event
+     * @param src  entity that scheduled the event
      * @param dest entity that the event will be sent to
      * @param tag  the {@link SimEvent#getTag() tag} that classifies the event
      * @param data the {@link SimEvent#getData() data} to be sent inside the event
@@ -428,12 +444,12 @@ public interface Simulation {
             return false;
         }
 
-        int id = lastEntity == null ? list.get(list.size()-1).getId() : lastEntity.getId();
+        long id = lastEntity == null ? list.get(list.size()-1).getId() : lastEntity.getId();
         //if the ID is a negative number lower than -1, it's set as -1 to start the first ID as 0
         id = Math.max(id, -1);
-        for (final ChangeableId e : list) {
-            if(e.getId() < 0) {
-                e.setId(++id);
+        for (final ChangeableId entity : list) {
+            if(entity.getId() < 0) {
+                entity.setId(++id);
             }
         }
 

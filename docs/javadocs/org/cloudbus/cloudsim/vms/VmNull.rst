@@ -79,19 +79,19 @@ addStateHistoryEntry
 allocateResource
 ^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public void allocateResource(Class<? extends ResourceManageable> c, long amount)
+.. java:method:: @Override public void allocateResource(Class<? extends ResourceManageable> clazz, long amount)
    :outertype: VmNull
 
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override public int compareTo(Vm o)
+.. java:method:: @Override public int compareTo(Vm vm)
    :outertype: VmNull
 
 deallocateResource
 ^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public void deallocateResource(Class<? extends ResourceManageable> c)
+.. java:method:: @Override public void deallocateResource(Class<? extends ResourceManageable> clazz)
    :outertype: VmNull
 
 getBroker
@@ -128,24 +128,6 @@ getCpuPercentUsage
 ^^^^^^^^^^^^^^^^^^
 
 .. java:method:: @Override public double getCpuPercentUsage()
-   :outertype: VmNull
-
-getCurrentAllocatedBw
-^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public long getCurrentAllocatedBw()
-   :outertype: VmNull
-
-getCurrentAllocatedRam
-^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public long getCurrentAllocatedRam()
-   :outertype: VmNull
-
-getCurrentAllocatedSize
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public long getCurrentAllocatedSize()
    :outertype: VmNull
 
 getCurrentRequestedBw
@@ -199,7 +181,7 @@ getHost
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: VmNull
 
 getIdleInterval
@@ -433,7 +415,7 @@ setBw
 setBwVerticalScaling
 ^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Vm setBwVerticalScaling(VerticalVmScaling v) throws IllegalArgumentException
+.. java:method:: @Override public Vm setBwVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException
    :outertype: VmNull
 
 setCloudletScheduler
@@ -463,7 +445,7 @@ setFailed
 setHorizontalScaling
 ^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Vm setHorizontalScaling(HorizontalVmScaling h) throws IllegalArgumentException
+.. java:method:: @Override public Vm setHorizontalScaling(HorizontalVmScaling scaling) throws IllegalArgumentException
    :outertype: VmNull
 
 setHost
@@ -475,19 +457,19 @@ setHost
 setId
 ^^^^^
 
-.. java:method:: @Override public void setId(int id)
+.. java:method:: @Override public void setId(long id)
    :outertype: VmNull
 
 setInMigration
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public void setInMigration(boolean inMigration)
+.. java:method:: @Override public void setInMigration(boolean migrating)
    :outertype: VmNull
 
 setPeVerticalScaling
 ^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Vm setPeVerticalScaling(VerticalVmScaling peVerticalScaling) throws IllegalArgumentException
+.. java:method:: @Override public Vm setPeVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException
    :outertype: VmNull
 
 setRam
@@ -499,7 +481,7 @@ setRam
 setRamVerticalScaling
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Vm setRamVerticalScaling(VerticalVmScaling v) throws IllegalArgumentException
+.. java:method:: @Override public Vm setRamVerticalScaling(VerticalVmScaling scaling) throws IllegalArgumentException
    :outertype: VmNull
 
 setSize

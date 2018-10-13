@@ -107,6 +107,7 @@ import java.util.List;
  * by calling {@link Host#enableStateHistory()}.</p>
  *
  * @author Manoel Campos da Silva Filho
+ * @todo Verify if inter-datacenter VM migration is working by default using the DatacenterBroker class.
  */
 public final class MigrationExample1 {
     /**
@@ -198,7 +199,6 @@ public final class MigrationExample1 {
 
         @SuppressWarnings("unused")
         Datacenter datacenter0 = createDatacenter();
-        datacenter0.setLog(false);
         DatacenterBroker broker = new DatacenterBrokerSimple(simulation);
         createAndSubmitVms(broker);
         createAndSubmitCloudlets(broker);
@@ -213,8 +213,8 @@ public final class MigrationExample1 {
 
         final List<Cloudlet> finishedList = broker.getCloudletFinishedList();
         finishedList.sort(
-            Comparator.comparingInt((Cloudlet c) -> c.getVm().getHost().getId())
-                      .thenComparingInt(c -> c.getVm().getId()));
+            Comparator.comparingLong((Cloudlet c) -> c.getVm().getHost().getId())
+                      .thenComparingLong(c -> c.getVm().getId()));
         new CloudletsTableBuilder(finishedList).build();
         System.out.println("\nHosts CPU usage History (when the allocated MIPS is lower than the requested, it is due to VM migration overhead)");
 
@@ -373,7 +373,7 @@ public final class MigrationExample1 {
                 HOST_UTILIZATION_THRESHOLD_FOR_VM_MIGRATION+0.2);
 
         DatacenterSimple dc = new DatacenterSimple(simulation, hostList, allocationPolicy);
-        dc.setSchedulingInterval(SCHEDULING_INTERVAL).setLog(true);
+        dc.setSchedulingInterval(SCHEDULING_INTERVAL);
         return dc;
     }
 

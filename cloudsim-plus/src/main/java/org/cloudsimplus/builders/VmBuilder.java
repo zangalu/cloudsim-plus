@@ -23,18 +23,18 @@
  */
 package org.cloudsimplus.builders;
 
+import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
+import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletScheduler;
+import org.cloudbus.cloudsim.vms.Vm;
+import org.cloudbus.cloudsim.vms.VmSimple;
+import org.cloudsimplus.listeners.EventListener;
+import org.cloudsimplus.listeners.VmDatacenterEventInfo;
+import org.cloudsimplus.listeners.VmHostEventInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-
-import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
-import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.vms.VmSimple;
-import org.cloudsimplus.listeners.VmHostEventInfo;
-import org.cloudsimplus.listeners.VmDatacenterEventInfo;
-import org.cloudsimplus.listeners.EventListener;
-import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletScheduler;
 
 /**
  * A Builder class to create {@link Vm} objects.
@@ -47,7 +47,7 @@ public class VmBuilder {
     private long size = 10000;
     private long  ram = 512;
     private double mips = 1000;
-    private long bw = 1000;
+    private long bandwidth = 1000;
     private int  pes = 1;
     private int numberOfCreatedVms;
     private final DatacenterBrokerSimple broker;
@@ -57,8 +57,7 @@ public class VmBuilder {
     private EventListener<VmHostEventInfo> onUpdateVmProcessingListener;
 
     public VmBuilder(final DatacenterBrokerSimple broker) {
-        Objects.requireNonNull(broker);
-        this.broker = broker;
+        this.broker = Objects.requireNonNull(broker);
         this.numberOfCreatedVms = 0;
         this.onHostAllocationListener = EventListener.NULL;
         this.onHostDeallocationListener = EventListener.NULL;
@@ -77,8 +76,8 @@ public class VmBuilder {
         return this;
     }
 
-    public VmBuilder setBw(long defaultBW) {
-        this.bw = defaultBW;
+    public VmBuilder setBandwidth(long defaultBW) {
+        this.bandwidth = defaultBW;
         return this;
     }
 
@@ -110,7 +109,7 @@ public class VmBuilder {
         final List<Vm> vms = new ArrayList<>();
         for (int i = 0; i < amount; i++) {
             final Vm vm = new VmSimple(numberOfCreatedVms++, mips, pes)
-                    .setRam(ram).setBw(bw).setSize(size)
+                    .setRam(ram).setBw(bandwidth).setSize(size)
                     .setCloudletScheduler(cloudletSchedulerSupplier.get())
                     .setBroker(broker)
                     .addOnHostAllocationListener(onHostAllocationListener)
@@ -123,8 +122,8 @@ public class VmBuilder {
         return this;
     }
 
-    public long getBw() {
-        return bw;
+    public long getBandwidth() {
+        return bandwidth;
     }
 
     public VmBuilder setPes(int defaultPEs) {
@@ -175,8 +174,7 @@ public class VmBuilder {
     }
 
     public VmBuilder setOnUpdateVmProcessingListener(final EventListener<VmHostEventInfo> onUpdateVmProcessing) {
-        Objects.requireNonNull(onUpdateVmProcessing);
-        this.onUpdateVmProcessingListener = onUpdateVmProcessing;
+        this.onUpdateVmProcessingListener = Objects.requireNonNull(onUpdateVmProcessing);
         return this;
     }
 }

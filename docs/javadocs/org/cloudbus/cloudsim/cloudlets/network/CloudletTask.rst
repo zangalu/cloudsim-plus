@@ -18,7 +18,7 @@ CloudletTask
 
    ..
 
-   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <http://dx.doi.org/10.1109/UCC.2011.24>`_\
+   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <https://doi.org/10.1109/UCC.2011.24>`_\
 
    :author: Saurabh Kumar Garg
 
@@ -63,7 +63,7 @@ getFinishTime
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: CloudletTask
 
    Gets the id of the CloudletTask.

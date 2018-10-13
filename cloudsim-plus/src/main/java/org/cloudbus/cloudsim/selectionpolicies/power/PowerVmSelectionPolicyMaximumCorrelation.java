@@ -8,14 +8,15 @@
 
 package org.cloudbus.cloudsim.selectionpolicies.power;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.cloudbus.cloudsim.hosts.Host;
-import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.util.MathUtil;
 import org.cloudbus.cloudsim.vms.UtilizationHistory;
+import org.cloudbus.cloudsim.vms.Vm;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A VM selection policy that selects for migration the VM with the Maximum Correlation Coefficient (MCC) among
@@ -25,7 +26,7 @@ import org.cloudbus.cloudsim.vms.UtilizationHistory;
  * the following paper:<br/>
  * <p>
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of Virtual Machines in
  * Cloud Data Centers", Concurrency and Computation: Practice and Experience (CCPE), Volume 24,
  * Issue 13, Pages: 1397-1420, John Wiley & Sons, Ltd, New York, USA, 2012</a>
@@ -90,16 +91,16 @@ public class PowerVmSelectionPolicyMaximumCorrelation extends PowerVmSelectionPo
         final double[][] utilization = new double[numberVms][minHistorySize];
 
         for (int i = 0; i < numberVms; i++) {
-            final List<Double> vmUtilization = vmList.get(i).getUtilizationHistory().getHistory();
-            for (int j = 0; j < minHistorySize; j++) {
-                utilization[i][j] = vmUtilization.get(j);
+            final double[] vmUtilization = vmList.get(i).getUtilizationHistory().getHistory().values().stream().mapToDouble(v -> v).toArray();
+            if (minHistorySize >= 0) {
+                System.arraycopy(vmUtilization, 0, utilization[i], 0, minHistorySize);
             }
         }
         return utilization;
     }
 
     /**
-     * Gets the min CPU utilization percentage history size among a list of VMs.
+     * Gets the min CPU utilization percentage history size between a list of VMs.
      *
      * @param vmList the VM list
      * @return the min CPU utilization percentage history size of the VM list
@@ -108,7 +109,7 @@ public class PowerVmSelectionPolicyMaximumCorrelation extends PowerVmSelectionPo
         return vmList.stream()
             .map(Vm::getUtilizationHistory)
             .map(UtilizationHistory::getHistory)
-            .mapToInt(List::size)
+            .mapToInt(Map::size)
             .min().orElse(0);
     }
 
@@ -119,13 +120,13 @@ public class PowerVmSelectionPolicyMaximumCorrelation extends PowerVmSelectionPo
      * @return the correlation coefficients
      */
     protected List<Double> getCorrelationCoefficients(final double[][] data) {
-        final int n = data.length;
-        final int m = data[0].length;
+        final int rows = data.length;
+        final int cols = data[0].length;
         final List<Double> correlationCoefficients = new LinkedList<>();
-        for (int i = 0; i < n; i++) {
-            final double[][] x = new double[n - 1][m];
+        for (int i = 0; i < rows; i++) {
+            final double[][] x = new double[rows - 1][cols];
             int k = 0;
-            for (int j = 0; j < n; j++) {
+            for (int j = 0; j < rows; j++) {
                 if (j != i) {
                     x[k++] = data[j];
                 }

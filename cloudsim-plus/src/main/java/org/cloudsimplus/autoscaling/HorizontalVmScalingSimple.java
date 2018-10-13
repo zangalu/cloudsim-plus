@@ -54,7 +54,7 @@ import java.util.function.Supplier;
  * @see HorizontalVmScaling
  */
 public class HorizontalVmScalingSimple extends VmScalingAbstract implements HorizontalVmScaling {
-    private static final Logger logger = LoggerFactory.getLogger(HorizontalVmScalingSimple.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(HorizontalVmScalingSimple.class.getSimpleName());
 
     /** @see #getVmSupplier() */
     private Supplier<Vm> vmSupplier;
@@ -82,8 +82,7 @@ public class HorizontalVmScalingSimple extends VmScalingAbstract implements Hori
 
     @Override
     public final HorizontalVmScaling setVmSupplier(final Supplier<Vm> supplier) {
-        Objects.requireNonNull(supplier);
-        this.vmSupplier = supplier;
+        this.vmSupplier = Objects.requireNonNull(supplier);
         return this;
     }
 
@@ -94,8 +93,7 @@ public class HorizontalVmScalingSimple extends VmScalingAbstract implements Hori
 
     @Override
     public VmScaling setOverloadPredicate(final Predicate<Vm> predicate) {
-        Objects.requireNonNull(predicate);
-        this.overloadPredicate = predicate;
+        this.overloadPredicate = Objects.requireNonNull(predicate);
         return this;
     }
 
@@ -107,7 +105,7 @@ public class HorizontalVmScalingSimple extends VmScalingAbstract implements Hori
 
         final double vmCpuUsagePercent = getVm().getCpuPercentUsage() * 100;
         final Vm newVm = getVmSupplier().get();
-        logger.info(
+        LOGGER.info(
             "{}: {}{}: Requesting creation of {} to receive new Cloudlets in order to balance load of {}. {} CPU usage is {}%",
             time, getClass().getSimpleName(), getVm(), newVm, getVm(), getVm().getId(), vmCpuUsagePercent);
         getVm().getBroker().submitVm(newVm);

@@ -37,7 +37,7 @@ import static java.util.stream.Collectors.toSet;
  * power package please cite the following paper:
  *
  * <ul>
- * <li><a href="http://dx.doi.org/10.1002/cpe.1867">Anton Beloglazov, and
+ * <li><a href="https://doi.org/10.1002/cpe.1867">Anton Beloglazov, and
  * Rajkumar Buyya, "Optimal Online Deterministic Algorithms and Adaptive
  * Heuristics for Energy and Performance Efficient Dynamic Consolidation of
  * Virtual Machines in Cloud Data Centers", Concurrency and Computation:
@@ -51,7 +51,7 @@ import static java.util.stream.Collectors.toSet;
  * @since CloudSim Toolkit 3.0
  */
 public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPolicyAbstract implements VmAllocationPolicyMigration {
-    private static final Logger logger = LoggerFactory.getLogger(VmAllocationPolicyMigrationAbstract.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VmAllocationPolicyMigrationAbstract.class.getSimpleName());
 
     /**@see #getUnderUtilizationThreshold() */
     private double underUtilizationThreshold;
@@ -180,15 +180,15 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
                 break;
             }
 
-            logger.info("{}: PowerVmAllocationPolicy: Underloaded hosts: {}", getDatacenter().getSimulation().clock(),  underloadedHost);
+            LOGGER.info("{}: PowerVmAllocationPolicy: Underloaded hosts: {}", getDatacenter().getSimulation().clock(),  underloadedHost);
 
             ignoredSourceHosts.add(underloadedHost);
             ignoredTargetHosts.add(underloadedHost);
 
             final List<? extends Vm> vmsToMigrateFromHost = getVmsToMigrateFromUnderUtilizedHost(underloadedHost);
             if (!vmsToMigrateFromHost.isEmpty()) {
-                if(logger.isInfoEnabled()) {
-                    logger.info("     VMs to be reallocated from the underloaded {}: {}     {}",
+                if(LOGGER.isInfoEnabled()) {
+                    LOGGER.info("     VMs to be reallocated from the underloaded {}: {}     {}",
                         underloadedHost, System.lineSeparator(), getVmIds(vmsToMigrateFromHost));
                 }
 
@@ -212,17 +212,17 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      * @param overloadedHosts the over utilized hosts
      */
     private void printOverUtilizedHosts(final Set<Host> overloadedHosts) {
-        if (!overloadedHosts.isEmpty() && logger.isWarnEnabled()) {
+        if (!overloadedHosts.isEmpty() && LOGGER.isWarnEnabled()) {
             final String hosts = overloadedHosts.stream().map(this::overloadedHostToString).collect(Collectors.joining(System.lineSeparator()));
-            logger.warn("{}: PowerVmAllocationPolicy: Overloaded hosts in {}{}:{}",
+            LOGGER.warn("{}: PowerVmAllocationPolicy: Overloaded hosts in {}{}:{}",
                 getDatacenter().getSimulation().clock(), getDatacenter(), System.lineSeparator(), hosts);
         }
     }
 
-    private String overloadedHostToString(final Host h) {
+    private String overloadedHostToString(final Host host) {
         return String.format(
             "    Host %d (upper CPU threshold %.2f, current utilization: %.2f)",
-            h.getId(), getOverUtilizationThreshold(h), h.getUtilizationOfCpu());
+            host.getId(), getOverUtilizationThreshold(host), host.getUtilizationOfCpu());
     }
 
     /**
@@ -257,9 +257,9 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
         }
 
         final double usagePercent = getHostCpuPercentRequested(host);
-        final boolean isNotHostOverUsedAfterAllocation = !isHostOverloaded(host, usagePercent);
+        final boolean notOverloadedAfterAllocation = !isHostOverloaded(host, usagePercent);
         host.destroyTemporaryVm(vm);
-        return isNotHostOverUsedAfterAllocation;
+        return notOverloadedAfterAllocation;
     }
 
     /**
@@ -353,9 +353,9 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      */
     public Optional<Host> findHostForVm(final Vm vm, final Set<? extends Host> excludedHosts, final Predicate<Host> predicate) {
         final Stream<Host> stream = this.getHostList().stream()
-            .filter(h -> !excludedHosts.contains(h))
-            .filter(h -> h.isSuitableForVm(vm))
-            .filter(h -> isNotHostOverloadedAfterAllocation(h, vm))
+            .filter(host -> !excludedHosts.contains(host))
+            .filter(host -> host.isSuitableForVm(vm))
+            .filter(host -> isNotHostOverloadedAfterAllocation(host, vm))
             .filter(predicate);
 
         return findHostForVmInternal(vm, stream);
@@ -375,7 +375,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      */
     protected Optional<Host> findHostForVmInternal(final Vm vm, final Stream<Host> hostStream){
         final Comparator<Host> hostPowerConsumptionComparator =
-            comparingDouble(h -> getPowerAfterAllocationDifference(h, vm));
+            comparingDouble(host -> getPowerAfterAllocationDifference(host, vm));
 
         return additionalHostFilters(vm, hostStream).min(hostPowerConsumptionComparator);
     }
@@ -392,7 +392,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      * @return the Hosts {@link Stream} after applying the additional filters
      */
     private Stream<Host> additionalHostFilters(final Vm vm, final Stream<Host> hostStream){
-        return hostStream.filter(h -> getPowerAfterAllocation(h, vm) > 0);
+        return hostStream.filter(host -> getPowerAfterAllocation(host, vm) > 0);
     }
 
     /**
@@ -424,21 +424,21 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
         sortByCpuUtilization(vmsToMigrate, getDatacenter().getSimulation().clock());
         final Map<Vm, Host> migrationMap = new HashMap<>();
 
-        final StringBuilder sb = new StringBuilder();
+        final StringBuilder builder = new StringBuilder();
         for (final Vm vm : vmsToMigrate) {
             findHostForVm(vm, overloadedHosts).ifPresent(targetHost -> {
                 addVmToMigrationMap(migrationMap, vm, targetHost);
-                appendVmMigrationMsgToStringBuilder(sb, vm, targetHost);
+                appendVmMigrationMsgToStringBuilder(builder, vm, targetHost);
             });
         }
-        logger.info("Reallocation of VMs from overloaded hosts: {}{}", System.lineSeparator(), sb.toString());
+        LOGGER.info("Reallocation of VMs from overloaded hosts: {}{}", System.lineSeparator(), builder.toString());
 
         return migrationMap;
     }
 
-    private void appendVmMigrationMsgToStringBuilder(final StringBuilder sb, final Vm vm, final Host targetHost) {
-        if(logger.isInfoEnabled()) {
-            sb.append("     ").append(vm).append(" will be migrated from ")
+    private void appendVmMigrationMsgToStringBuilder(final StringBuilder builder, final Vm vm, final Host targetHost) {
+        if(LOGGER.isInfoEnabled()) {
+            builder.append("     ").append(vm).append(" will be migrated from ")
               .append(vm.getHost()).append(" to ").append(targetHost)
               .append(System.lineSeparator());
         }
@@ -462,7 +462,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
             //try to find a target Host to place a VM from an underloaded Host that is not underloaded too
             final Optional<Host> optional = findHostForVm(vm, excludedHosts, host -> !isHostUnderloaded(host));
             if (!optional.isPresent()) {
-                logger.warn(
+                LOGGER.warn(
                     "A new Host, which isn't also underloaded or won't be overloaded, couldn't be found to migrate {}{}.Migration of VMs from the underloaded {} cancelled.",
                     vm, System.lineSeparator(), vm.getHost());
                 return new HashMap<>();
@@ -565,7 +565,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
     private Set<Host> getOverloadedHosts() {
         return this.getHostList().stream()
             .filter(this::isHostOverloaded)
-            .filter(h -> h.getVmsMigratingOut().isEmpty())
+            .filter(host -> host.getVmsMigratingOut().isEmpty())
             .collect(toSet());
     }
 
@@ -584,10 +584,10 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      */
     private Host getUnderloadedHost(final Set<? extends Host> excludedHosts) {
         return this.getHostList().stream()
-            .filter(h -> !excludedHosts.contains(h))
+            .filter(host -> !excludedHosts.contains(host))
             .filter(Host::isActive)
             .filter(this::isHostUnderloaded)
-            .filter(h -> h.getVmsMigratingIn().isEmpty())
+            .filter(host -> host.getVmsMigratingIn().isEmpty())
             .filter(this::notAllVmsAreMigratingOut)
             .min(comparingDouble(Host::getUtilizationOfCpu))
             .orElse(Host.NULL);
@@ -650,7 +650,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
         for (final Vm vm : savedAllocation.keySet()) {
             final Host host = savedAllocation.get(vm);
             if (!host.createTemporaryVm(vm)) {
-                logger.error("Couldn't restore {} on {}", vm, host);
+                LOGGER.error("Couldn't restore {} on {}", vm, host);
                 return;
             }
         }
@@ -670,7 +670,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
         try {
             return host.getPowerModel().getPower(getMaxUtilizationAfterAllocation(host, vm));
         } catch (IllegalArgumentException e) {
-            logger.error("Power consumption for {} could not be determined: {}", host, e.getMessage());
+            LOGGER.error("Power consumption for {} could not be determined: {}", host, e.getMessage());
         }
 
         return 0;
@@ -739,8 +739,7 @@ public abstract class VmAllocationPolicyMigrationAbstract extends VmAllocationPo
      * @param vmSelectionPolicy the new vm selection policy
      */
     protected final void setVmSelectionPolicy(final PowerVmSelectionPolicy vmSelectionPolicy) {
-        Objects.requireNonNull(vmSelectionPolicy);
-        this.vmSelectionPolicy = vmSelectionPolicy;
+        this.vmSelectionPolicy = Objects.requireNonNull(vmSelectionPolicy);
     }
 
     /**

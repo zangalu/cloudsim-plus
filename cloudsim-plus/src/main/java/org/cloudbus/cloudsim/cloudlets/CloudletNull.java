@@ -19,8 +19,8 @@ import java.util.List;
  * @see Cloudlet#NULL
  */
 final class CloudletNull implements Cloudlet {
-    @Override public void setId(int id) {/**/}
-    @Override public int getId() {
+    @Override public void setId(long id) {/**/}
+    @Override public long getId() {
         return -1;
     }
     @Override public String getUid() {
@@ -104,6 +104,8 @@ final class CloudletNull implements Cloudlet {
     @Override public double getArrivalTime(Datacenter datacenter) {
         return 0.0;
     }
+    @Override public long getJobId() { return 0; }
+    @Override public void setJobId(long jobId) {/**/}
     @Override public UtilizationModel getUtilizationModelBw() {
         return UtilizationModel.NULL;
     }
@@ -190,18 +192,14 @@ final class CloudletNull implements Cloudlet {
     @Override public Cloudlet setVm(Vm vm) {
         return Cloudlet.NULL;
     }
-    @Override public boolean removeOnFinishListener(EventListener<CloudletVmEventInfo> l) {
-        return false;
-    }
-    @Override public Cloudlet addOnFinishListener(EventListener<CloudletVmEventInfo> l) {
-        return Cloudlet.NULL;
-    }
+    @Override public boolean removeOnFinishListener(EventListener<CloudletVmEventInfo> listener) { return false; }
+    @Override public Cloudlet addOnFinishListener(EventListener<CloudletVmEventInfo> listener) { return Cloudlet.NULL; }
     @Override public void notifyOnUpdateProcessingListeners(double time) {/**/}
     @Override public Simulation getSimulation() {
         return Simulation.NULL;
     }
-    @Override public boolean removeOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> l) { return false; }
-    @Override public Cloudlet addOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> l) { return Cloudlet.NULL; }
+    @Override public boolean removeOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> listener) { return false; }
+    @Override public Cloudlet addOnUpdateProcessingListener(EventListener<CloudletVmEventInfo> listener) { return Cloudlet.NULL; }
     @Override public double getSubmissionDelay() {
         return 0;
     }
@@ -209,12 +207,10 @@ final class CloudletNull implements Cloudlet {
     @Override public boolean isBindToVm() {
         return false;
     }
-    @Override public int compareTo(Cloudlet o) {
+    @Override public int compareTo(Cloudlet cloudlet) {
         return 0;
     }
-    @Override public boolean isAssignedToDatacenter() {
-        return false;
-    }
+    @Override public boolean isAssignedToDatacenter() { return false; }
     @Override public String toString() {
         return "Cloudlet.NULL";
     }

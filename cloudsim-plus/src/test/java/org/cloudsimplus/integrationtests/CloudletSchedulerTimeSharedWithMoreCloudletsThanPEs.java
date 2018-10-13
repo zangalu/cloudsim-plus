@@ -59,20 +59,17 @@ public final class CloudletSchedulerTimeSharedWithMoreCloudletsThanPEs {
     private static final int CLOUDLET_LENGTH = VM_MIPS*10;
     private static final int NUMBER_OF_CLOUDLETS = VM_PES*2;
 
-    private SimulationScenarioBuilder scenario;
-    private UtilizationModel utilizationModel;
     private DatacenterBroker broker;
     private CloudSim simulation;
 
     @Before
     public void setUp() {
         simulation = new CloudSim();
-        utilizationModel = new UtilizationModelFull();
-        scenario = new SimulationScenarioBuilder(simulation);
+        final SimulationScenarioBuilder scenario = new SimulationScenarioBuilder(simulation);
         scenario.getDatacenterBuilder().setSchedulingInterval(2).createDatacenter(
             new HostBuilder()
                 .setVmSchedulerClass(VmSchedulerSpaceShared.class)
-                .setRam(4000).setBw(400000)
+                .setRam(4000).setBandwidth(400000)
                 .setPes(HOST_PES).setMips(HOST_MIPS)
                 .createOneHost()
                 .getHosts()
@@ -81,11 +78,12 @@ public final class CloudletSchedulerTimeSharedWithMoreCloudletsThanPEs {
         final BrokerBuilderDecorator brokerBuilder = scenario.getBrokerBuilder().createBroker();
         broker = brokerBuilder.getBroker();
         brokerBuilder.getVmBuilder()
-            .setRam(1000).setBw(100000)
+            .setRam(1000).setBandwidth(100000)
             .setPes(VM_PES).setMips(VM_MIPS).setSize(50000)
-            .setCloudletSchedulerSupplier(() -> new CloudletSchedulerTimeShared())
+            .setCloudletSchedulerSupplier(CloudletSchedulerTimeShared::new)
             .createAndSubmitVms(NUMBER_OF_VMS);
 
+        final UtilizationModel utilizationModel = new UtilizationModelFull();
         brokerBuilder.getCloudletBuilder()
             .setLength(CLOUDLET_LENGTH)
             .setUtilizationModelCpu(utilizationModel)
@@ -100,19 +98,17 @@ public final class CloudletSchedulerTimeSharedWithMoreCloudletsThanPEs {
 
         final double time = 20;
         for(final Cloudlet c: broker.getCloudletFinishedList()){
-            assertEquals(String.format(
-                "Cloudlet %d doesn't have the expected finish time.",
-                c.getId(), time),
+            assertEquals(
+                String.format("Cloudlet %d doesn't have the expected finish time.", c.getId()),
                 time, c.getFinishTime(), 0.3);
 
-            assertEquals(String.format(
-                "Cloudlet %d doesn't have the expected exec time.",
-                c.getId(), time),
+            assertEquals(
+                String.format("Cloudlet %d doesn't have the expected exec time.", c.getId()),
                 time, c.getActualCpuTime(), 0.3);
         }
     }
 
-    public void printCloudletsExecutionResults(DatacenterBroker broker) {
+    private void printCloudletsExecutionResults(DatacenterBroker broker) {
         new CloudletsTableBuilder(broker.getCloudletFinishedList())
                 .setTitle(broker.getName())
                 .build();

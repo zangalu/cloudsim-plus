@@ -1,5 +1,3 @@
-.. java:import:: java.util Objects
-
 .. java:import:: org.cloudbus.cloudsim.datacenters Datacenter
 
 File
@@ -173,7 +171,7 @@ getOwnerName
 getRegistrationID
 ^^^^^^^^^^^^^^^^^
 
-.. java:method:: public int getRegistrationID()
+.. java:method:: public long getRegistrationID()
    :outertype: File
 
    Gets the file registration ID.

@@ -17,7 +17,7 @@ import org.cloudbus.cloudsim.core.Identifiable;
  * <p>Please refer to following publication for more details:
  * <ul>
  * <li>
- * <a href="http://dx.doi.org/10.1109/UCC.2011.24">
+ * <a href="https://doi.org/10.1109/UCC.2011.24">
  * Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel
  * Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM
  * International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS
@@ -38,7 +38,7 @@ public abstract class CloudletTask implements Identifiable {
     /**
      * @see #getId()
      */
-    private int id;
+    private long id;
 
     /**
      * @see #getStartTime()
@@ -77,7 +77,7 @@ public abstract class CloudletTask implements Identifiable {
      * @return
      */
     @Override
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -181,7 +181,7 @@ public abstract class CloudletTask implements Identifiable {
      * @return the time the task spent executing, or -1 if not finished yet
      */
     public double getExecutionTime(){
-        return (finished ? finishTime - startTime : -1);
+        return finished ? finishTime - startTime : -1;
     }
 
     /**

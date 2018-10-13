@@ -8,21 +8,25 @@
 package org.cloudbus.cloudsim.hosts;
 
 import org.cloudbus.cloudsim.core.Machine;
-import org.cloudbus.cloudsim.power.models.PowerModel;
-import org.cloudbus.cloudsim.resources.*;
-import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudbus.cloudsim.datacenters.Datacenter;
-import org.cloudbus.cloudsim.schedulers.vm.VmScheduler;
-
-import java.util.List;
-import java.util.Set;
-
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.datacenters.Datacenter;
+import org.cloudbus.cloudsim.power.models.PowerModel;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
+import org.cloudbus.cloudsim.resources.Bandwidth;
+import org.cloudbus.cloudsim.resources.Pe;
+import org.cloudbus.cloudsim.resources.Pe.Status;
+import org.cloudbus.cloudsim.resources.Ram;
+import org.cloudbus.cloudsim.resources.ResourceManageable;
+import org.cloudbus.cloudsim.schedulers.vm.VmScheduler;
+import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmUtilizationHistory;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudsimplus.listeners.HostUpdatesVmsProcessingEventInfo;
-import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
-import org.cloudbus.cloudsim.resources.Pe.Status;
+
+import java.util.DoubleSummaryStatistics;
+import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
 /**
  * An interface to be implemented by each class that provides
@@ -334,6 +338,30 @@ public interface Host extends Machine, Comparable<Host> {
     Host setVmScheduler(VmScheduler vmScheduler);
 
     /**
+     * Gets the time the Host was powered-on (in seconds).
+     * @return
+     */
+    double getStartTime();
+
+    /**
+     * Sets the time the Host was powered-on.
+     * @param startTime the time to set (in seconds)
+     */
+    void setStartTime(double startTime);
+
+    /**
+     * Gets the time the Host shut down.
+     * @return
+     */
+    double getShutdownTime();
+
+    /**
+     * Sets the time the Host shut down.
+     * @param shutdownTime the time to set
+     */
+    void setShutdownTime(double shutdownTime);
+
+    /**
      * Checks if the host is working properly or has failed.
      *
      * @return true, if the host PEs have failed; false otherwise
@@ -484,21 +512,65 @@ public interface Host extends Machine, Comparable<Host> {
     long getUtilizationOfRam();
 
     /**
-     * <p>Gets the host CPU utilization percentage history (between [0 and 1], where 1 is 100%),
+     * <p>Gets a map containing the host CPU utilization percentage history (between [0 and 1]),
      * based on its VM utilization history.
-     * Each value into the returned array is the CPU utilization percentage for
-     * a time interval equal to the {@link Datacenter#getSchedulingInterval()}.
+     * Each key is a time when the data collection was performed
+     * and each value is a {@link DoubleSummaryStatistics}
+     * from where some operations over the CPU utilization entries for every VM inside the Host
+     * can be performed, such as counting, summing, averaging, etc.
+     * For instance, if you call the {@link DoubleSummaryStatistics#getSum()},
+     * you'll get the total Host's CPU utilization for the time specified
+     * by the map key.
      * </p>
      *
-     * <p><b>The values are stored in the reverse chronological order.</b></p>
+     * <p>
+     * There is an entry for each time multiple of the {@link Datacenter#getSchedulingInterval()}.
+     * <b>This way, it's required to set a Datacenter scheduling interval with the desired value.</b>
+     * </p>
      *
      * <p><b>In order to enable the Host to get utilization history,
-     * utilization history of its VMs should be enabled
+     * its VMs' utilization history must be enabled
      * by calling {@link VmUtilizationHistory#enable() enable()} from
-     * the {@link Vm#getUtilizationHistory()}.</b></p>
-     * @return
+     * the {@link Vm#getUtilizationHistory()}.</b>
+     * </p>
+     *
+     * @return a Map where keys are the data collection time
+     * and each value is a {@link DoubleSummaryStatistics} objects
+     * that provides lots of useful methods to get
+     * max, min, average, count and sum of utilization values.
+     *
+     * @see #getUtilizationHistorySum()
      */
-    double[] getUtilizationHistory();
+    SortedMap<Double, DoubleSummaryStatistics> getUtilizationHistory();
+
+    /**
+     * <p>Gets a map containing the host CPU utilization percentage history (between [0 and 1]),
+     * based on its VM utilization history.
+     * Each key is a time when the data collection was performed
+     * and each value is the sum of all CPU utilization of the VMs running inside this Host for that time.
+     * This way, the value represents the total Host's CPU utilization for each time
+     * that data was collected.
+     * </p>
+     *
+     * <p>
+     * There is an entry for each time multiple of the {@link Datacenter#getSchedulingInterval()}.
+     * <b>This way, it's required to set a Datacenter scheduling interval with the desired value.</b>
+     * </p>
+     *
+     * <p><b>In order to enable the Host to get utilization history,
+     * its VMs' utilization history must be enabled
+     * by calling {@link VmUtilizationHistory#enable() enable()} from
+     * the {@link Vm#getUtilizationHistory()}.</b>
+     * </p>
+     *
+     * @return a Map where keys are the data collection time
+     * and each value is a {@link DoubleSummaryStatistics} objects
+     * that provides lots of useful methods to get
+     * max, min, average, count and sum of utilization values.
+     *
+     * @see #getUtilizationHistory()
+     */
+    SortedMap<Double, Double> getUtilizationHistorySum();
 
     /**
      * Gets the {@link PowerModel} used by the host

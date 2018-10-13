@@ -52,15 +52,13 @@ public abstract class UtilizationModelAbstract implements UtilizationModel {
      * @return
      */
     protected final UtilizationModel setUnit(final Unit unit) {
-        Objects.requireNonNull(unit);
-        this.unit = unit;
+        this.unit = Objects.requireNonNull(unit);
         return this;
     }
 
     @Override
     public UtilizationModel setSimulation(final Simulation simulation) {
-        Objects.requireNonNull(simulation);
-        this.simulation = simulation;
+        this.simulation = Objects.requireNonNull(simulation);
         return this;
     }
 
@@ -79,7 +77,7 @@ public abstract class UtilizationModelAbstract implements UtilizationModel {
     }
 
     protected void validateUtilizationField(final String fieldName, final double fieldValue, double minValue) {
-        minValue = (minValue <= ALMOST_ZERO ? 0 : minValue);
+        minValue = minValue <= ALMOST_ZERO ? 0 : minValue;
         if(fieldValue < minValue) {
             throw new IllegalArgumentException(fieldName + " cannot be lower than " + minValue);
         }

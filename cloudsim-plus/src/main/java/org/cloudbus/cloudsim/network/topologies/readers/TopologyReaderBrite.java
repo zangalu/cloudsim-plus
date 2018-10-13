@@ -14,7 +14,10 @@ import org.cloudbus.cloudsim.network.topologies.TopologicalLink;
 import org.cloudbus.cloudsim.network.topologies.TopologicalNode;
 import org.cloudbus.cloudsim.util.ResourceLoader;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.StringTokenizer;
 import java.util.function.Function;
 
@@ -51,9 +54,9 @@ public class TopologyReaderBrite implements TopologyReader {
     @Override
     public TopologicalGraph readGraphFile(final InputStreamReader streamReader) {
         graph = new TopologicalGraph();
-        try(final BufferedReader br = new BufferedReader(streamReader)) {
+        try(BufferedReader reader = new BufferedReader(streamReader)) {
             String nextLine;
-            while ((nextLine = br.readLine()) != null) {
+            while ((nextLine = reader.readLine()) != null) {
                 // functionality to diferentiate between all the parsing-states
                 // state that should just find the start of node-declaration
                 if (state == PARSE_NOTHING) {

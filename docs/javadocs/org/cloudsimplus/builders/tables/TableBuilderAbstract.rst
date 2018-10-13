@@ -4,8 +4,6 @@
 
 .. java:import:: java.util Map
 
-.. java:import:: java.util Objects
-
 .. java:import:: java.util.function Function
 
 TableBuilderAbstract
@@ -120,7 +118,7 @@ setObjectList
 setTable
 ^^^^^^^^
 
-.. java:method:: protected TableBuilderAbstract<T> setTable(Table table)
+.. java:method:: protected final TableBuilderAbstract<T> setTable(Table table)
    :outertype: TableBuilderAbstract
 
    Sets the \ :java:ref:`Table`\  used to build the table with Cloudlet Data. The default table builder is \ :java:ref:`TextTable`\ .

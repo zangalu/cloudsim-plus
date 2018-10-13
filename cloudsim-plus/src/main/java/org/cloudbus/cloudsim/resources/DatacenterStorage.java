@@ -1,12 +1,14 @@
 package org.cloudbus.cloudsim.resources;
 
+import org.apache.commons.lang3.StringUtils;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.util.DataCloudTags;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Implements the storage logic for a Datacenter. It keeps a list of
@@ -50,8 +52,7 @@ public class DatacenterStorage {
      * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
      */
     public boolean contains(final File file) {
-        Objects.requireNonNull(file);
-        return contains(file.getName());
+        return contains(requireNonNull(file).getName());
     }
 
     /**
@@ -61,7 +62,7 @@ public class DatacenterStorage {
      * @return <tt>true</tt> if successful, <tt>false</tt> otherwise
      */
     public boolean contains(final String fileName) {
-        if (fileName == null || fileName.trim().isEmpty()) {
+        if (StringUtils.isBlank(fileName)) {
             return false;
         }
 
@@ -85,8 +86,7 @@ public class DatacenterStorage {
      * @return
      */
     public final DatacenterStorage setStorageList(final List<FileStorage> storageList) {
-        Objects.requireNonNull(storageList);
-        this.storageList = storageList;
+        this.storageList = requireNonNull(storageList);
         setAllFilesOfAllStoragesToThisDatacenter();
 
         return this;
@@ -150,7 +150,7 @@ public class DatacenterStorage {
      * @return a tag from {@link DataCloudTags} informing the result of the operation
      */
     public int addFile(final File file) {
-        Objects.requireNonNull(file);
+        requireNonNull(file);
 
         if (contains(file.getName())) {
             return DataCloudTags.FILE_ADD_ERROR_EXIST_READ_ONLY;

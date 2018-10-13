@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
  * @since CloudSim Plus 1.0
  */
 public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
-    private static final Logger logger = LoggerFactory.getLogger(CloudletTaskSchedulerSimple.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CloudletTaskSchedulerSimple.class.getSimpleName());
 
     /**
      * @see #getVm()
@@ -87,7 +87,7 @@ public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
     private void updateExecutionTask(final NetworkCloudlet cloudlet, final long partialFinishedMI) {
         /*
          * @todo @author manoelcampos It has to be checked if the task execution
-         * is considering only one cloudlet PE our all PEs.
+         * is considering only one cloudlet PE or all PEs.
          * Each execution task is supposed to use just one PE.
          */
         final Optional<CloudletExecutionTask> optional = getCloudletCurrentTask(cloudlet);
@@ -135,7 +135,7 @@ public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
     private void addPacketsToBeSentFromVm(final NetworkCloudlet sourceCloudlet) {
         final Optional<CloudletSendTask> optional = getCloudletCurrentTask(sourceCloudlet);
         optional.ifPresent(task -> {
-            logger.trace(
+            LOGGER.trace(
                 "{}: {}: {} pkts added to be sent from {} in {}",
                 sourceCloudlet.getSimulation().clock(), getClass().getSimpleName(),
                 task.getPacketsToSend().size(), sourceCloudlet,
@@ -160,7 +160,7 @@ public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
             // Assumption: packet will not arrive in the same cycle
             receivedPkts.forEach(task::receivePacket);
             receivedPkts.forEach(pkt ->
-                logger.trace(
+                LOGGER.trace(
                     "{}: {}: {} in {} received pkt with {} bytes from {} in {}",
                     candidateDestinationCloudlet.getSimulation().clock(), getClass().getSimpleName(),
                     pkt.getReceiverCloudlet(),
@@ -222,7 +222,7 @@ public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
         }
 
         final Datacenter dc = getVm().getHost().getDatacenter();
-        dc.schedule(dc, dc.getSimulation().getMinTimeBetweenEvents(), CloudSimTags.VM_UPDATE_CLOUDLET_PROCESSING_EVENT);
+        dc.schedule(dc, dc.getSimulation().getMinTimeBetweenEvents(), CloudSimTags.VM_UPDATE_CLOUDLET_PROCESSING);
     }
 
     @Override
@@ -232,8 +232,7 @@ public class CloudletTaskSchedulerSimple implements CloudletTaskScheduler {
 
     @Override
     public void setVm(final Vm vm) {
-        Objects.requireNonNull(vm);
-        this.vm = vm;
+        this.vm = Objects.requireNonNull(vm);
     }
 
     @Override

@@ -10,8 +10,8 @@ package org.cloudbus.cloudsim.provisioners;
 
 import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.resources.Pe;
-import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.resources.ResourceManageable;
+import org.cloudbus.cloudsim.vms.Vm;
 
 import java.util.Objects;
 
@@ -50,10 +50,14 @@ public class ResourceProvisionerSimple extends ResourceProvisionerAbstract {
     @Override
     public boolean allocateResourceForVm(final Vm vm, final long newTotalVmResourceCapacity) {
         Objects.requireNonNull(vm);
+
         if (!isSuitableForVm(vm, newTotalVmResourceCapacity)) {
             return false;
         }
 
+        /* Stores the resource allocation before changing the current allocation,
+         * this line, this line must be placed here and not at the end
+         * where it's in fact used.*/
         final long prevVmResourceAllocation = vm.getResource(getResourceClass()).getAllocatedResource();
         if (getResourceAllocationMap().containsKey(vm)) {
             //Deallocates any amount of the resource assigned to the Vm in order to allocate a new capacity

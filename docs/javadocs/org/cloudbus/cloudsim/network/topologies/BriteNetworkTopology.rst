@@ -30,6 +30,8 @@ BriteNetworkTopology
 
    :author: Rodrigo N. Calheiros, Anton Beloglazov
 
+   **See also:** :java:ref:`.getInstance(String)`
+
 Constructors
 ------------
 BriteNetworkTopology
@@ -38,7 +40,9 @@ BriteNetworkTopology
 .. java:constructor:: public BriteNetworkTopology()
    :outertype: BriteNetworkTopology
 
-   Creates a network topology
+   Instantiates a Network Topology.
+
+   **See also:** :java:ref:`.BriteNetworkTopology(String)`, :java:ref:`.BriteNetworkTopology(InputStreamReader)`, :java:ref:`.getInstance(String)`
 
 BriteNetworkTopology
 ^^^^^^^^^^^^^^^^^^^^
@@ -46,16 +50,18 @@ BriteNetworkTopology
 .. java:constructor:: public BriteNetworkTopology(String filePath)
    :outertype: BriteNetworkTopology
 
-   Creates a network topology if the file exists and can be successfully parsed. File is written in the BRITE format and contains topological information on simulation entities.
+   Instantiates a Network Topology if a given file exists and can be successfully parsed. File is written in the BRITE format and contains topological information on simulation entities.
 
    :param filePath: the path of the BRITE file
+
+   **See also:** :java:ref:`.BriteNetworkTopology()`, :java:ref:`.BriteNetworkTopology(InputStreamReader)`, :java:ref:`.getInstance(String)`
 
 Methods
 -------
 addLink
 ^^^^^^^
 
-.. java:method:: @Override public void addLink(int srcId, int destId, double bw, double lat)
+.. java:method:: @Override public void addLink(long srcId, long destId, double bandwidth, double latency)
    :outertype: BriteNetworkTopology
 
 getBwMatrix
@@ -69,7 +75,7 @@ getBwMatrix
 getDelay
 ^^^^^^^^
 
-.. java:method:: @Override public double getDelay(int srcID, int destID)
+.. java:method:: @Override public double getDelay(long srcID, long destID)
    :outertype: BriteNetworkTopology
 
 getInstance
@@ -78,7 +84,7 @@ getInstance
 .. java:method:: public static BriteNetworkTopology getInstance(String fileName)
    :outertype: BriteNetworkTopology
 
-   Instantiates a new Network Topology a file inside the \ **application's resource directory**\ .
+   Instantiates a Network Topology from a file inside the \ **application's resource directory**\ .
 
    :param fileName: the \ **relative name**\  of the BRITE file
    :return: the BriteNetworkTopology instance.
@@ -98,12 +104,12 @@ isNetworkEnabled
 mapNode
 ^^^^^^^
 
-.. java:method:: @Override public void mapNode(int cloudSimEntityID, int briteID)
+.. java:method:: @Override public void mapNode(long cloudSimEntityID, int briteID)
    :outertype: BriteNetworkTopology
 
 unmapNode
 ^^^^^^^^^
 
-.. java:method:: @Override public void unmapNode(int cloudSimEntityID)
+.. java:method:: @Override public void unmapNode(long cloudSimEntityID)
    :outertype: BriteNetworkTopology
 

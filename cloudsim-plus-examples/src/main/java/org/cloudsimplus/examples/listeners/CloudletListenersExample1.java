@@ -133,7 +133,7 @@ public class CloudletListenersExample1 {
      * finishes running into a VM. All cloudlets will use this same listener.
      *
      * @param eventInfo information about the happened event
-     * @see #createCloudlet(int, Vm, long)
+     * @see #createCloudlet(long, Vm, long)
      */
     private void onCloudletFinishListener(CloudletVmEventInfo eventInfo) {
         System.out.printf(
@@ -152,10 +152,10 @@ public class CloudletListenersExample1 {
      * Creates cloudlets and submit them to the broker.
      * @param vm Vm to run the cloudlets to be created
      *
-     * @see #createCloudlet(int, Vm, long)
+     * @see #createCloudlet(long, Vm, long)
      */
     private void createAndSubmitCloudlets(Vm vm) {
-        int cloudletId;
+        long cloudletId;
         long length = 10000;
         for(int i = 0; i < NUMBER_OF_CLOUDLETS; i++){
             cloudletId = vm.getId() + i;
@@ -183,8 +183,8 @@ public class CloudletListenersExample1 {
      */
     private Vm createVm(int id) {
         int mips = 1000;
-        long size = 10000; // image size (MEGABYTE)
-        int ram = 512; // vm memory (MEGABYTE)
+        long size = 10000; // image size (Megabyte)
+        int ram = 512; // vm memory (Megabyte)
         long bw = 1000;
         Vm vm = new VmSimple(id, mips, VM_PES_NUMBER)
             .setRam(ram).setBw(bw).setSize(size)
@@ -201,7 +201,7 @@ public class CloudletListenersExample1 {
      * @param length the cloudlet length in number of Million Instructions (MI)
      * @return the created cloudlet
      */
-    private Cloudlet createCloudlet(int id, Vm vm, long length) {
+    private Cloudlet createCloudlet(long id, Vm vm, long length) {
         long fileSize = 300;
         long outputSize = 300;
         int pesNumber = 1;
@@ -241,8 +241,8 @@ public class CloudletListenersExample1 {
         for(int i = 0; i < HOST_PES_NUMBER; i++){
             peList.add(new PeSimple(mips, new PeProvisionerSimple()));
         }
-        long ram = 2048; // host memory (MEGABYTE)
-        long storage = 1000000; // host storage (MEGABYTE)
+        long ram = 2048; // host memory (Megabyte)
+        long storage = 1000000; // host storage (Megabyte)
         long bw = 10000; //Megabits/s
 
         return new HostSimple(ram, bw, storage, peList)

@@ -23,6 +23,8 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.cloudbus.cloudsim.examples.network.applications.NetworkVmExampleAbstract.getSwitchIndex;
+
 /**
  * A simple example showing how two {@link NetworkCloudlet}'s communicate
  * between them, each one running inside VMs on different hosts.
@@ -33,7 +35,7 @@ public class NetworkVmsExample1 {
     private static final int NUMBER_OF_HOSTS = 2;
     private static final int HOST_MIPS = 1000;
     private static final int HOST_PES = 4;
-    private static final int HOST_RAM = 2048; // host memory (MEGABYTE)
+    private static final int HOST_RAM = 2048; // host memory (Megabyte)
     private static final long HOST_STORAGE = 1000000; // host storage
     private static final long HOST_BW = 10000;
 
@@ -141,7 +143,7 @@ public class NetworkVmsExample1 {
         }
 
         for (NetworkHost host : datacenter.<NetworkHost>getHostList()) {
-            int switchNum = host.getId() / edgeSwitches[0].getPorts();
+            final int switchNum = getSwitchIndex(host, edgeSwitches[0].getPorts());
             /*
             @TODO these two calls below are redundant.
             When connecting a host to a switch, the
@@ -265,7 +267,7 @@ public class NetworkVmsExample1 {
         CloudletReceiveTask task = new CloudletReceiveTask(
                 cloudlet.getTasks().size(), sourceCloudlet.getVm());
         task.setMemory(TASK_RAM);
-        task.setNumberOfExpectedPacketsToReceive(NUMBER_OF_PACKETS_TO_SEND);
+        task.setExpectedPacketsToReceive(NUMBER_OF_PACKETS_TO_SEND);
         cloudlet.addTask(task);
     }
 

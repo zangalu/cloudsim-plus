@@ -19,13 +19,13 @@ Methods
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override public int compareTo(SimEntity o)
+.. java:method:: @Override public int compareTo(SimEntity entity)
    :outertype: SimEntityNull
 
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: SimEntityNull
 
 getName
@@ -38,6 +38,12 @@ getSimulation
 ^^^^^^^^^^^^^
 
 .. java:method:: @Override public Simulation getSimulation()
+   :outertype: SimEntityNull
+
+getState
+^^^^^^^^
+
+.. java:method:: @Override public State getState()
    :outertype: SimEntityNull
 
 isAlive
@@ -61,7 +67,7 @@ isStarted
 processEvent
 ^^^^^^^^^^^^
 
-.. java:method:: @Override public void processEvent(SimEvent ev)
+.. java:method:: @Override public void processEvent(SimEvent evt)
    :outertype: SimEntityNull
 
 run
@@ -73,13 +79,25 @@ run
 schedule
 ^^^^^^^^
 
-.. java:method:: @Override public void schedule(SimEntity dest, double delay, int tag)
+.. java:method:: @Override public boolean schedule(SimEvent evt)
    :outertype: SimEntityNull
 
-setLog
-^^^^^^
+schedule
+^^^^^^^^
 
-.. java:method:: @Override public void setLog(boolean log)
+.. java:method:: @Override public boolean schedule(SimEntity dest, double delay, int tag, Object data)
+   :outertype: SimEntityNull
+
+schedule
+^^^^^^^^
+
+.. java:method:: @Override public boolean schedule(double delay, int tag, Object data)
+   :outertype: SimEntityNull
+
+schedule
+^^^^^^^^
+
+.. java:method:: @Override public boolean schedule(SimEntity dest, double delay, int tag)
    :outertype: SimEntityNull
 
 setName

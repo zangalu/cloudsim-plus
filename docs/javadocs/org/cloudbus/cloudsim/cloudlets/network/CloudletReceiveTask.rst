@@ -1,12 +1,12 @@
+.. java:import:: org.cloudbus.cloudsim.network VmPacket
+
+.. java:import:: org.cloudbus.cloudsim.vms Vm
+
 .. java:import:: java.util ArrayList
 
 .. java:import:: java.util Collections
 
 .. java:import:: java.util List
-
-.. java:import:: org.cloudbus.cloudsim.network VmPacket
-
-.. java:import:: org.cloudbus.cloudsim.vms Vm
 
 CloudletReceiveTask
 ===================
@@ -22,7 +22,7 @@ CloudletReceiveTask
 
    ..
 
-   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <http://dx.doi.org/10.1109/UCC.2011.24>`_\
+   * \ `Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS Press, USA), Melbourne, Australia, December 5-7, 2011. <https://doi.org/10.1109/UCC.2011.24>`_\
 
    :author: Saurabh Kumar Garg, Manoel Campos da Silva Filho
 
@@ -41,13 +41,13 @@ CloudletReceiveTask
 
 Methods
 -------
-getNumberOfExpectedPacketsToReceive
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+getExpectedPacketsToReceive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public long getNumberOfExpectedPacketsToReceive()
+.. java:method:: public long getExpectedPacketsToReceive()
    :outertype: CloudletReceiveTask
 
-   The number of packets that are expected to be received. After this number of packets is received, the task is marked as finished.
+   Gets the number of packets that are expected to be received. After this number of packets is received, the task is marked as finished.
 
 getPacketsReceived
 ^^^^^^^^^^^^^^^^^^
@@ -77,9 +77,13 @@ receivePacket
 
    :param packet: the packet received
 
-setNumberOfExpectedPacketsToReceive
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+setExpectedPacketsToReceive
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: public void setNumberOfExpectedPacketsToReceive(long numberOfExpectedPacketsToReceive)
+.. java:method:: public void setExpectedPacketsToReceive(long expectedPacketsToReceive)
    :outertype: CloudletReceiveTask
+
+   Sets the number of packets that are expected to be received. After this number of packets is received, the task is marked as finished.
+
+   :param expectedPacketsToReceive: the number of expected packets to set
 

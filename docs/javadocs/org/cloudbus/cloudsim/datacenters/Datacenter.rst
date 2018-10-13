@@ -1,22 +1,22 @@
+.. java:import:: org.cloudbus.cloudsim.allocationpolicies VmAllocationPolicy
+
+.. java:import:: org.cloudbus.cloudsim.cloudlets Cloudlet
+
+.. java:import:: org.cloudbus.cloudsim.core SimEntity
+
 .. java:import:: org.cloudbus.cloudsim.hosts Host
 
 .. java:import:: org.cloudbus.cloudsim.power.models PowerAware
 
 .. java:import:: org.cloudbus.cloudsim.power.models PowerModel
 
-.. java:import:: org.cloudbus.cloudsim.vms Vm
-
-.. java:import:: org.cloudbus.cloudsim.cloudlets Cloudlet
-
-.. java:import:: org.cloudbus.cloudsim.core SimEntity
-
 .. java:import:: org.cloudbus.cloudsim.resources DatacenterStorage
 
-.. java:import:: org.cloudbus.cloudsim.resources File
+.. java:import:: org.cloudbus.cloudsim.vms Vm
 
-.. java:import:: org.cloudbus.cloudsim.allocationpolicies VmAllocationPolicy
+.. java:import:: org.cloudsimplus.listeners EventListener
 
-.. java:import:: org.cloudbus.cloudsim.resources FileStorage
+.. java:import:: org.cloudsimplus.listeners HostEventInfo
 
 .. java:import:: java.util List
 
@@ -34,10 +34,10 @@ Datacenter
 
 Fields
 ------
-DEF_BANDWIDTH_PERCENT_FOR_MIGRATION
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+DEF_BW_PERCENT_FOR_MIGRATION
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:field::  double DEF_BANDWIDTH_PERCENT_FOR_MIGRATION
+.. java:field::  double DEF_BW_PERCENT_FOR_MIGRATION
    :outertype: Datacenter
 
    The default percentage of bandwidth allocated for VM migration, is a value is not set.
@@ -82,6 +82,16 @@ addHostList
 
    **See also:** :java:ref:`.getVmAllocationPolicy()`
 
+addOnHostAvailableListener
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method::  Datacenter addOnHostAvailableListener(EventListener<HostEventInfo> listener)
+   :outertype: Datacenter
+
+   Adds a \ :java:ref:`EventListener`\  object that will be notified every time when the a new Hosts is available for the Datacenter during simulation runtime. If the \ :java:ref:`addHost(Host)`\  or \ :java:ref:`addHostList(List)`\  is called before the simulation starts, the listeners will not be notified.
+
+   :param listener: the event listener to add
+
 getBandwidthPercentForMigration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -90,7 +100,7 @@ getBandwidthPercentForMigration
 
    Gets the percentage of the bandwidth allocated to a Host to migrate VMs. It's a value between [0 and 1] (where 1 is 100%). The default value is 0.5, meaning only 50% of the bandwidth will be allowed for migration, while the remaining will be used for VM services.
 
-   **See also:** :java:ref:`.DEF_BANDWIDTH_PERCENT_FOR_MIGRATION`
+   **See also:** :java:ref:`.DEF_BW_PERCENT_FOR_MIGRATION`
 
 getCharacteristics
 ^^^^^^^^^^^^^^^^^^
@@ -117,6 +127,21 @@ getHost
 
 .. java:method::  Host getHost(int index)
    :outertype: Datacenter
+
+   Gets a Host in a given position inside the Host List.
+
+   :param index: the position of the List to get the Host
+
+getHostById
+^^^^^^^^^^^
+
+.. java:method::  Host getHostById(long id)
+   :outertype: Datacenter
+
+   Gets a Host from its id.
+
+   :param id: the ID of the Host to get from the List.
+   :return: the Host if found or \ :java:ref:`Host.NULL`\  otherwise
 
 getHostList
 ^^^^^^^^^^^
@@ -177,6 +202,16 @@ getVmList
 
    :param <T>: the class of VMs inside the list
    :return: the list all VMs from all Hosts
+
+removeHost
+^^^^^^^^^^
+
+.. java:method::  <T extends Host> Datacenter removeHost(T host)
+   :outertype: Datacenter
+
+   Removes a Host from its Datacenter.
+
+   :param host: the new host to be removed from its assigned Datacenter
 
 setBandwidthPercentForMigration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

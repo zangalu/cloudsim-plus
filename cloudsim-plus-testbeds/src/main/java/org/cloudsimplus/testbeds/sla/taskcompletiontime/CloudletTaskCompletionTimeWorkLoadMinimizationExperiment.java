@@ -28,12 +28,6 @@
  */
 package org.cloudsimplus.testbeds.sla.taskcompletiontime;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
-
-import static java.util.Comparator.comparingDouble;
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.brokers.DatacenterBrokerSimple;
@@ -50,20 +44,24 @@ import org.cloudbus.cloudsim.resources.PeSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.util.ResourceLoader;
-import org.cloudbus.cloudsim.util.WorkloadFileReader;
+import org.cloudbus.cloudsim.util.SwfWorkloadFileReader;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudbus.cloudsim.vms.VmSimple;
 import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
-
-import static java.util.Comparator.comparingInt;
-import static java.util.Comparator.comparingLong;
-import static java.util.stream.Collectors.toList;
-import static org.cloudsimplus.testbeds.sla.taskcompletiontime.CloudletTaskCompletionTimeWorkLoadMinimizationRunner.*;
-
 import org.cloudsimplus.builders.tables.TextTableColumn;
 import org.cloudsimplus.slametrics.SlaContract;
 import org.cloudsimplus.testbeds.ExperimentRunner;
 import org.cloudsimplus.testbeds.SimulationExperiment;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.*;
+
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.toList;
+import static org.cloudsimplus.testbeds.sla.taskcompletiontime.CloudletTaskCompletionTimeWorkLoadMinimizationRunner.*;
 
 /**
  * An experiment that tries to minimize task completion time,
@@ -144,7 +142,7 @@ public class CloudletTaskCompletionTimeWorkLoadMinimizationExperiment extends Si
     public final void printResults() {
         final DatacenterBroker broker0 = getFirstBroker();
         final List<Cloudlet> finishedCloudlets = broker0.getCloudletFinishedList();
-        finishedCloudlets.sort(comparingInt(Cloudlet::getId));
+        finishedCloudlets.sort(comparingLong(Cloudlet::getId));
 
         new CloudletsTableBuilder(finishedCloudlets)
             .addColumn(7, new TextTableColumn("VM    ", "MIPS  "), c -> (long)c.getVm().getMips())
@@ -155,14 +153,14 @@ public class CloudletTaskCompletionTimeWorkLoadMinimizationExperiment extends Si
     @Override
     protected List<Cloudlet> createCloudlets() {
         try {
-            final WorkloadFileReader workloadFileReader =
-                WorkloadFileReader.getInstance("METACENTRUM-2009-2.swf", 1);
+            final SwfWorkloadFileReader workloadFileReader =
+                SwfWorkloadFileReader.getInstance("METACENTRUM-2009-2.swf", 1);
             workloadFileReader.setPredicate(c -> c.getLength() > 1000);
             workloadFileReader.setMaxLinesToRead(CLOUDLETS);
             final List<Cloudlet> list = workloadFileReader.generateWorkload();
             System.out.printf("Created %d Cloudlets from the workload file\n", list.size());
             return list;
-        } catch (IOException ex) {
+        } catch (UncheckedIOException ex) {
             throw new RuntimeException(ex);
         }
     }

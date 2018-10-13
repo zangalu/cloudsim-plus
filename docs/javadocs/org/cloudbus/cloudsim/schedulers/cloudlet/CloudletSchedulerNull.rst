@@ -34,58 +34,58 @@ addCloudletToReturnedList
 .. java:method:: @Override public void addCloudletToReturnedList(Cloudlet cloudlet)
    :outertype: CloudletSchedulerNull
 
-canAddCloudletToExecutionList
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public boolean canAddCloudletToExecutionList(CloudletExecution cloudlet)
-   :outertype: CloudletSchedulerNull
-
 cloudletCancel
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Cloudlet cloudletCancel(int cloudletId)
+.. java:method:: @Override public Cloudlet cloudletCancel(Cloudlet cloudlet)
+   :outertype: CloudletSchedulerNull
+
+cloudletFail
+^^^^^^^^^^^^
+
+.. java:method:: @Override public Cloudlet cloudletFail(Cloudlet cloudlet)
    :outertype: CloudletSchedulerNull
 
 cloudletFinish
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public void cloudletFinish(CloudletExecution ce)
+.. java:method:: @Override public void cloudletFinish(CloudletExecution cle)
    :outertype: CloudletSchedulerNull
 
 cloudletPause
 ^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean cloudletPause(int cloudletId)
+.. java:method:: @Override public boolean cloudletPause(Cloudlet cloudlet)
+   :outertype: CloudletSchedulerNull
+
+cloudletReady
+^^^^^^^^^^^^^
+
+.. java:method:: @Override public boolean cloudletReady(Cloudlet cloudlet)
    :outertype: CloudletSchedulerNull
 
 cloudletResume
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double cloudletResume(int cloudletId)
+.. java:method:: @Override public double cloudletResume(Cloudlet cloudlet)
    :outertype: CloudletSchedulerNull
 
 cloudletSubmit
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double cloudletSubmit(Cloudlet cl, double fileTransferTime)
+.. java:method:: @Override public double cloudletSubmit(Cloudlet cloudlet, double fileTransferTime)
    :outertype: CloudletSchedulerNull
 
 cloudletSubmit
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double cloudletSubmit(Cloudlet cl)
+.. java:method:: @Override public double cloudletSubmit(Cloudlet cloudlet)
    :outertype: CloudletSchedulerNull
 
 deallocatePesFromVm
 ^^^^^^^^^^^^^^^^^^^
 
 .. java:method:: @Override public void deallocatePesFromVm(int pesToRemove)
-   :outertype: CloudletSchedulerNull
-
-getAllocatedMipsForCloudlet
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public double getAllocatedMipsForCloudlet(CloudletExecution ce, double time)
    :outertype: CloudletSchedulerNull
 
 getCloudletExecList
@@ -130,12 +130,6 @@ getCloudletWaitingList
 .. java:method:: @Override public List<CloudletExecution> getCloudletWaitingList()
    :outertype: CloudletSchedulerNull
 
-getCurrentMipsShare
-^^^^^^^^^^^^^^^^^^^
-
-.. java:method:: @Override public List<Double> getCurrentMipsShare()
-   :outertype: CloudletSchedulerNull
-
 getCurrentRequestedBwPercentUtilization
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -169,7 +163,7 @@ getRequestedCpuPercentUtilization
 getRequestedMipsForCloudlet
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double getRequestedMipsForCloudlet(CloudletExecution ce, double time)
+.. java:method:: @Override public double getRequestedMipsForCloudlet(CloudletExecution cle, double time)
    :outertype: CloudletSchedulerNull
 
 getTaskScheduler
@@ -208,10 +202,10 @@ isEmpty
 .. java:method:: @Override public boolean isEmpty()
    :outertype: CloudletSchedulerNull
 
-isTherePacketScheduler
-^^^^^^^^^^^^^^^^^^^^^^
+isThereTaskScheduler
+^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean isTherePacketScheduler()
+.. java:method:: @Override public boolean isThereTaskScheduler()
    :outertype: CloudletSchedulerNull
 
 runningCloudletsNumber

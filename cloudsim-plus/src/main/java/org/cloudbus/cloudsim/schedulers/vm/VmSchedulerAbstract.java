@@ -17,6 +17,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -28,7 +29,6 @@ import static java.util.stream.Collectors.toList;
  * @since CloudSim Toolkit 1.0
  */
 public abstract class VmSchedulerAbstract implements VmScheduler {
-    private static final Logger logger = LoggerFactory.getLogger(VmSchedulerSpaceShared.class.getSimpleName());
 
     /**
      * The default percentage to define the CPU overhead of VM migration
@@ -37,6 +37,8 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
      */
     public static final double DEFAULT_VM_MIGRATION_CPU_OVERHEAD = 0.1;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(VmSchedulerSpaceShared.class.getSimpleName());
+    
     /**
      * @see #getRequestedMipsMap()
      */
@@ -80,7 +82,7 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
     @Override
     public boolean isSuitableForVm(Vm vm, List<Double> requestedMips, boolean showLog) {
         if(requestedMips.isEmpty()){
-            logger.warn(
+            LOGGER.warn(
                 "{}: {}: It was requested an empty list of PEs for {} in {}",
                 getHost().getSimulation().clock(), getClass().getSimpleName(), vm, host);
             return false;
@@ -89,13 +91,13 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
         return isSuitableForVmInternal(vm, requestedMips, showLog);
     }
 
-    protected abstract boolean isSuitableForVmInternal(final Vm vm, final List<Double> requestedMips, final boolean showLog);
+    protected abstract boolean isSuitableForVmInternal(Vm vm, List<Double> requestedMips, boolean showLog);
 
     @Override
     public final boolean allocatePesForVm(final Vm vm) {
         final List<Double> mipsShareRequested =
                 LongStream.range(0, vm.getNumberOfPes())
-                        .mapToObj(i -> vm.getMips())
+                        .mapToObj(idx -> vm.getMips())
                         .collect(toList());
         return allocatePesForVm(vm, mipsShareRequested);
     }
@@ -144,7 +146,7 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
               .forEach(pe -> pe.setStatus(status));
     }
 
-    protected abstract boolean allocatePesForVmInternal(final Vm vm, final List<Double> mipsShareRequested);
+    protected abstract boolean allocatePesForVmInternal(Vm vm, List<Double> mipsShareRequested);
 
     @Override
     public void deallocatePesFromVm(final Vm vm) {
@@ -196,7 +198,7 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
 
         pesToRemove = Math.min((int)vm.getNumberOfPes(), pesToRemove);
         pesToRemove = Math.min(pesToRemove, values.size());
-        IntStream.range(0, pesToRemove).forEach(i -> values.remove(0));
+        IntStream.range(0, pesToRemove).forEach(idx -> values.remove(0));
         if(values.isEmpty()){
             map.remove(vm);
         }
@@ -204,7 +206,7 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
         return pesToRemove;
     }
 
-    protected abstract void deallocatePesFromVmInternal(final Vm vm, final int pesToRemove);
+    protected abstract void deallocatePesFromVmInternal(Vm vm, int pesToRemove);
 
     @Override
     public void deallocatePesForAllVms() {
@@ -400,10 +402,8 @@ public abstract class VmSchedulerAbstract implements VmScheduler {
     }
 
     @Override
-    public VmScheduler setHost(final Host host) {
-        Objects.requireNonNull(host);
-
-        if(isOtherHostAssigned(host)){
+    public final VmScheduler setHost(final Host host) {
+        if(isOtherHostAssigned(requireNonNull(host))){
             throw new IllegalStateException("VmScheduler already has a Host assigned to it. Each Host must have its own VmScheduler instance.");
         }
 

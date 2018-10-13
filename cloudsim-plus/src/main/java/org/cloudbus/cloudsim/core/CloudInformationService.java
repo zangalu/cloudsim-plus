@@ -32,7 +32,7 @@ import java.util.TreeSet;
  * @since CloudSim Toolkit 1.0
  */
 public class CloudInformationService extends CloudSimEntity {
-    private static final Logger logger = LoggerFactory.getLogger(CloudInformationService.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CloudInformationService.class.getSimpleName());
 
     /**
      * A list containing all Datacenters that are registered at the
@@ -61,27 +61,26 @@ public class CloudInformationService extends CloudSimEntity {
      * The method has no effect at the current class.
      */
     @Override
-    protected void startEntity() {
-    }
+    protected void startEntity() {/**/}
 
     @Override
-    public void processEvent(SimEvent ev) {
-        switch (ev.getTag()) {
+    public void processEvent(SimEvent evt) {
+        switch (evt.getTag()) {
             case CloudSimTags.REGISTER_REGIONAL_CIS:
-                cisList.add((CloudInformationService) ev.getData());
+                cisList.add((CloudInformationService) evt.getData());
             break;
 
             case CloudSimTags.REQUEST_REGIONAL_CIS:
-                super.send(ev.getSource(), 0, ev.getTag(), cisList);
+                super.send(evt.getSource(), 0, evt.getTag(), cisList);
             break;
 
             case CloudSimTags.DATACENTER_REGISTRATION_REQUEST:
-                datacenterList.add((Datacenter) ev.getData());
+                datacenterList.add((Datacenter) evt.getData());
             break;
 
             // A Broker is requesting a list of all datacenters.
             case CloudSimTags.DATACENTER_LIST_REQUEST:
-                super.send(ev.getSource(), 0, ev.getTag(), datacenterList);
+                super.send(evt.getSource(), 0, evt.getTag(), datacenterList);
             break;
         }
     }
@@ -89,7 +88,7 @@ public class CloudInformationService extends CloudSimEntity {
     @Override
     public void shutdownEntity() {
         super.shutdownEntity();
-        logger.info("{}: Notify all CloudSim Plus entities to shutdown.{}", super.getName(), System.lineSeparator());
+        LOGGER.info("{}: Notify all CloudSim Plus entities to shutdown.{}", super.getName(), System.lineSeparator());
 
         signalShutdown(datacenterList);
         signalShutdown(cisList);

@@ -7,15 +7,13 @@
  */
 package org.cloudbus.cloudsim.resources;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
-
 import org.cloudbus.cloudsim.provisioners.PeProvisioner;
 import org.cloudbus.cloudsim.provisioners.PeProvisionerSimple;
 import org.cloudbus.cloudsim.resources.Pe.Status;
-import static org.junit.Assert.assertFalse;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author	Anton Beloglazov
@@ -76,13 +74,13 @@ public class PeTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void testSetPeProvisioner_null() {
-        PeSimple pe = createPe();
+    public void testSetPeProvisionerWhenNull() {
+        final PeSimple pe = createPe();
         pe.setPeProvisioner(null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewPe_nullPeProvisioner() {
+    public void testNewPeWhenNullProvisioner() {
         createPe(null);
     }
 

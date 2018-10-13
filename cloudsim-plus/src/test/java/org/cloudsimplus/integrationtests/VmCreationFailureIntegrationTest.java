@@ -23,6 +23,7 @@
  */
 package org.cloudsimplus.integrationtests;
 
+import ch.qos.logback.classic.Level;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.core.CloudSim;
@@ -39,6 +40,7 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.cloudsimplus.listeners.EventListener;
 import org.cloudsimplus.listeners.VmDatacenterEventInfo;
 import org.cloudsimplus.listeners.VmHostEventInfo;
+import org.cloudsimplus.util.Log;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -52,25 +54,25 @@ import static org.junit.Assert.assertEquals;
  *
  * An Integration Test (IT) to check a simulation scenario with 1 PM that has
  * capacity to host just 1 of the user's VMs. Two cloudlets are submitted to the
- * same VM and run using the SpaceShared CloudletScheduler.
+ * same VM and run using the CloudletSchedulerSpaceShared.
  * The Integration Test performs several tests that aren't described here in
  * order to avoid the documentation being out-of-date in case the IT is changed.
  *
- * <p>To see what verifications are being performed, take a look at methods such as
+ * <p>To check which verifications are being performed, take a look at methods such as
  * {@link #assertThatBrokerCloudletsHaveTheExpectedExecutionTimes(DatacenterBroker)}
  * and all the others that start with "assertThat". Those method names were
  * defined to give an exact notion of what is being tested.</p>
  *
  * <p>The IT uses the new VM listeners to get notified when a host is allocated,
  * deallocated for a given VM and when a VM fails to be created due to lack of
- * host resources. It also relies on the new CloudSim
+ * host resources. It also relies on the new CloudSim Plus
  * {@link CloudSim#addOnEventProcessingListener(EventListener) process event listener} to be notified every time
  * when any event is processed by CloudSim. By this way, it is possible to
  * verify, for instance, if the resource usage of a given host at a given time
  * is as expected.</p>
  *
- * <i><b>NOTE</b>:See the profile section in the pom.xml for details of how to
- * run all tests, including Functional/Integration Tests in this package.</i>
+ * <i><b>NOTE</b>:See the profile section in the pom.xml for details on how to
+ * run all tests, including Functional/Integration Tests.</i>
  *
  * @see Vm#addOnHostAllocationListener(EventListener)
  * @see Vm#addOnHostDeallocationListener(EventListener)
@@ -81,7 +83,7 @@ import static org.junit.Assert.assertEquals;
  * @author Manoel Campos da Silva Filho
  */
 public final class VmCreationFailureIntegrationTest {
-    private static final Logger logger = LoggerFactory.getLogger(VmCreationFailureIntegrationTest.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VmCreationFailureIntegrationTest.class.getSimpleName());
 
     /** The number of times a host was allocated to a VM. */
     private int numberOfHostAllocations;
@@ -103,9 +105,9 @@ public final class VmCreationFailureIntegrationTest {
      *
      * @param evt
      */
-    private void onHostAllocation(VmHostEventInfo evt) {
+    private void onHostAllocation(final VmHostEventInfo evt) {
         numberOfHostAllocations++;
-        logger.info(
+        LOGGER.info(
                 "# Host {} allocated to Vm {} at time {}",
                 evt.getHost().getId(), evt.getVm().getId(), evt.getTime());
         if (scenario.getFirstHostFromFirstDatacenter().equals(evt.getHost())
@@ -124,9 +126,9 @@ public final class VmCreationFailureIntegrationTest {
      *
      * @param evt
      */
-    private void onHostDeallocation(VmHostEventInfo evt) {
+    private void onHostDeallocation(final VmHostEventInfo evt) {
         numberOfHostDeallocations++;
-        logger.info(
+        LOGGER.info(
                 "# {} moved/removed from {} at time {}",
                 evt.getVm(), evt.getHost(), evt.getTime());
         if (scenario.getFirstHostFromFirstDatacenter().equals(evt.getHost()) &&
@@ -144,7 +146,7 @@ public final class VmCreationFailureIntegrationTest {
      *
      * @param evt
      */
-    private void onVmCreationFailure(VmDatacenterEventInfo evt) {
+    private void onVmCreationFailure(final VmDatacenterEventInfo evt) {
         numberOfVmCreationFailures++;
         final int expectedVmId = 1;
 
@@ -159,20 +161,14 @@ public final class VmCreationFailureIntegrationTest {
      * that will be called every time an event is processed by {@link CloudSim}.
      * @param evt
      */
-    private void onEventProcessing(SimEvent evt) {
-        logger.info("* onEventProcessing at time {}: {}", evt.getTime(), evt);
-        switch ((int) evt.getTime()) {
-            case 10:
-                assertEquals(200,
-                        scenario.getFirstHostFromFirstDatacenter().getAvailableMips(), 0.1);
-            break;
-            case 20:
-                assertEquals(200,
-                        scenario.getFirstHostFromFirstDatacenter().getAvailableMips(), 0.1);
-            break;
+    private void onEventProcessing(final SimEvent evt) {
+        LOGGER.info("* onEventProcessing at time {}: {}", evt.getTime(), evt);
+        final int time = (int) evt.getTime();
+        if (time == 10 || time == 20) {
+            assertEquals(200,
+                scenario.getFirstHostFromFirstDatacenter().getAvailableMips(), 0.1);
         }
     }
-
 
     /**
      * A lambda function used by an {@link Vm#addOnUpdateProcessingListener(EventListener)}  }
@@ -183,8 +179,8 @@ public final class VmCreationFailureIntegrationTest {
      *
      * @param evt
      */
-    private void onUpdateVmProcessing(VmHostEventInfo evt) {
-        logger.info(
+    private void onUpdateVmProcessing(final VmHostEventInfo evt) {
+        LOGGER.info(
             "- onUpdateVmProcessing at time {} for {}: {} available mips: {}",
             evt.getTime(), evt.getVm(), evt.getHost(), evt.getHost().getAvailableMips());
         assertEquals(200, evt.getHost().getAvailableMips(), 0);
@@ -192,28 +188,29 @@ public final class VmCreationFailureIntegrationTest {
 
     @Before
     public void setUp() {
+        Log.setLevel(Level.WARN);
         simulation = new CloudSim();
-        simulation.addOnEventProcessingListener((evt) -> onEventProcessing(evt));
+        simulation.addOnEventProcessingListener(this::onEventProcessing);
         scenario = new SimulationScenarioBuilder(simulation);
         scenario.getDatacenterBuilder().createDatacenter(
                 new HostBuilder()
-                .setVmSchedulerClass(VmSchedulerTimeShared.class)
-                .setRam(2048).setBw(10000)
-                .setPes(1).setMips(1200)
-                .createOneHost()
-                .getHosts()
+                    .setVmSchedulerClass(VmSchedulerTimeShared.class)
+                    .setRam(2048).setBandwidth(10000)
+                    .setPes(1).setMips(1200)
+                    .createOneHost()
+                    .getHosts()
         );
 
         final BrokerBuilderDecorator brokerBuilder = scenario.getBrokerBuilder().createBroker();
 
         brokerBuilder.getVmBuilder()
-                .setRam(512).setBw(1000)
+                .setRam(512).setBandwidth(1000)
                 .setPes(1).setMips(1000).setSize(10000)
-                .setCloudletSchedulerSupplier(() -> new CloudletSchedulerSpaceShared())
-                .setOnHostAllocationListener(evt -> onHostAllocation(evt))
-                .setOnHostDeallocationListener(evt -> onHostDeallocation(evt))
-                .setOnVmCreationFilatureListenerForAllVms(evt -> onVmCreationFailure(evt))
-                .setOnUpdateVmProcessingListener(evt -> onUpdateVmProcessing(evt))
+                .setCloudletSchedulerSupplier(CloudletSchedulerSpaceShared::new)
+                .setOnHostAllocationListener(this::onHostAllocation)
+                .setOnHostDeallocationListener(this::onHostDeallocation)
+                .setOnVmCreationFilatureListenerForAllVms(this::onVmCreationFailure)
+                .setOnUpdateVmProcessingListener(this::onUpdateVmProcessing)
                 /*try to create 2 VMs where there is capacity to only one,
                  thus, 1 will fail being created*/
                 .createAndSubmitVms(2);
@@ -248,9 +245,7 @@ public final class VmCreationFailureIntegrationTest {
                 };
 
         final List<Cloudlet> cloudletList = broker.getCloudletFinishedList();
-        assertEquals(
-                "The number of finished cloudlets was not as expected",
-                cloudletList.size(), expectedResults.length);
+        assertEquals("The number of finished cloudlets was not as expected", expectedResults.length, cloudletList.size());
         int i = -1;
         for (final Cloudlet cloudlet : cloudletList) {
             expectedResults[++i].setCloudlet(cloudlet);

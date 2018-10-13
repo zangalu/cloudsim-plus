@@ -63,7 +63,7 @@ import java.util.List;
  * @since CloudSim Plus 1.0.0
  */
 public final class CheckHostAvailableMipsTest {
-    private static final Logger logger = LoggerFactory.getLogger(CheckHostAvailableMipsTest.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(CheckHostAvailableMipsTest.class.getSimpleName());
 
     private static final double HOST_MIPS = 1000;
     private static final int    HOST_PES = 5;
@@ -73,6 +73,8 @@ public final class CheckHostAvailableMipsTest {
     private static final int    CLOUDLET_PES = VM_PES;
     private static final long   CLOUDLET_LENGTH = (long)HOST_MIPS*10;
     private static final int    NUMBER_OF_CLOUDLETS = NUMBER_OF_VMS;
+    public static final int FIRST_VM_FINISH_TIME = 6;
+    public static final int LAST_VM_FINISH_TIME = 10;
 
     private SimulationScenarioBuilder scenario;
     private UtilizationModel utilizationModel;
@@ -85,7 +87,7 @@ public final class CheckHostAvailableMipsTest {
         scenario = new SimulationScenarioBuilder(simulation);
         final List<Host> hosts = new HostBuilder()
             .setVmSchedulerClass(VmSchedulerSpaceShared.class)
-            .setRam(4000).setBw(400000)
+            .setRam(4000).setBandwidth(400000)
             .setOnUpdateVmsProcessingListener(this::onUpdateVmsProcessing)
             .setPes(HOST_PES).setMips(HOST_MIPS)
             .createOneHost()
@@ -96,7 +98,7 @@ public final class CheckHostAvailableMipsTest {
         for(int i = 0; i < NUMBER_OF_VMS; i++){
             final BrokerBuilderDecorator brokerBuilder = scenario.getBrokerBuilder().createBroker();
             brokerBuilder.getVmBuilder()
-                .setRam(1000).setBw(100000)
+                .setRam(1000).setBandwidth(100000)
                 .setPes(VM_PES).setMips(VM_MIPS).setSize(50000)
                 .setCloudletSchedulerSupplier(CloudletSchedulerTimeShared::new)
                 .createAndSubmitOneVm();
@@ -122,7 +124,7 @@ public final class CheckHostAvailableMipsTest {
         final double time = (int)evt.getTime();
         final double expectedAvailableHostMips = getExpectedAvailableHostMips(time);
 
-        logger.info(
+        LOGGER.info(
             "- VMs processing at time {}: {} available mips: {} expected availability: {}",
             time, evt.getHost(), evt.getHost().getAvailableMips(), expectedAvailableHostMips);
     }
@@ -131,15 +133,15 @@ public final class CheckHostAvailableMipsTest {
         final double usedHostMips = NUMBER_OF_CLOUDLETS * CLOUDLET_PES * VM_MIPS * utilizationModel.getUtilization(time);
         final double expectedAvailableHostMips = HOST_MIPS * HOST_PES - usedHostMips;
 
-        if(time > 10) {
-            /*After 10 seconds all VMs finish and
-            all host capacity will be free*/
-            return 5000.0;
-        }
-        else if(time > 6){
+        if(time > FIRST_VM_FINISH_TIME){
             /*After 6 seconds, one VM finishes and
             its used capacity will be free*/
             return expectedAvailableHostMips + VM_MIPS*VM_PES;
+        }
+        else if(time > LAST_VM_FINISH_TIME) {
+            /*After 10 seconds all VMs finish and
+            all host capacity will be free*/
+            return 5000.0;
         }
 
         return expectedAvailableHostMips;

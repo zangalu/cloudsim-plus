@@ -34,6 +34,16 @@ getSimulation
 
    Gets the CloudSim instance that represents the simulation to each the Entity is related to.
 
+getState
+^^^^^^^^
+
+.. java:method::  State getState()
+   :outertype: SimEntity
+
+   Gets the entity state.
+
+   :return: the state
+
 isAlive
 ^^^^^^^
 
@@ -61,12 +71,12 @@ isStarted
 processEvent
 ^^^^^^^^^^^^
 
-.. java:method::  void processEvent(SimEvent ev)
+.. java:method::  void processEvent(SimEvent evt)
    :outertype: SimEntity
 
    Processes events or services that are available for the entity. This method is invoked by the \ :java:ref:`CloudSim`\  class whenever there is an event in the deferred queue, which needs to be processed by the entity.
 
-   :param ev: information about the event just happened
+   :param evt: information about the event just happened
 
 run
 ^^^
@@ -81,7 +91,45 @@ run
 schedule
 ^^^^^^^^
 
-.. java:method::  void schedule(SimEntity dest, double delay, int tag)
+.. java:method::  boolean schedule(SimEvent evt)
+   :outertype: SimEntity
+
+   Sends an event where all data required is defined inside the event instance.
+
+   :param evt: the event to send
+   :return: true if the event was sent, false if the simulation was not started yet
+
+schedule
+^^^^^^^^
+
+.. java:method::  boolean schedule(double delay, int tag, Object data)
+   :outertype: SimEntity
+
+   Sends an event from the entity to itself.
+
+   :param delay: How many seconds after the current simulation time the event should be sent
+   :param tag: An user-defined number representing the type of event.
+   :param data: The data to be sent with the event.
+   :return: true if the event was sent, false if the simulation was not started yet
+
+schedule
+^^^^^^^^
+
+.. java:method::  boolean schedule(SimEntity dest, double delay, int tag, Object data)
+   :outertype: SimEntity
+
+   Sends an event to another entity.
+
+   :param dest: the destination entity
+   :param delay: How many seconds after the current simulation time the event should be sent
+   :param tag: An user-defined number representing the type of event.
+   :param data: The data to be sent with the event.
+   :return: true if the event was sent, false if the simulation was not started yet
+
+schedule
+^^^^^^^^
+
+.. java:method::  boolean schedule(SimEntity dest, double delay, int tag)
    :outertype: SimEntity
 
    Sends an event to another entity with \ **no**\  attached data.
@@ -89,16 +137,7 @@ schedule
    :param dest: the destination entity
    :param delay: How many seconds after the current simulation time the event should be sent
    :param tag: An user-defined number representing the type of event.
-
-setLog
-^^^^^^
-
-.. java:method::  void setLog(boolean log)
-   :outertype: SimEntity
-
-   Define if log is enabled for this particular entity or not.
-
-   :param log: true to enable logging, false to disable
+   :return: true if the event was sent, false if the simulation was not started yet
 
 setName
 ^^^^^^^

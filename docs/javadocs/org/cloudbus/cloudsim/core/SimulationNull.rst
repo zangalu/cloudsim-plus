@@ -8,6 +8,14 @@
 
 .. java:import:: org.cloudsimplus.listeners EventListener
 
+.. java:import:: java.util Calendar
+
+.. java:import:: java.util Collections
+
+.. java:import:: java.util List
+
+.. java:import:: java.util Set
+
 .. java:import:: java.util.function Predicate
 
 SimulationNull
@@ -35,7 +43,7 @@ abort
 addEntity
 ^^^^^^^^^
 
-.. java:method:: @Override public void addEntity(CloudSimEntity e)
+.. java:method:: @Override public void addEntity(CloudSimEntity entity)
    :outertype: SimulationNull
 
 addOnClockTickListener
@@ -50,22 +58,28 @@ addOnEventProcessingListener
 .. java:method:: @Override public Simulation addOnEventProcessingListener(EventListener<SimEvent> listener)
    :outertype: SimulationNull
 
-addOnSimulationPausedListener
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+addOnSimulationPauseListener
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Simulation addOnSimulationPausedListener(EventListener<EventInfo> listener)
+.. java:method:: @Override public Simulation addOnSimulationPauseListener(EventListener<EventInfo> listener)
+   :outertype: SimulationNull
+
+addOnSimulationStartListener
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public Simulation addOnSimulationStartListener(EventListener<EventInfo> listener)
    :outertype: SimulationNull
 
 cancel
 ^^^^^^
 
-.. java:method:: @Override public SimEvent cancel(SimEntity src, Predicate<SimEvent> p)
+.. java:method:: @Override public SimEvent cancel(SimEntity src, Predicate<SimEvent> predicate)
    :outertype: SimulationNull
 
 cancelAll
 ^^^^^^^^^
 
-.. java:method:: @Override public boolean cancelAll(SimEntity src, Predicate<SimEvent> p)
+.. java:method:: @Override public boolean cancelAll(SimEntity src, Predicate<SimEvent> predicate)
    :outertype: SimulationNull
 
 clock
@@ -89,7 +103,7 @@ clockInMinutes
 findFirstDeferred
 ^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public SimEvent findFirstDeferred(SimEntity dest, Predicate<SimEvent> p)
+.. java:method:: @Override public SimEvent findFirstDeferred(SimEntity dest, Predicate<SimEvent> predicate)
    :outertype: SimulationNull
 
 getCalendar
@@ -200,10 +214,10 @@ removeOnEventProcessingListener
 .. java:method:: @Override public boolean removeOnEventProcessingListener(EventListener<SimEvent> listener)
    :outertype: SimulationNull
 
-removeOnSimulationPausedListener
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+removeOnSimulationPauseListener
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean removeOnSimulationPausedListener(EventListener<EventInfo> listener)
+.. java:method:: @Override public boolean removeOnSimulationPauseListener(EventListener<EventInfo> listener)
    :outertype: SimulationNull
 
 resume
@@ -215,13 +229,25 @@ resume
 select
 ^^^^^^
 
-.. java:method:: @Override public SimEvent select(SimEntity dest, Predicate<SimEvent> p)
+.. java:method:: @Override public SimEvent select(SimEntity dest, Predicate<SimEvent> predicate)
+   :outertype: SimulationNull
+
+send
+^^^^
+
+.. java:method:: @Override public void send(SimEvent evt)
    :outertype: SimulationNull
 
 send
 ^^^^
 
 .. java:method:: @Override public void send(SimEntity src, SimEntity dest, double delay, int tag, Object data)
+   :outertype: SimulationNull
+
+sendFirst
+^^^^^^^^^
+
+.. java:method:: @Override public void sendFirst(SimEvent evt)
    :outertype: SimulationNull
 
 sendFirst
@@ -263,12 +289,12 @@ terminateAt
 wait
 ^^^^
 
-.. java:method:: @Override public void wait(CloudSimEntity src, Predicate<SimEvent> p)
+.. java:method:: @Override public void wait(CloudSimEntity src, Predicate<SimEvent> predicate)
    :outertype: SimulationNull
 
 waiting
 ^^^^^^^
 
-.. java:method:: @Override public long waiting(SimEntity dest, Predicate<SimEvent> p)
+.. java:method:: @Override public long waiting(SimEntity dest, Predicate<SimEvent> predicate)
    :outertype: SimulationNull
 

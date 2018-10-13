@@ -8,18 +8,18 @@ package org.cloudbus.cloudsim.network.topologies;
  * @see NetworkTopology#NULL
  */
 final class NetworkTopologyNull implements NetworkTopology {
-    private final TopologicalGraph graph = new TopologicalGraph();
+    private static final TopologicalGraph GRAPH = new TopologicalGraph();
 
-    @Override public void addLink(int srcId, int destId, double bw, double lat) {/**/}
-    @Override public void mapNode(int cloudSimEntityID, int briteID) {/**/}
-    @Override public void unmapNode(int cloudSimEntityID) {/**/}
-    @Override public double getDelay(int srcID, int destID) {
+    @Override public void addLink(long srcId, long destId, double bandwidth, double lat) {/**/}
+    @Override public void mapNode(long cloudSimEntityID, int briteID) {/**/}
+    @Override public void unmapNode(long cloudSimEntityID) {/**/}
+    @Override public double getDelay(long srcID, long destID) {
         return 0;
     }
     @Override public boolean isNetworkEnabled() {
         return false;
     }
     @Override public TopologicalGraph getTopologycalGraph() {
-        return graph;
+        return GRAPH;
     }
 }

@@ -23,14 +23,14 @@
  */
 package org.cloudbus.cloudsim.schedulers.cloudlet;
 
-import java.util.*;
-
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletExecution;
 import org.cloudbus.cloudsim.datacenters.Datacenter;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.util.MathUtil;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -111,8 +111,8 @@ import static java.util.stream.Collectors.toList;
  *
  * @see <a href="http://www.ibm.com/developerworks/library/l-completely-fair-scheduler/">Inside the Linux 2.6 Completely Fair Scheduler</a>
  * @see <a href="http://www.ibm.com/developerworks/library/l-lpic1-103-6/index.html">Learn Linux, 101: Process execution priorities</a>
- * @see <a href="http://dx.doi.org/10.1145/1400097.1400102">Towards achieving fairness in the Linux scheduler</a>
- * @see <a href="http://dx.doi.org/10.1145/10.1145/2901318.2901326">The Linux scheduler</a>
+ * @see <a href="https://doi.org/10.1145/1400097.1400102">Towards achieving fairness in the Linux scheduler</a>
+ * @see <a href="https://doi.org/10.1145/10.1145/2901318.2901326">The Linux scheduler</a>
  * @see <a href="https://www.kernel.org/doc/Documentation/scheduler/sched-design-CFS.txt">kernel.org: CFS Scheduler Design</a>
  * @see <a href="https://oakbytes.wordpress.com/linux-scheduler/">Linux Scheduler FAQ</a>
  */
@@ -145,9 +145,10 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
             return MathUtil.doubleToInt(vRuntimeDiff);
         }
 
-        final int priorityDiff = c1.getCloudlet().getPriority() - c2.getCloudlet().getPriority();
-        final int idDiff = c1.getCloudletId() - c2.getCloudletId();
-        return priorityDiff == 0 ? idDiff : priorityDiff;
+        final long priorityDiff = c1.getCloudlet().getPriority() - c2.getCloudlet().getPriority();
+        final long idDiff = c1.getCloudletId() - c2.getCloudletId();
+        //Since the computed value is long but the comparator return must be int, rounds the value to the closest int
+        return Math.round(priorityDiff == 0 ? idDiff : priorityDiff);
     }
 
     /**
@@ -265,12 +266,12 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
      * <p>As "niceness" is a terminology defined by specific schedulers
      * (such as Linux Schedulers), it is not defined inside the Cloudlet.</p>
      *
-     * @param cl Cloudlet to get the nice value
+     * @param cloudlet Cloudlet to get the nice value
      * @return the cloudlet niceness
      * @see <a href="http://man7.org/linux/man-pages/man1/nice.1.html">Man Pages: Nice values for Linux processes</a>
      */
-    protected double getCloudletNiceness(final CloudletExecution cl){
-        return -cl.getCloudlet().getPriority();
+    protected double getCloudletNiceness(final CloudletExecution cloudlet){
+        return -cloudlet.getCloudlet().getPriority();
     }
 
     /**
@@ -338,14 +339,15 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
      * See {@link #computeCloudletInitialVirtualRuntime(CloudletExecution)}
      * for more details.</p>
      *
-     * @param ce {@inheritDoc}
+     * @param cle {@inheritDoc}
      * @param fileTransferTime {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
-    protected double cloudletSubmitInternal(final CloudletExecution ce, final double fileTransferTime) {
-        ce.setVirtualRuntime(computeCloudletInitialVirtualRuntime(ce));
-        ce.setTimeSlice(computeCloudletTimeSlice(ce));
-        return super.cloudletSubmitInternal(ce, fileTransferTime);
+    protected double cloudletSubmitInternal(final CloudletExecution cle, final double fileTransferTime) {
+        cle.setVirtualRuntime(computeCloudletInitialVirtualRuntime(cle));
+        cle.setTimeSlice(computeCloudletTimeSlice(cle));
+        return super.cloudletSubmitInternal(cle, fileTransferTime);
     }
 
     /**
@@ -364,20 +366,20 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
     }
 
     @Override
-    public long updateCloudletProcessing(final CloudletExecution ce, final double currentTime) {
+    public long updateCloudletProcessing(final CloudletExecution cle, final double currentTime) {
         /*
         Cloudlet has never been executed yet and it will start executing now,
         sets its actual virtual runtime. The negative value was used so far
         just to sort Cloudlets in the waiting list according to their priorities.
         */
-        if(ce.getVirtualRuntime() < 0){
-            ce.setVirtualRuntime(0);
+        if(cle.getVirtualRuntime() < 0){
+            cle.setVirtualRuntime(0);
         }
 
-        final double cloudletTimeSpan = currentTime - ce.getLastProcessingTime();
-        final long partialFinishedMI = super.updateCloudletProcessing(ce, currentTime);
+        final double cloudletTimeSpan = currentTime - cle.getLastProcessingTime();
+        final long partialFinishedMI = super.updateCloudletProcessing(cle, currentTime);
 
-        ce.addVirtualRuntime(cloudletTimeSpan);
+        cle.addVirtualRuntime(cloudletTimeSpan);
         return partialFinishedMI;
     }
 
@@ -387,11 +389,11 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
      * The initial value is negative to indicate the Cloudlet hasn't started
      * executing yet. The virtual runtime is computed based on the Cloudlet priority.
      *
-     * @param cl Cloudlet to compute the initial virtual runtime
+     * @param cloudlet Cloudlet to compute the initial virtual runtime
      * @return the computed initial virtual runtime as a negative value
      * to indicate that the Cloudlet hasn't started executing yet
      */
-    private double computeCloudletInitialVirtualRuntime(final CloudletExecution cl) {
+    private double computeCloudletInitialVirtualRuntime(final CloudletExecution cloudlet) {
         /*
         A negative virtual runtime indicates the cloudlet has never been executed yet.
         This math was used just to ensure that the first added cloudlets
@@ -409,9 +411,9 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
         can be understood as resulting in "higher negative" values, that is,
         extreme negative values.
         */
-        final double inverseOfCloudletId = Integer.MAX_VALUE/(cl.getCloudletId()+1.0);
+        final double inverseOfCloudletId = Integer.MAX_VALUE/(cloudlet.getCloudletId()+1.0);
 
-        return -Math.abs(cl.getCloudlet().getPriority() + inverseOfCloudletId);
+        return -Math.abs(cloudlet.getCloudlet().getPriority() + inverseOfCloudletId);
     }
 
     /**
@@ -428,7 +430,7 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
      * @return {@inheritDoc}
      */
     @Override
-    public boolean canAddCloudletToExecutionList(final CloudletExecution cloudlet) {
+    protected boolean canExecuteCloudletInternal(final CloudletExecution cloudlet) {
         return isThereEnoughFreePesForCloudlet(cloudlet);
     }
 
@@ -464,9 +466,9 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
     }
 
     /**
-     * Checks which Cloudlets in the execution list has the virtual runtime
-     * equals to its allocated time slice and preempt them, getting
-     * the most priority Cloudlets in the waiting list (that is those ones
+     * Checks which Cloudlets in the execution list have the virtual runtime
+     * equals to their allocated time slice and preempt them, getting
+     * the most priority Cloudlets in the waiting list (i.e., those ones
      * in the beginning of the list).
      *
      * @see #preemptExecCloudletsWithExpiredVRuntimeAndMoveToWaitingList()
@@ -497,14 +499,14 @@ public final class CloudletSchedulerCompletelyFair extends CloudletSchedulerTime
      *
      */
     private List<CloudletExecution> preemptExecCloudletsWithExpiredVRuntimeAndMoveToWaitingList() {
-        final Predicate<CloudletExecution> vrtReachedTimeSlice = c -> c.getVirtualRuntime() >= c.getTimeSlice();
+        final Predicate<CloudletExecution> vrtReachedTimeSlice = cle -> cle.getVirtualRuntime() >= cle.getTimeSlice();
         final List<CloudletExecution> expiredVrtCloudlets =
             getCloudletExecList()
                 .stream()
                 .filter(vrtReachedTimeSlice)
                 .collect(toList());
 
-        expiredVrtCloudlets.forEach(c -> addCloudletToWaitingList(removeCloudletFromExecList(c)));
+        expiredVrtCloudlets.forEach(cle -> addCloudletToWaitingList(removeCloudletFromExecList(cle)));
         return expiredVrtCloudlets;
     }
 

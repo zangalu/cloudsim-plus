@@ -65,7 +65,7 @@ public final class HostFaultInjectionExample1 {
 
     private static final int HOST_MIPS_BY_PE = 1000;
     private static final int HOST_PES = 4;
-    private static final long HOST_RAM = 500000; //host memory (MEGABYTE)
+    private static final long HOST_RAM = 500000; //host memory (Megabyte)
     private static final long HOST_STORAGE = 1000000; //host storage
     private static final long HOST_BW = 100000000L;
 
@@ -76,8 +76,8 @@ public final class HostFaultInjectionExample1 {
     private List<Host> hostList;
 
     private static final int VM_MIPS = 1000;
-    private static final long VM_SIZE = 1000; //image size (MEGABYTE)
-    private static final int VM_RAM = 10000; //vm memory (MEGABYTE)
+    private static final long VM_SIZE = 1000; //image size (Megabyte)
+    private static final int VM_RAM = 10000; //vm memory (Megabyte)
     private static final long VM_BW = 100000;
     private static final int VM_PES = 2; //number of cpus
 
@@ -136,7 +136,7 @@ public final class HostFaultInjectionExample1 {
 
         System.out.printf(
             "\n# Mean Number of Failures per Hour: %.3f (1 failure expected at each %.2f hours).\n",
-            MEAN_FAILURE_NUMBER_PER_HOUR, poisson.getInterarrivalMeanTime());
+            MEAN_FAILURE_NUMBER_PER_HOUR, poisson.getInterArrivalMeanTime());
         System.out.printf("# Number of Host faults: %d\n", fault.getNumberOfHostFaults());
         System.out.printf("# Number of VM faults (VMs destroyed): %d\n", fault.getNumberOfFaults());
         System.out.printf("# Time the simulations finished: %.4f hours\n", simulation.clockInHours());
@@ -190,9 +190,7 @@ public final class HostFaultInjectionExample1 {
         System.out.println();
 
         Datacenter dc = new DatacenterSimple(simulation, hostList, new VmAllocationPolicySimple());
-        dc
-                .setSchedulingInterval(SCHEDULE_TIME_TO_PROCESS_DATACENTER_EVENTS)
-                .setLog(false);
+        dc.setSchedulingInterval(SCHEDULE_TIME_TO_PROCESS_DATACENTER_EVENTS);
         return dc;
     }
 
@@ -233,7 +231,7 @@ public final class HostFaultInjectionExample1 {
         this.poisson = new PoissonDistr(MEAN_FAILURE_NUMBER_PER_HOUR, seed);
 
         fault = new HostFaultInjection(datacenter, poisson);
-        fault.setMaxTimeToGenerateFailureInHours(800);
+        fault.setMaxTimeToFailInHours(800);
 
         this.vmList.forEach(vm -> fault.addVmCloner(broker, new VmClonerSimple(this::cloneVm, this::cloneCloudlets)));
     }

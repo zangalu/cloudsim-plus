@@ -10,7 +10,6 @@ package org.cloudbus.cloudsim.schedulers.cloudlet;
 import org.cloudbus.cloudsim.brokers.DatacenterBroker;
 import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletExecution;
-import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.datacenters.DatacenterSimple;
 import org.cloudbus.cloudsim.network.VmPacket;
 import org.cloudbus.cloudsim.resources.Pe;
@@ -45,67 +44,72 @@ public interface CloudletScheduler extends Serializable {
     CloudletScheduler NULL = new CloudletSchedulerNull();
 
     /**
+     * Sets a cloudlet as failed.
+     *
+     * @param cloudlet ID of the cloudlet to set as failed
+     * @return the failed cloudlet or {@link Cloudlet#NULL} if not found
+     */
+    Cloudlet cloudletFail(Cloudlet cloudlet);
+
+    /**
      * Cancels execution of a cloudlet.
      *
-     * @param cloudletId ID of the cloudlet being canceled
+     * @param cloudlet ID of the cloudlet being canceled
      * @return the canceled cloudlet or {@link Cloudlet#NULL} if not found
-     * @pre $none
-     * @post $none
      */
-    Cloudlet cloudletCancel(int cloudletId);
+    Cloudlet cloudletCancel(Cloudlet cloudlet);
 
     /**
      * Processes a finished cloudlet.
      *
-     * @param ce finished cloudlet
-     * @pre ce != $null
-     * @post $none
+     * @param cle finished cloudlet
      */
-    void cloudletFinish(CloudletExecution ce);
+    void cloudletFinish(CloudletExecution cle);
+
+    /**
+     * Sets the status of a Cloudlet to {@link Cloudlet.Status#READY}
+     * so that it can start executing as soon as possible.
+     *
+     * @param cloudlet the cloudlet to be started
+     * @return $true if cloudlet was set to ready, $false otherwise
+     */
+    boolean cloudletReady(Cloudlet cloudlet);
 
     /**
      * Pauses execution of a cloudlet.
      *
-     * @param cloudletId ID of the cloudlet being paused
-     * @return $true if cloudlet paused, $false otherwise
-     * @pre $none
-     * @post $none
+     * @param cloudlet the cloudlet being paused
+     * @return $true if cloudlet was paused, $false otherwise
      */
-    boolean cloudletPause(int cloudletId);
+    boolean cloudletPause(Cloudlet cloudlet);
 
     /**
      * Resumes execution of a paused cloudlet.
      *
-     * @param cloudletId ID of the cloudlet being resumed
+     * @param cloudlet the cloudlet being resumed
      * @return expected finish time of the cloudlet, 0.0 if queued or not found in the
      * paused list
-     * @pre $none
-     * @post $none
      */
-    double cloudletResume(int cloudletId);
+    double cloudletResume(Cloudlet cloudlet);
 
     /**
-     * Receives an cloudlet to be executed in the VM managed by this scheduler.
+     * Receives a cloudlet to be executed in the VM managed by this scheduler.
      *
-     * @param cl the submitted cloudlet
+     * @param cloudlet the submitted cloudlet
      * @param fileTransferTime time required to move the required files from the SAN to the VM
      * @return expected finish time of this cloudlet (considering the time to transfer required
      * files from the Datacenter to the Vm), or 0 if it is in a waiting queue
-     * @pre cl != null
-     * @post $none
      */
-    double cloudletSubmit(Cloudlet cl, double fileTransferTime);
+    double cloudletSubmit(Cloudlet cloudlet, double fileTransferTime);
 
     /**
      * Receives an cloudlet to be executed in the VM managed by this scheduler.
      *
-     * @param cl the submitted cloudlet
+     * @param cloudlet the submitted cloudlet
      * @return expected finish time of this cloudlet (considering the time to transfer required
      * files from the Datacenter to the Vm), or 0 if it is in a waiting queue
-     * @pre cl != null
-     * @post $none
      */
-    double cloudletSubmit(Cloudlet cl);
+    double cloudletSubmit(Cloudlet cloudlet);
 
     /**
      * Gets a <b>read-only</b> List of cloudlets being executed on the VM.
@@ -154,21 +158,8 @@ public interface CloudletScheduler extends Serializable {
      *
      * @param cloudletId ID of the cloudlet to get the status
      * @return status of the cloudlet if it was found, otherwise, returns -1
-     * @pre $none
-     * @post $none
      */
     int getCloudletStatus(int cloudletId);
-
-    /**
-     * Gets a <b>read-only</b> list of current mips capacity from the VM that will be
-     * made available to the scheduler. This mips share will be allocated
-     * to Cloudlets as requested.
-     *
-     * @return the current mips share list, where each item represents
-     * the MIPS capacity of a {@link Pe}. that is available to the scheduler.
-     *
-     */
-    List<Double> getCurrentMipsShare();
 
     /**
      * Releases a given number of PEs from a VM.
@@ -201,22 +192,13 @@ public interface CloudletScheduler extends Serializable {
     double getPreviousTime();
 
     /**
-     * Gets the current allocated MIPS for cloudlet.
-     *
-     * @param ce the ce
-     * @param time the time
-     * @return the current allocated mips for cloudlet
-     */
-    double getAllocatedMipsForCloudlet(CloudletExecution ce, double time);
-
-    /**
      * Gets the current requested MIPS for a given cloudlet.
      *
-     * @param ce the ce
+     * @param cle the ce
      * @param time the time
      * @return the current requested mips for the given cloudlet
      */
-    double getRequestedMipsForCloudlet(CloudletExecution ce, double time);
+    double getRequestedMipsForCloudlet(CloudletExecution cle, double time);
 
     /**
      * Gets total CPU utilization percentage of all cloudlets,
@@ -232,8 +214,6 @@ public interface CloudletScheduler extends Serializable {
      * Informs if there is any cloudlet that finished to execute in the VM managed by this scheduler.
      *
      * @return $true if there is at least one finished cloudlet; $false otherwise
-     * @pre $none
-     * @post $none
      */
     boolean hasFinishedCloudlets();
 
@@ -260,11 +240,11 @@ public interface CloudletScheduler extends Serializable {
     void setTaskScheduler(CloudletTaskScheduler taskScheduler);
 
     /**
-     * Checks if there is a packet scheduler assigned to this CloudletScheduler
-     * in order to enable dispatching packets from and to the Vm of this CloudletScheduler.
+     * Checks if there is a {@link CloudletTaskScheduler} assigned to this CloudletScheduler
+     * in order to enable tasks execution and dispatching packets from and to the Vm of this CloudletScheduler.
      * @return
      */
-    boolean isTherePacketScheduler();
+    boolean isThereTaskScheduler();
 
     /**
      * Returns one cloudlet to migrate to another Vm.
@@ -272,8 +252,6 @@ public interface CloudletScheduler extends Serializable {
      * class implementing this interface.
      *
      * @return one running cloudlet
-     * @pre $none
-     * @post $none
      * @todo @author manoelcampos Despite there is this method, it is not being
      * used anywhere and Cloudlet migration is not in fact supported.
      * Actually, in a real scenario, application migration is a tough
@@ -282,7 +260,7 @@ public interface CloudletScheduler extends Serializable {
      * to follow. Vm migration makes more sense because you deal it as a
      * black box, not having to be concerned with any internal data or
      * configurations. You just move the entire VM to another host.
-     * There is the {@link CloudSimTags#CLOUDLET_MOVE} that is used in the
+     * There was a CloudSimTags.CLOUDLET_MOVE that was used in the
      * {@link DatacenterSimple} class, but the event
      * is not being sent anywhere. The CloudSim forum has 3 questions about
      * Cloudlet migration only. It shows that this features is not
@@ -295,8 +273,6 @@ public interface CloudletScheduler extends Serializable {
      * Returns the number of cloudlets running in the virtual machine.
      *
      * @return number of cloudlets running
-     * @pre $none
-     * @post $none
      */
     int runningCloudletsNumber();
 
@@ -308,8 +284,6 @@ public interface CloudletScheduler extends Serializable {
      * @return the predicted completion time of the earliest finishing cloudlet
      * (which is a relative delay from the current simulation time),
      * or {@link Double#MAX_VALUE} if there is no next Cloudlet to execute
-     * @pre currentTime >= 0
-     * @post $none
      */
     double updateProcessing(double currentTime, List<Double> mipsShare);
 
@@ -343,30 +317,6 @@ public interface CloudletScheduler extends Serializable {
      * @return
      */
     long getFreePes();
-
-    /**
-	 * Checks if a Cloudlet can be added to the execution list or not.
-	 * Each CloudletScheduler can define a different policy to
-	 * indicate if a Cloudlet can be added to the execution list
-	 * or not at the moment this method is called.
-	 *
-	 * <p>For instance, time-shared implementations can put all
-	 * Cloudlets in the execution list, once it uses a preemptive policy
-	 * that shares the CPU time between all running Cloudlets,
-	 * even there are more Cloudlets than the number of CPUs.
-	 * That is, it might always add new Cloudlets to the execution list.
-	 * </p>
-	 *
-	 * <p>On the other hand, space-shared schedulers do not share
-	 * the same CPUs between different Cloudlets. In this type of
-	 * scheduler, a CPU is only allocated to a Cloudlet when the previous
-	 * Cloudlet finished its entire execution.
-	 * That is, it might not always add new Cloudlets to the execution list.</p>
-	 *
-	 * @param cloudlet Cloudlet to check if it can be added to the execution list
-	 * @return true if the Cloudlet can be added to the execution list, false otherwise
-	 */
-	boolean canAddCloudletToExecutionList(CloudletExecution cloudlet);
 
     /**
      * Checks if a Cloudlet has finished and was returned to its {@link DatacenterBroker}.

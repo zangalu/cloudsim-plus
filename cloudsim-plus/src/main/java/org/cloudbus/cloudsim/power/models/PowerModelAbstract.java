@@ -20,8 +20,7 @@ public abstract class PowerModelAbstract implements PowerModel {
 
     @Override
     public final void setHost(final Host host) {
-        Objects.requireNonNull(host);
-        this.host = host;
+        this.host = Objects.requireNonNull(host);
     }
 
     @Override
@@ -56,7 +55,7 @@ public abstract class PowerModelAbstract implements PowerModel {
      * @throws IllegalArgumentException when the utilization percentage is not
      * between [0 and 1]
      */
-    protected abstract double getPowerInternal(final double utilization) throws IllegalArgumentException;
+    protected abstract double getPowerInternal(double utilization) throws IllegalArgumentException;
 
     @Override
     public double getEnergyLinearInterpolation(

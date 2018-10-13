@@ -23,6 +23,8 @@
  */
 package org.cloudsimplus.builders.tables;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,8 +84,7 @@ public abstract class AbstractTable implements Table {
 
     @Override
     public final Table setTitle(final String title) {
-        Objects.requireNonNull(title);
-        this.title = title;
+        this.title = Objects.requireNonNull(title);
         return this;
     }
 
@@ -119,7 +120,7 @@ public abstract class AbstractTable implements Table {
      * has a subtitle.
      */
     private boolean isThereAnySubtitledColumn(){
-        return columns.stream().anyMatch(col -> !col.getSubTitle().trim().isEmpty());
+        return columns.stream().anyMatch(col -> StringUtils.isNotBlank(col.getSubTitle()));
     }
 
     private void printRow(final List<Object> row) {
@@ -129,9 +130,9 @@ public abstract class AbstractTable implements Table {
                 .limit( Math.min(columns.size(), row.size()))
                 .collect(toList());
 
-        int i = 0;
+        int idxCol = 0;
         for(final TableColumn col: cols){
-            getPrintStream().print(col.generateData(row.get(i++)));
+            getPrintStream().print(col.generateData(row.get(idxCol++)));
         }
         printRowClosing();
     }

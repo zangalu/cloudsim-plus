@@ -75,6 +75,7 @@ import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
 
 /**
@@ -204,7 +205,6 @@ public final class MigrationExample2_PowerUsage {
 
         @SuppressWarnings("unused")
         Datacenter datacenter0 = createDatacenter();
-        datacenter0.setLog(false);
         DatacenterBroker broker = new DatacenterBrokerSimple(simulation);
         createAndSubmitVms(broker);
         createAndSubmitCloudlets(broker);
@@ -213,8 +213,8 @@ public final class MigrationExample2_PowerUsage {
 
         final List<Cloudlet> finishedList = broker.getCloudletFinishedList();
         finishedList.sort(
-            Comparator.comparingInt((Cloudlet c) -> c.getVm().getHost().getId())
-                      .thenComparingInt(c -> c.getVm().getId()));
+            Comparator.comparingLong((Cloudlet c) -> c.getVm().getHost().getId())
+                      .thenComparingLong(c -> c.getVm().getId()));
         new CloudletsTableBuilder(finishedList).build();
         System.out.println("\n    WHEN A HOST CPU ALLOCATED MIPS IS LOWER THAN THE REQUESTED, IT'S DUE TO VM MIGRATION OVERHEAD)\n");
 
@@ -260,7 +260,7 @@ public final class MigrationExample2_PowerUsage {
     private void printHostCpuUsageAndPowerConsumption(final Host host) {
         System.out.printf("Host: %6d | CPU Usage | Power Consumption\n", host.getId());
         System.out.println("-------------------------------------------------------------------------------------------");
-        final double[] utilizationHistory = host.getUtilizationHistory();
+        final double[] utilizationHistory = host.getUtilizationHistory().values().stream().mapToDouble(DoubleSummaryStatistics::getSum).toArray();
         double time = simulation.clock();
         for (int i = 0; i < utilizationHistory.length; i++) {
             final double cpuUsage = utilizationHistory[i];
@@ -425,7 +425,7 @@ public final class MigrationExample2_PowerUsage {
                 HOST_UTILIZATION_THRESHOLD_FOR_VM_MIGRATION+0.2, fallback);
 
         Datacenter dc = new DatacenterSimple(simulation, hostList, allocationPolicy);
-        dc.setSchedulingInterval(SCHEDULING_INTERVAL).setLog(true);
+        dc.setSchedulingInterval(SCHEDULING_INTERVAL);
         return dc;
     }
 

@@ -20,12 +20,6 @@
 
 .. java:import:: org.cloudsimplus.listeners HostUpdatesVmsProcessingEventInfo
 
-.. java:import:: java.util Collections
-
-.. java:import:: java.util List
-
-.. java:import:: java.util Set
-
 HostNull
 ========
 
@@ -51,7 +45,7 @@ addMigratingInVm
 addOnUpdateProcessingListener
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public Host addOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> l)
+.. java:method:: @Override public Host addOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> listener)
    :outertype: HostNull
 
 addVmMigratingOut
@@ -63,7 +57,7 @@ addVmMigratingOut
 compareTo
 ^^^^^^^^^
 
-.. java:method:: @Override public int compareTo(Host o)
+.. java:method:: @Override public int compareTo(Host host)
    :outertype: HostNull
 
 createTemporaryVm
@@ -171,7 +165,7 @@ getFreePeList
 getId
 ^^^^^
 
-.. java:method:: @Override public int getId()
+.. java:method:: @Override public long getId()
    :outertype: HostNull
 
 getMaxAvailableMips
@@ -231,7 +225,7 @@ getPreviousUtilizationOfCpu
 getProvisioner
 ^^^^^^^^^^^^^^
 
-.. java:method:: @Override public ResourceProvisioner getProvisioner(Class<? extends ResourceManageable> c)
+.. java:method:: @Override public ResourceProvisioner getProvisioner(Class<? extends ResourceManageable> clazz)
    :outertype: HostNull
 
 getRam
@@ -252,10 +246,22 @@ getResources
 .. java:method:: @Override public List<ResourceManageable> getResources()
    :outertype: HostNull
 
+getShutdownTime
+^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public double getShutdownTime()
+   :outertype: HostNull
+
 getSimulation
 ^^^^^^^^^^^^^
 
 .. java:method:: @Override public Simulation getSimulation()
+   :outertype: HostNull
+
+getStartTime
+^^^^^^^^^^^^
+
+.. java:method:: @Override public double getStartTime()
    :outertype: HostNull
 
 getStateHistory
@@ -285,7 +291,13 @@ getTotalMipsCapacity
 getUtilizationHistory
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public double[] getUtilizationHistory()
+.. java:method:: @Override public SortedMap<Double, DoubleSummaryStatistics> getUtilizationHistory()
+   :outertype: HostNull
+
+getUtilizationHistorySum
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public SortedMap<Double, Double> getUtilizationHistorySum()
    :outertype: HostNull
 
 getUtilizationOfBw
@@ -393,7 +405,7 @@ removeMigratingInVm
 removeOnUpdateProcessingListener
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. java:method:: @Override public boolean removeOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> l)
+.. java:method:: @Override public boolean removeOnUpdateProcessingListener(EventListener<HostUpdatesVmsProcessingEventInfo> listener)
    :outertype: HostNull
 
 removeVmMigratingIn
@@ -435,7 +447,7 @@ setFailed
 setId
 ^^^^^
 
-.. java:method:: @Override public void setId(int id)
+.. java:method:: @Override public void setId(long id)
    :outertype: HostNull
 
 setPowerModel
@@ -450,10 +462,22 @@ setRamProvisioner
 .. java:method:: @Override public Host setRamProvisioner(ResourceProvisioner ramProvisioner)
    :outertype: HostNull
 
+setShutdownTime
+^^^^^^^^^^^^^^^
+
+.. java:method:: @Override public void setShutdownTime(double shutdownTime)
+   :outertype: HostNull
+
 setSimulation
 ^^^^^^^^^^^^^
 
 .. java:method:: @Override public Host setSimulation(Simulation simulation)
+   :outertype: HostNull
+
+setStartTime
+^^^^^^^^^^^^
+
+.. java:method:: @Override public void setStartTime(double startTime)
    :outertype: HostNull
 
 setVmScheduler

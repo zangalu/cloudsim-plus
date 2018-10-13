@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * <p>Please refer to following publication for more details:
  * <ul>
  * <li>
- * <a href="http://dx.doi.org/10.1109/UCC.2011.24">
+ * <a href="https://doi.org/10.1109/UCC.2011.24">
  * Saurabh Kumar Garg and Rajkumar Buyya, NetworkCloudSim: Modelling Parallel
  * Applications in Cloud Simulations, Proceedings of the 4th IEEE/ACM
  * International Conference on Utility and Cloud Computing (UCC 2011, IEEE CS
@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
  * @since CloudSim Toolkit 3.0
  */
 public class RootSwitch extends AbstractSwitch {
-    private static final Logger logger = LoggerFactory.getLogger(RootSwitch.class.getSimpleName());
 
     /**
      * The level (layer) of the switch in the network topology.
@@ -61,7 +60,9 @@ public class RootSwitch extends AbstractSwitch {
      * The downlink bandwidth of RootSwitch in Megabits/s.
      * It also represents the uplink bandwidth of connected aggregation Datacenter.
      */
-    public static final long DOWNLINK_BW = (long) Conversion.GIGABYTE * 40 * 8; // 40000 Megabits (40 Gigabits)
+    public static final long DOWNLINK_BW = (long) Conversion.gigaToMega(40 * 8); // 40000 Megabits (40 Gigabits)
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RootSwitch.class.getSimpleName());
 
     /**
      * Instantiates a Root AbstractSwitch specifying what other Datacenter are connected
@@ -78,16 +79,16 @@ public class RootSwitch extends AbstractSwitch {
     }
 
     @Override
-    protected void processPacketUp(SimEvent ev) {
-        super.processPacketUp(ev);
+    protected void processPacketUp(SimEvent evt) {
+        super.processPacketUp(evt);
 
-        final HostPacket netPkt = (HostPacket) ev.getData();
+        final HostPacket netPkt = (HostPacket) evt.getData();
         final Vm receiverVm = netPkt.getVmPacket().getDestination();
         final Switch edgeSwitch = getVmEdgeSwitch(receiverVm);
         final Switch aggSwitch = findAggregateSwitchConnectedToGivenEdgeSwitch(edgeSwitch);
 
         if (aggSwitch == Switch.NULL) {
-            logger.error("No destination switch for this packet");
+            LOGGER.error("No destination switch for this packet");
             return;
         }
 

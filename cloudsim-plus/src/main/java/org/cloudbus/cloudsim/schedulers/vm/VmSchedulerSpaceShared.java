@@ -7,7 +7,6 @@
  */
 package org.cloudbus.cloudsim.schedulers.vm;
 
-import org.cloudbus.cloudsim.hosts.Host;
 import org.cloudbus.cloudsim.resources.Pe;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.slf4j.Logger;
@@ -31,7 +30,7 @@ import java.util.List;
  * @since CloudSim Toolkit 1.0
  */
 public class VmSchedulerSpaceShared extends VmSchedulerAbstract {
-    private static final Logger logger = LoggerFactory.getLogger(VmSchedulerSpaceShared.class.getSimpleName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VmSchedulerSpaceShared.class.getSimpleName());
 
     /**
      * Creates a space-shared VM scheduler.
@@ -52,12 +51,6 @@ public class VmSchedulerSpaceShared extends VmSchedulerAbstract {
     }
 
     @Override
-    public VmScheduler setHost(final Host host) {
-        super.setHost(host);
-        return this;
-    }
-
-    @Override
     protected boolean isSuitableForVmInternal(final Vm vm, final List<Double> requestedMips, final boolean showLog) {
         final List<Pe> selectedPes = getTotalCapacityToBeAllocatedToVm(requestedMips);
         if(selectedPes.size() >= requestedMips.size()){
@@ -65,7 +58,7 @@ public class VmSchedulerSpaceShared extends VmSchedulerAbstract {
         }
 
         if(showLog) {
-            logger.error(
+            LOGGER.error(
                 "{}: {}: Allocation of {} to {} failed due to lack of PEs. {}\t\tRequired {} PEs of {} MIPS.{}" +
                     "\t\tHowever, there are just {} available PEs with the required MIPS.",
                 getHost().getSimulation().clock(), getClass().getSimpleName(), vm, getHost(), System.lineSeparator(),
