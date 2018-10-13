@@ -97,7 +97,7 @@ public class HybridVmCpuScalingWithScoap
         broker0 = new DatacenterBrokerSimple(simulation);
         loadThresholds();
 
-        loadWorkloadTraceIntoQueue();
+        loadWorkloadTraceInQueue();
 
         //initial allocation of cloulets and VMs
         createCloudletListsAndVmsFromTrace();
@@ -230,7 +230,10 @@ public class HybridVmCpuScalingWithScoap
     }
 
 
-    private void loadWorkloadTraceIntoQueue()
+    /**
+     * Load workload Trace in a Queue using Arrival Generator class
+     */
+    private void loadWorkloadTraceInQueue()
     {
 
         String WORKLOAD_FILENAME = "trace10seconds.txt";

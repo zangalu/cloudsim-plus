@@ -5,6 +5,7 @@ import org.cloudbus.cloudsim.cloudlets.Cloudlet;
 import org.cloudbus.cloudsim.cloudlets.CloudletSimple;
 import org.cloudbus.cloudsim.core.CloudSimTags;
 import org.cloudbus.cloudsim.core.Simulation;
+import org.cloudbus.cloudsim.provisioners.ResourceProvisioner;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerAbstract;
 import org.cloudbus.cloudsim.provisioners.ResourceProvisionerSimple;
 import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerSpaceShared;
@@ -29,6 +30,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
     private int createdVmsProgressionID;
     private static final int VM_PES = 8;
     private static final int VM_RAM = 1200;
+    private ResourceProvisioner resourceProvisioner;
 
     @Override
     public Threshold createAndSubmitVmsAndCloudlets(DatacenterBroker broker, List<Cloudlet> cloudletList, List<Vm> hiddleVmsList, List<Vm> vmList, RequestsArrivalGenerator arrivalGenerator, ArrayList<Threshold> thresholds, Threshold currentThreshold, Simulation simulation, int simulationTime) {
@@ -121,35 +123,35 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         return totalCapacity;
     }
 
-    private Threshold thresholdStrategy(ArrayList<Threshold> thresholds, final Threshold currentThreshold, RequestsArrivalGenerator arrivalGenerator) {
+    private Threshold thresholdStrategy(ArrayList<Threshold> planThresholds, final Threshold currentThreshold, RequestsArrivalGenerator arrivalGenerator) {
 
         Threshold localThreshold = currentThreshold;
-        OptionalInt indexOpt = IntStream.range(0, thresholds.size())
-            .filter(i -> currentThreshold.equals(thresholds.get(i)))
-            .findFirst();
+        OptionalInt indexOpt = findThrehsoldIndex(planThresholds, localThreshold);
 
         int index = indexOpt.getAsInt();
-        System.out.println("INDICE PRIMA -->"+indexOpt.getAsInt());
+        System.out.println("INDICE PRIMA -->"+index);
 
-        if(index < thresholds.size()-1 && arrivalGenerator.getInstantWorkload() > currentThreshold.getWorkLoad()){
-            localThreshold = thresholds.get(indexOpt.getAsInt()+1);
+        if(index < planThresholds.size()-1 && arrivalGenerator.getInstantWorkload() > currentThreshold.getWorkLoad()){
+            localThreshold = planThresholds.get(index++);
         }
-        else if (index>0  && arrivalGenerator.getInstantWorkload() < currentThreshold.getWorkLoad())
+        else if (index>0 && arrivalGenerator.getInstantWorkload() < currentThreshold.getWorkLoad())
         {
-            localThreshold = thresholds.get(indexOpt.getAsInt()-1);
+            localThreshold = planThresholds.get(index--);
         }
 
-        Threshold finalLocalThreshold = localThreshold;
-        indexOpt = IntStream.range(0, thresholds.size())
-            .filter(i -> finalLocalThreshold.equals(thresholds.get(i)))
-            .findFirst();
-
-        index = indexOpt.getAsInt();
-        System.out.println("INDICE DOPO -->"+indexOpt.getAsInt());
+        index = findThrehsoldIndex(planThresholds, localThreshold).getAsInt();
+        System.out.println("INDICE DOPO -->"+index);
         System.out.println("Instant workload" +arrivalGenerator.getInstantWorkload());
         System.out.println("Current threshold "+localThreshold.getWorkLoad());
         return localThreshold;
 
+    }
+
+    private OptionalInt findThrehsoldIndex(ArrayList<Threshold> planThresholds, Threshold currentThreshold)
+    {
+        return IntStream.range(0, planThresholds.size())
+                .filter(i -> currentThreshold.equals(planThresholds.get(i)))
+                .findFirst();
     }
 
 
@@ -210,9 +212,14 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
     private void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation) {
 
         System.out.println("Destroyng VM !!!!");
+        if(resourceProvisioner == null)
+        {
+            resourceProvisioner = new ResourceProvisionerSimple();
+        }
+
         if (null != event) {
 
-            ResourceProvisionerAbstract resourceProvisioner = new ResourceProvisionerSimple();
+            resourceProvisioner = new ResourceProvisionerSimple();
             resourceProvisioner.deallocateResourceForVm(event.getVm());
 
             System.out.println("Destroyng VM at execution termination " + event.getVm());
