@@ -1,7 +1,6 @@
 package org.cloudbus.cloudsim.scoap;
 
 import org.cloudbus.cloudsim.util.ResourceLoader;
-import org.cloudbus.cloudsim.util.WorkloadFileReader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

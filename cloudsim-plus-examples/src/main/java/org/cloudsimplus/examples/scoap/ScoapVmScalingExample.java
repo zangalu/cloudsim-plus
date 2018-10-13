@@ -45,7 +45,7 @@ import org.cloudbus.cloudsim.schedulers.cloudlet.CloudletSchedulerTimeShared;
 import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.scoap.*;
 import org.cloudbus.cloudsim.util.ResourceLoader;
-import org.cloudbus.cloudsim.util.WorkloadFileReader;
+import org.cloudbus.cloudsim.util.SwfWorkloadFileReader;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModel;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelFull;
 import org.cloudbus.cloudsim.utilizationmodels.UtilizationModelPlanetLab;
@@ -283,7 +283,7 @@ public class ScoapVmScalingExample {
     private void createCloudletsFromWorkloadFile(EventInfo eventInfo) {
         try {
             final String fileName = "workload/scoap/" + WORKLOAD_FILENAME;
-            WorkloadFileReader reader = WorkloadFileReader.getInstance(fileName, CLOUDLETS_MIPS);
+            SwfWorkloadFileReader reader = SwfWorkloadFileReader.getInstance(fileName, CLOUDLETS_MIPS);
             reader.setMaxLinesToRead(maximumNumberOfCloudletsToCreateFromTheWorkloadFile);
             this.cloudletList = reader.generateWorkload();
         }catch (Exception e)

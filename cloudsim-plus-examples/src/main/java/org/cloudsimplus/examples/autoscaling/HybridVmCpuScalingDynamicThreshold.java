@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.Comparator.comparingDouble;
@@ -437,7 +438,7 @@ public class HybridVmCpuScalingDynamicThreshold {
      * @see #createVerticalPeScaling()
      */
     private double upperCpuUtilizationThreshold(Vm vm) {
-        final List<Double> history = vm.getUtilizationHistory().getHistory();
+        final List<Double> history = vm.getUtilizationHistory().getHistory().values().stream().collect(Collectors.toList());
         return history.size() > 10 ? MathUtil.median(history) * 1.2 : 0.7;
     }
 
