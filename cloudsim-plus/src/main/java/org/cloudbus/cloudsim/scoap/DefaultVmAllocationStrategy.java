@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 public class DefaultVmAllocationStrategy implements VmAllocationStrategy
@@ -44,6 +45,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
 
         // get VM from waiting list
         if(availableVm.isPresent()) {
+
             System.out.println("VM Present "+availableVm.get().getId()+" with cpu usage "+availableVm.get().getCpuPercentUsage());
             newAvailableVm = availableVm.get();
             Cloudlet cloudlet = createCloudlet(newAvailableVm, arrivalGenerator, broker, hiddleVmsList, currentThreshold, simulation, simulationTime);
@@ -52,6 +54,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
             newCloudletList.add(cloudlet);
         }// get VM from hiddle list
         else if(hiddleVmsList.size()>0){
+
             Vm vm = hiddleVmsList.iterator().next();
             Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList, currentThreshold, simulation, simulationTime);
             hiddleVmsList.remove(vm);
@@ -62,6 +65,7 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         //se workload gestito dalle VM attive < del current workload
 
         else {
+
             newThreshold = thresholdStrategy(thresholds, currentThreshold, arrivalGenerator);
             double totalCapacity = sumCapacity(broker);
             if(totalCapacity<newThreshold.getWorkLoad() && hiddleVmsList.size()==0){
@@ -132,11 +136,11 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
         System.out.println("INDICE PRIMA -->"+index);
 
         if(index < planThresholds.size()-1 && arrivalGenerator.getInstantWorkload() > currentThreshold.getWorkLoad()){
-            localThreshold = planThresholds.get(index++);
+            localThreshold = planThresholds.get(index+1);
         }
         else if (index>0 && arrivalGenerator.getInstantWorkload() < currentThreshold.getWorkLoad())
         {
-            localThreshold = planThresholds.get(index--);
+            localThreshold = planThresholds.get(index-1);
         }
 
         index = findThrehsoldIndex(planThresholds, localThreshold).getAsInt();
@@ -211,7 +215,6 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
 
     private void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation) {
 
-        System.out.println("Destroyng VM !!!!");
         if(resourceProvisioner == null)
         {
             resourceProvisioner = new ResourceProvisionerSimple();
@@ -221,6 +224,8 @@ public class DefaultVmAllocationStrategy implements VmAllocationStrategy
 
             resourceProvisioner = new ResourceProvisionerSimple();
             resourceProvisioner.deallocateResourceForVm(event.getVm());
+
+            broker.setVmDestructionDelayFunction(vm -> 1.0);
 
             System.out.println("Destroyng VM at execution termination " + event.getVm());
         }
