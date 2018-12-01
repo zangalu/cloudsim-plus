@@ -171,12 +171,7 @@ public class VerticalVmCpuScalingDynamicThreshold {
     }
 
     private void printSimulationResults() {
-        final List<Cloudlet> finishedCloudlets = broker0.getCloudletFinishedList();
-        final Comparator<Cloudlet> sortByVmId = comparingDouble(c -> c.getVm().getId());
-        final Comparator<Cloudlet> sortByStartTime = comparingDouble(Cloudlet::getExecStartTime);
-        finishedCloudlets.sort(sortByVmId.thenComparing(sortByStartTime));
-
-        new CloudletsTableBuilder(finishedCloudlets).build();
+        HybridVmCpuScalingWithScoap.printSimulationResults(broker0);
     }
 
     /**

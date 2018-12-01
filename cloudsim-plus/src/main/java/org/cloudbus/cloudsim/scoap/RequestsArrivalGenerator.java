@@ -4,11 +4,13 @@ import java.util.Queue;
 
 public interface RequestsArrivalGenerator
 {
-    Queue<Double> getRequests(int simulationTime);
+    Queue<Double> getRequests();
 
     void setWorkload(String workloadLine);
 
     double getInstantWorkload();
 
     double allocateRequest();
+
+    int workloadQueue();
 }
