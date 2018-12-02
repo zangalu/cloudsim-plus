@@ -19,13 +19,11 @@ import org.cloudbus.cloudsim.schedulers.vm.VmSchedulerTimeShared;
 import org.cloudbus.cloudsim.scoap.*;
 import org.cloudbus.cloudsim.util.ResourceLoader;
 import org.cloudbus.cloudsim.vms.Vm;
-import org.cloudsimplus.autoscaling.*;
 import org.cloudsimplus.examples.scoap.ScoapVmScalingExample;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.util.Log;
 import java.io.*;
 import java.util.*;
-import java.util.function.Function;
 
 public class HybridVmCpuScalingWithScoap
 {
@@ -35,15 +33,13 @@ public class HybridVmCpuScalingWithScoap
 
     private static final int SCHEDULING_INTERVAL = 1;
     private static final int HOSTS = 1;
-
     private static final int HOST_PES = 32;
     private static final int VMS = 1;
-
     public static final String WORKLOAD_SCOAP_PATH = "workload/scoap/";
 
+    public static final String SIMULATION_TIME_PROPERTY = "simulationTime";
+
     private int SIMULATION_TIME;
-
-
 
     private final CloudSim simulation;
     private DatacenterBroker broker0;
@@ -64,6 +60,10 @@ public class HybridVmCpuScalingWithScoap
 
     private String allocationStrategy_config;
 
+    private ArrayList<VMOnDemand> ondemandVMs;
+
+    private ArrayList<VMReservedType> reservedVMs;
+
     public static void main(String[] args)
     {
         new HybridVmCpuScalingWithScoap();
@@ -75,7 +75,6 @@ public class HybridVmCpuScalingWithScoap
     private HybridVmCpuScalingWithScoap()
     {
 
-        //TODO rendere tutto parametrico
         /*You can remove the seed to get a dynamic one, based on current computer time.
          * With a dynamic seed you will get different results at each simulation run.*/
 
@@ -83,7 +82,7 @@ public class HybridVmCpuScalingWithScoap
         readConfigFile(reader);
 
 
-        SIMULATION_TIME=Integer.valueOf(simulationConfigMap.get("simulationTime")).intValue();
+        SIMULATION_TIME=Integer.valueOf(simulationConfigMap.get(SIMULATION_TIME_PROPERTY)).intValue();
 
         hostList = new ArrayList<>(HOSTS);
         vmList = new ArrayList<>(VMS);
@@ -113,16 +112,16 @@ public class HybridVmCpuScalingWithScoap
     private void loadThresholds()
     {
 
-        ArrayList<VMReservedType> typeOfReservedVMs = new ArrayList<VMReservedType>();
+        reservedVMs = new ArrayList<VMReservedType>();
 
         //Different kind of VMs that have to be reserved(OnDemand).
-        ArrayList<VMOnDemand> ondemandVMs = new ArrayList<VMOnDemand>();
+        ondemandVMs = new ArrayList<VMOnDemand>();
 
         /* Theoretic values of thresholds fetched from XML file */
         thresholds = new ArrayList<>();
 
         //Ask the XMLparser to populate reservedVMs and Payments for the reservedVms
-        ScoapXMLparser.XMLReserved(typeOfReservedVMs, thresholds, WORKLOAD_SCOAP_PATH);
+        ScoapXMLparser.XMLReserved(reservedVMs, thresholds, WORKLOAD_SCOAP_PATH);
         //Ask the XMLparser to populate singleVMs and thresholds, parsing the XML OnDemand file.
         ScoapXMLparser.XMLOnDemand(ondemandVMs, thresholds, WORKLOAD_SCOAP_PATH);
         int isteresiLength = 3;
@@ -134,7 +133,6 @@ public class HybridVmCpuScalingWithScoap
             {
                 thresholds.get(i).setDeactivationWorkload(0);
             }
-
             thresholds.get(i + isteresiLength).setDeactivationWorkload(thresholds.get(i).getWorkLoad());
         }
         for (Threshold ts : thresholds)
@@ -158,7 +156,7 @@ public class HybridVmCpuScalingWithScoap
 
         System.out.println("VM EXECUTION SIZE --> " + broker0.getVmExecList().size());
         System.out.println("VM WAITING SIZE --> " + broker0.getVmWaitingList().size());
-
+        System.out.println("TOTAL COST --> "+allocationStrategy.getTotalCost());
 
         arrivalGenerator.getInstantWorkload();
 
@@ -185,12 +183,12 @@ public class HybridVmCpuScalingWithScoap
 
     }
 
-    public static void printSimulationResults(DatacenterBroker broker0)
+    public void printSimulationResults(DatacenterBroker broker0)
     {
         printResults(broker0);
     }
 
-    private static void printResults(DatacenterBroker broker0)
+    private void printResults(DatacenterBroker broker0)
     {
         /*final List<Cloudlet> finishedCloudlets = broker0.getCloudletFinishedList();
         final Comparator<Cloudlet> sortByVmId = comparingDouble(c -> c.getVm().getId());
@@ -207,6 +205,7 @@ public class HybridVmCpuScalingWithScoap
             out.println("awt media: "+" min: "+" Max: ");
             out.println("peak medio: "+" Min : "+ " Max : ");
             out.println("cost medio: "+" Min: "+" Max : ");
+            out.println("toatal cost"+ allocationStrategy.getTotalCost());
             out.println("reconfigurations medio: "+" Min: ");
             out.println("availab media: "+" Min: "+" Max: ");
             out.close();
@@ -215,8 +214,6 @@ public class HybridVmCpuScalingWithScoap
         {
             e.printStackTrace();
         }
-
-
 
 
 
@@ -306,19 +303,19 @@ public class HybridVmCpuScalingWithScoap
                     switch (allocationStrategy_config)
                     {
                         case "default":
-                            allocationStrategy = new DefaultVmAllocationStrategy(simulationConfigMap);
+                            allocationStrategy = new DefaultVmAllocationStrategy(simulationConfigMap, ondemandVMs);
                             break;
 
                         case "deactivationTimeout":
-                            allocationStrategy = new DeactivationTimeoutVmAllocationStrategy(simulationConfigMap);
+                            allocationStrategy = new DeactivationTimeoutVmAllocationStrategy(simulationConfigMap, ondemandVMs);
                             break;
 
                         case "hysteresis":
-                            allocationStrategy = new HysteresisVmAllocationStrategy(simulationConfigMap);
+                            allocationStrategy = new HysteresisVmAllocationStrategy(simulationConfigMap, ondemandVMs);
                             break;
 
                         case "hybrid":
-                            allocationStrategy = new HybridVmAllocationStrategy(simulationConfigMap);
+                            allocationStrategy = new HybridVmAllocationStrategy(simulationConfigMap, ondemandVMs);
                             break;
 
                         default:
@@ -352,6 +349,10 @@ public class HybridVmCpuScalingWithScoap
             simulationConfigMap = new HashMap<>();
             while ((nextLine = reader.readLine()) != null) {
                 localConfig = parseLine(nextLine);
+                if(localConfig.contains("#"))
+                {
+                    continue;
+                }
                 String[] key_value = localConfig.split("=");
                 if(key_value.length>1)
                 {

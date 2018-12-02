@@ -16,10 +16,11 @@ public class DeactivationTimeoutVmAllocationStrategy extends AbstractVmAllocatio
     //time related to samples arrival (real time not simulation time)
     private double deactivationTime;
 
-    public DeactivationTimeoutVmAllocationStrategy(Map<String, String> simulationConfigMap)
+    public DeactivationTimeoutVmAllocationStrategy(Map<String, String> simulationConfigMap,
+        ArrayList<VMOnDemand> ondemandVMs)
     {
-        super(simulationConfigMap);
-        deactivationTime = Double.valueOf(simulationConfigMap.get(DEACTIVATION_TIME_PROPERTY));
+        super(simulationConfigMap, ondemandVMs);
+        deactivationTime = (Double.valueOf(simulationConfigMap.get(DEACTIVATION_TIME_PROPERTY)))/3600*Double.valueOf(simulationConfigMap.get(SIMULATION_SCALE_FACTOR_PROPERTY));
     }
 
     public Threshold createAndSubmitVmsAndCloudlets(DatacenterBroker broker, List<Cloudlet> cloudletList, List<Vm> hiddleVmsList, List<Vm> vmList, RequestsArrivalGenerator arrivalGenerator, ArrayList<Threshold> thresholds, Threshold currentThreshold, Simulation simulation, int simulationTime) {
@@ -51,5 +52,11 @@ public class DeactivationTimeoutVmAllocationStrategy extends AbstractVmAllocatio
     public Vm findVmToRemove(List<Vm> hiddleVmsList)
     {
         return null;
+    }
+
+    @Override
+    public double getTotalCost()
+    {
+        return super.getTotalCost();
     }
 }

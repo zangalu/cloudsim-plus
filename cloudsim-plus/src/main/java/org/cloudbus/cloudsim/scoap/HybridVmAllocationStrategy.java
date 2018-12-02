@@ -16,9 +16,10 @@ public class HybridVmAllocationStrategy extends AbstractVmAllocationStrategy
     int isteresi;
     private double deactivationTime;
 
-    public HybridVmAllocationStrategy(Map<String, String> simulationConfigMap)
+    public HybridVmAllocationStrategy(Map<String, String> simulationConfigMap,
+        ArrayList<VMOnDemand> ondemandVMs)
     {
-        super(simulationConfigMap);
+        super(simulationConfigMap, ondemandVMs);
         isteresi = Integer.valueOf(simulationConfigMap.get(ISTERESI_PROPERTY));
         deactivationTime = Double.valueOf(simulationConfigMap.get(DEACTIVATION_TIME_PROPERTY));
     }
@@ -41,9 +42,9 @@ public class HybridVmAllocationStrategy extends AbstractVmAllocationStrategy
 
             planThresholds.get(i+isteresi).deactivationWorkload=planThresholds.get(i).WorkLoad;
         }
-        for( Threshold ts: planThresholds){
+        /*for( Threshold ts: planThresholds){
             System.out.println("Soglia con id:"+ts.Id+ "e workload teorico:"+ts.WorkLoad+" e deactivation :"+ts.deactivationWorkload);
-        }
+        }*/
 
 
         currentThreshold.deactivationTime= simulation.clock()+this.deactivationTime;

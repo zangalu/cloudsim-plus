@@ -15,9 +15,10 @@ public class HysteresisVmAllocationStrategy extends AbstractVmAllocationStrategy
 
     int isteresi;
 
-    public HysteresisVmAllocationStrategy(Map<String, String> simulationConfigMap)
+    public HysteresisVmAllocationStrategy(Map<String, String> simulationConfigMap,
+        ArrayList<VMOnDemand> ondemandVMs)
     {
-        super(simulationConfigMap);
+        super(simulationConfigMap, ondemandVMs);
         isteresi = Integer.valueOf(simulationConfigMap.get(ISTERESI_PROPERTY));
     }
 

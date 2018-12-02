@@ -11,4 +11,6 @@ import java.util.List;
 public interface VmAllocationStrategy
 {
     Threshold createAndSubmitVmsAndCloudlets(DatacenterBroker broker, List<Cloudlet> cloudletList, List<Vm> hiddleVmsList, List<Vm> vmList, RequestsArrivalGenerator arrivalGenerator, ArrayList<Threshold> thresholds, Threshold currentThreshold, Simulation simulation, int simulationTime);
+
+    double getTotalCost();
 }

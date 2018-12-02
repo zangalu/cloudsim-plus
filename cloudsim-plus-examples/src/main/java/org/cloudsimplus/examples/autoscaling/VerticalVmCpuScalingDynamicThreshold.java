@@ -54,16 +54,12 @@ import org.cloudsimplus.autoscaling.VerticalVmScalingSimple;
 import org.cloudsimplus.autoscaling.resources.ResourceScaling;
 import org.cloudsimplus.autoscaling.resources.ResourceScalingGradual;
 import org.cloudsimplus.autoscaling.resources.ResourceScalingInstantaneous;
-import org.cloudsimplus.builders.tables.CloudletsTableBuilder;
 import org.cloudsimplus.listeners.EventInfo;
 import org.cloudsimplus.listeners.EventListener;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.util.Comparator.comparingDouble;
 
 /**
  * An example that scales VM PEs up or down, according to the arrival of Cloudlets.
@@ -151,7 +147,7 @@ public class VerticalVmCpuScalingDynamicThreshold {
 
         simulation.start();
 
-        printSimulationResults();
+        printSimulationResults(broker0);
     }
 
     /**
@@ -170,8 +166,8 @@ public class VerticalVmCpuScalingDynamicThreshold {
         });
     }
 
-    private void printSimulationResults() {
-        HybridVmCpuScalingWithScoap.printSimulationResults(broker0);
+    private void printSimulationResults(DatacenterBroker broker0) {
+        printSimulationResults(this.broker0);
     }
 
     /**

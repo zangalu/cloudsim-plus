@@ -128,6 +128,10 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
     @Override
     public double allocateRequest()
     {
+        if(requests.isEmpty()){
+            System.out.println("REQUEST LIST IS EMPTY");
+            return 0.0;
+        }
         return requests.poll();
     }
 

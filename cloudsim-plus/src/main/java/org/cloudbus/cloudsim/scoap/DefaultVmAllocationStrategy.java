@@ -5,14 +5,16 @@ import org.cloudbus.cloudsim.core.Simulation;
 import org.cloudbus.cloudsim.vms.Vm;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class DefaultVmAllocationStrategy extends AbstractVmAllocationStrategy
 {
-    public DefaultVmAllocationStrategy(Map<String, String> simulationConfigMap)
+    public DefaultVmAllocationStrategy(Map<String, String> simulationConfigMap,
+        ArrayList<VMOnDemand> ondemandVMs)
     {
-        super(simulationConfigMap);
+        super(simulationConfigMap, ondemandVMs);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class DefaultVmAllocationStrategy extends AbstractVmAllocationStrategy
 
     @Override
     public Vm findVmToRemove(List<Vm> hiddleVmsList) {
-        return hiddleVmsList.stream().filter(vm -> vm.getMips() == 50).findFirst().get();
+        return hiddleVmsList.stream().filter(vm -> vm.getMips() == VM_XLARGE_MIPS || vm.getMips() == VM_LARGE_MIPS || vm.getMips() == VM_MID_MIPS || vm.getMips() == VM_SMALL_MIPS).findFirst().get();
     }
 
 }
