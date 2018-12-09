@@ -53,7 +53,6 @@ public class HybridVmCpuScalingWithScoap
     private Threshold currentThreshold;
     private ArrayList<Threshold> thresholds;
     private VmAllocationStrategy allocationStrategy;
-    private boolean workLoadCompleted=false;
     private Map<String,String> simulationConfigMap;
 
     private int inMemoryTraceBatchSize = 10000000;
@@ -63,6 +62,9 @@ public class HybridVmCpuScalingWithScoap
     private ArrayList<VMOnDemand> ondemandVMs;
 
     private ArrayList<VMReservedType> reservedVMs;
+    private ScoapStatistics statistics;
+
+    private int workLoadSize;
 
     public static void main(String[] args)
     {
@@ -80,9 +82,9 @@ public class HybridVmCpuScalingWithScoap
 
         final InputStreamReader reader = new InputStreamReader(ResourceLoader.getInputStream(HybridVmCpuScalingWithScoap.class, CONFIGURATION_NAME));
         readConfigFile(reader);
+        statistics = new ScoapStatistics();
 
-
-        SIMULATION_TIME=Integer.valueOf(simulationConfigMap.get(SIMULATION_TIME_PROPERTY)).intValue();
+        SIMULATION_TIME=Integer.valueOf(simulationConfigMap.get(SIMULATION_TIME_PROPERTY));
 
         hostList = new ArrayList<>(HOSTS);
         vmList = new ArrayList<>(VMS);
@@ -105,8 +107,25 @@ public class HybridVmCpuScalingWithScoap
         simulation.terminateAt(SIMULATION_TIME);
         simulation.start();
 
-        //TODO stampare risultati e costi
-        printSimulationResults(broker0);
+        if(arrivalGenerator.workloadQueue()==0){
+            populateStatistics();
+            printSimulationResults(broker0);
+            System.out.println("------FINE------");
+            simulation.terminateAt(1.0);
+        }
+
+    }
+
+    private void populateStatistics()
+    {
+        statistics.setAllocationStrategy(simulationConfigMap.get(ALLOCATION_STRATEGY));
+        statistics.setCost_AVG(allocationStrategy.getTotalCost()/(SIMULATION_TIME*Integer.valueOf(simulationConfigMap.get(
+            AbstractVmAllocationStrategy.SIMULATION_SCALE_FACTOR_PROPERTY))));
+        statistics.setPeak_Max(arrivalGenerator.getRequestPeak());
+        statistics.setPeak_AVG(workLoadSize/simulation.clock());
+        statistics.setIsteresi(Integer.valueOf(simulationConfigMap.get(AbstractVmAllocationStrategy.ISTERESI_PROPERTY)));
+        statistics.setSlowstart(Boolean.valueOf(simulationConfigMap.get(AbstractVmAllocationStrategy.SLOW_START_PROPERTY)));
+        statistics.setTotalPackets(arrivalGenerator.getTotalPackets());
     }
 
     private void loadThresholds()
@@ -163,8 +182,8 @@ public class HybridVmCpuScalingWithScoap
         Log.setLevel(Level.INFO);
         broker0.getVmExecList().forEach(vm -> {
             System.out.printf(
-                "\t\tTime %6.1f: Vm %d CPU Usage: %6.2f%% (%2d vCPUs. Running Cloudlets: #%02d) Cloudlet waiting: %s History Entries: %d\n",
-                evt.getTime(), vm.getId(), vm.getCpuPercentUsage() * 100.0,
+                "\t\tTime %6.1f: Vm %d (%2d vCPUs. Running Cloudlets: #%02d) Cloudlet waiting: %s History Entries: %d\n",
+                arrivalGenerator.getCurrentTime()/60, vm.getId(),
                 vm.getNumberOfPes(),
                 vm.getCloudletScheduler().getCloudletExecList().size(),
                 vm.getBroker().getCloudletWaitingList(),
@@ -201,13 +220,14 @@ public class HybridVmCpuScalingWithScoap
         try
         {
             PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("simulation_result")));
-            out.println("-----fine simulazione con booting time:"+" isteresi: "+" timeout:");
-            out.println("awt media: "+" min: "+" Max: ");
-            out.println("peak medio: "+" Min : "+ " Max : ");
-            out.println("cost medio: "+" Min: "+" Max : ");
-            out.println("toatal cost"+ allocationStrategy.getTotalCost());
-            out.println("reconfigurations medio: "+" Min: ");
-            out.println("availab media: "+" Min: "+" Max: ");
+            out.println("-----End of Simulation with simulation strategy ["+statistics.getAllocationStrategy()+"] booting time:"+statistics.getBooting()+" isteresi: "+statistics.getIsteresi()+" timeout:"+statistics.getTimeout());
+            //out.println("awt media: "+" min: "+" Max: ");
+            out.println("AWG peak: "+statistics.getPeak_AVG()+" Max: "+statistics.getPeak_Max());
+            out.println("AVG cost: "+statistics.getCost_AVG()+" Min: "+statistics.getCost_Min()+" Max : "+statistics.getCost_Max());
+            out.println("total cost "+ allocationStrategy.getTotalCost());
+            out.println("total packets "+ statistics.getTotalPackets());
+            //out.println("reconfigurations medio: "+" Min: ");
+            //out.println("availab media: "+" Min: "+" Max: ");
             out.close();
         }
         catch (IOException e)
@@ -254,9 +274,9 @@ public class HybridVmCpuScalingWithScoap
             peList.add(new PeSimple(50000, new PeProvisionerSimple()));
         }
 
-        final long ram = 200000; //in Megabytes
-        final long bw = 100000; //in Megabytes
-        final long storage = 10000000; //in Megabites/s
+        final long ram = 2000000; //in Megabytes
+        final long bw = 1000000; //in Megabytes
+        final long storage = 100000000; //in Megabites/s
         final int id = hostList.size();
         return new HostSimple(ram, bw, storage, peList)
             .setRamProvisioner(new ResourceProvisionerSimple())
@@ -281,6 +301,7 @@ public class HybridVmCpuScalingWithScoap
             {
                 arrivalGenerator.setWorkload(sCurrentLine);
             }
+            workLoadSize=arrivalGenerator.workloadQueue();
         }
         catch (IOException e)
         {
@@ -303,19 +324,19 @@ public class HybridVmCpuScalingWithScoap
                     switch (allocationStrategy_config)
                     {
                         case "default":
-                            allocationStrategy = new DefaultVmAllocationStrategy(simulationConfigMap, ondemandVMs);
+                            allocationStrategy = new DefaultVmAllocationStrategy(simulationConfigMap, ondemandVMs, statistics);
                             break;
 
                         case "deactivationTimeout":
-                            allocationStrategy = new DeactivationTimeoutVmAllocationStrategy(simulationConfigMap, ondemandVMs);
+                            allocationStrategy = new DeactivationTimeoutVmAllocationStrategy(simulationConfigMap, ondemandVMs, statistics);
                             break;
 
                         case "hysteresis":
-                            allocationStrategy = new HysteresisVmAllocationStrategy(simulationConfigMap, ondemandVMs);
+                            allocationStrategy = new HysteresisVmAllocationStrategy(simulationConfigMap, ondemandVMs, statistics);
                             break;
 
                         case "hybrid":
-                            allocationStrategy = new HybridVmAllocationStrategy(simulationConfigMap, ondemandVMs);
+                            allocationStrategy = new HybridVmAllocationStrategy(simulationConfigMap, ondemandVMs, statistics);
                             break;
 
                         default:
@@ -336,7 +357,11 @@ public class HybridVmCpuScalingWithScoap
 
             }
 
-        System.out.println("WORKLOAD QUEUE SIZE --> "+arrivalGenerator.workloadQueue()+" !!!!!");
+        System.out.println(" \n");
+        System.out.println("CURRENT TIME in Hours --> "+arrivalGenerator.getCurrentTime()/60);
+        System.out.println(" \n");
+
+            System.out.println("WORKLOAD QUEUE SIZE --> "+arrivalGenerator.workloadQueue()+" !!!!!");
 
     }
 
@@ -374,11 +399,11 @@ public class HybridVmCpuScalingWithScoap
     private String parseLine(String nodeLine){
         final StringTokenizer tokenizer = new StringTokenizer(nodeLine);
 
-        String test="";
+        String token="";
         for (int i = 0; tokenizer.hasMoreElements() ; i++) {
-            test = tokenizer.nextToken();
+            token = tokenizer.nextToken();
         }
 
-        return test;
+        return token;
     }
 }

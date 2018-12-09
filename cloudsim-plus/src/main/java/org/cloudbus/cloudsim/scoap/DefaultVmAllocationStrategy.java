@@ -12,15 +12,17 @@ import java.util.Map;
 public class DefaultVmAllocationStrategy extends AbstractVmAllocationStrategy
 {
     public DefaultVmAllocationStrategy(Map<String, String> simulationConfigMap,
-        ArrayList<VMOnDemand> ondemandVMs)
+        ArrayList<VMOnDemand> ondemandVMs, ScoapStatistics statistics)
     {
-        super(simulationConfigMap, ondemandVMs);
+        super(simulationConfigMap, ondemandVMs, statistics);
     }
 
     @Override
-    public void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation) {
+    public void destroyIdleVMs(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
+        Threshold currentThreshold, Simulation simulation,
+        RequestsArrivalGenerator arrivalGenerator) {
 
-       super.destroyHiddleVms(event,broker,hiddleVmsList,currentThreshold,simulation);
+       super.destroyIdleVMs(event,broker,hiddleVmsList,currentThreshold,simulation, arrivalGenerator);
     }
 
     @Override

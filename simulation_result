@@ -1,7 +1,6 @@
------fine simulazione con booting time: isteresi:  timeout:
+-----End of Simulation with simulation strategy [default] booting time:0 isteresi: 3 timeout:0
 awt media:  min:  Max: 
-peak medio:  Min :  Max : 
-cost medio:  Min:  Max : 
-toatal cost2840.6757229166874
-reconfigurations medio:  Min: 
-availab media:  Min:  Max: 
+peak medio: 1195.219123505976 Min:  Max: 453.5
+cost medio: 0.31545405416666455 Min: 0.0 Max : 1.8150000000000004
+total cost 1892.7243249999874
+total packets 140998633

@@ -16,7 +16,6 @@ import org.cloudsimplus.autoscaling.ConfigurableHorizontalVmScaling;
 import org.cloudsimplus.autoscaling.ConfigurableHorizontalVmScalingSimple;
 import org.cloudsimplus.listeners.CloudletVmEventInfo;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -53,6 +52,8 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
 
     public static final String SIMULATION_SCALE_FACTOR_PROPERTY ="scale-factor";
 
+    public static final String SLOW_START_PROPERTY ="slow-start";
+
     private final ArrayList<VMOnDemand> ondemandVMs;
 
     private int numberOfCreatedCloudlets;
@@ -71,7 +72,6 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
     public long VM_XLARGE_MIPS;
     ResourceProvisioner resourceProvisioner;
 
-    private int simulationScaleFactor;
 
     private double totalCost;
 
@@ -83,11 +83,18 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
 
     private double running_payment_xlarge_vm;
 
-    AbstractVmAllocationStrategy(Map<String, String> simulationConfigMap,
-        ArrayList<VMOnDemand> ondemandVMs){
+    private boolean slowStart;
 
-        this.ondemandVMs =ondemandVMs;
-        this.simulationScaleFactor=Integer.valueOf(simulationConfigMap.get(SIMULATION_SCALE_FACTOR_PROPERTY));
+    private ScoapStatistics statistics;
+
+    private int slowStartFactor;
+
+    AbstractVmAllocationStrategy(Map<String, String> simulationConfigMap,
+        ArrayList<VMOnDemand> ondemandVMs, ScoapStatistics statistics){
+
+        this.ondemandVMs=ondemandVMs;
+        this.statistics=statistics;
+        this.slowStart=Boolean.valueOf(simulationConfigMap.get(SLOW_START_PROPERTY));
 
         VM_SMALL_PES = Integer.valueOf(simulationConfigMap.get(VM_SMALL_PES_PROPERTY));
         VM_MID_PES = Integer.valueOf(simulationConfigMap.get(VM_MID_PES_PROPERTY));
@@ -104,6 +111,7 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
         VM_LARGE_MIPS = Integer.valueOf(simulationConfigMap.get(VM_LARGE_MIPS_PROPERTY));
         VM_XLARGE_MIPS = Integer.valueOf(simulationConfigMap.get(VM_XLARGE_MIPS_PROPERTY));
 
+        slowStartFactor=2;
         readCostOnDemand();
     }
 
@@ -238,7 +246,7 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
                 cloudletList.addAll(newCloudletList);
             }
             if(totalCapacity>newThreshold.getWorkLoad()){
-                destroyHiddleVms(null, broker, hiddleVmsList, currentThreshold, simulation);
+                destroyIdleVMs(null, broker, hiddleVmsList, currentThreshold, simulation, arrivalGenerator);
             }
         }
         return newThreshold;
@@ -252,7 +260,7 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
 
         long length = 0; //in Million Structions (MI)
 
-        while ( (vm.getMips()*100 - length )>0 && arrivalGenerator.allocateRequest()>0){
+        while ( (vm.getMips()- length )>0 && arrivalGenerator.allocateRequest()>0){
 
             length += arrivalGenerator.getRequests().poll();
 
@@ -265,16 +273,17 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
         //Defines how CPU, RAM and Bandwidth resources are used
         //Sets the same utilization model for all these resources.
         UtilizationModel utilization = new UtilizationModelFull();
+        currentThreshold.setActivationTime(arrivalGenerator.getCurrentTime());
 
 
         Cloudlet cloudlet = new CloudletSimple(
             numberOfCreatedCloudlets++, length, numberOfCpuCores)
-            .addOnUpdateProcessingListener(event-> calculateOnDemandCost(event, vm))
+            .addOnUpdateProcessingListener(event-> calculateOnDemandCost(event, vm, currentThreshold, arrivalGenerator))
             .setFileSize(fileSize)
             .setOutputSize(outputSize)
             .setUtilizationModel(utilization)
             .setVm(vm)
-            .addOnFinishListener(event -> destroyHiddleVms(event, broker, hiddleVmsList, currentThreshold, simulation));
+            .addOnFinishListener(event -> destroyIdleVMs(event, broker, hiddleVmsList, currentThreshold, simulation, arrivalGenerator));
 
         System.out.println(vm.getCpuPercentUsage());
         //listener in case we want to perform some action when a cloudlet finish to execute e.g. statistics
@@ -283,9 +292,11 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
         return cloudlet;
     }
 
-    public void calculateOnDemandCost(CloudletVmEventInfo event, Vm vm)
+    @Override
+    public void calculateOnDemandCost(CloudletVmEventInfo event, Vm vm,
+        Threshold currentThreshold, RequestsArrivalGenerator arrivalGenerator)
     {
-        double executionTime = vm.getTotalExecutionTime();
+        double executionTime = arrivalGenerator.getCurrentTime()-currentThreshold.getActivationTime();
         double running_payment = 0.0;
 
         if(vm.getMips()==VM_SMALL_MIPS){
@@ -301,8 +312,15 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
             running_payment = running_payment_xlarge_vm;
         }
 
-       totalCost+=(running_payment*executionTime/simulationScaleFactor);
+        double currentVmCost =running_payment*executionTime/600;
 
+       totalCost+=(currentVmCost);
+        if(currentVmCost>statistics.getCost_Max()){
+            statistics.setCost_Max(currentVmCost);
+        }
+        if(currentVmCost<statistics.getCost_Min()){
+            statistics.setCost_Min(currentVmCost);
+        }
     }
 
     private double sumCapacity(DatacenterBroker broker){
@@ -345,6 +363,15 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
 
 
     private Map<String,ArrayList<Vm>> createListOfScalableVms(int newSmallVmNumber, int newMidVmNumber, int newLargeVmNumber, int newXlargeVmNumber){
+
+
+        if(slowStart){
+            newSmallVmNumber*=slowStartFactor;
+            newMidVmNumber*=slowStartFactor;
+            newLargeVmNumber*=slowStartFactor;
+            newXlargeVmNumber*=slowStartFactor;
+        }
+
 
         return createListOfHorizontalScalableVms(newSmallVmNumber, newMidVmNumber, newLargeVmNumber, newXlargeVmNumber);
 
@@ -452,7 +479,10 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
         return vm;
     }
 
-    public void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList, Threshold currentThreshold, Simulation simulation){
+    @Override
+    public void destroyIdleVMs(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
+        Threshold currentThreshold, Simulation simulation,
+        RequestsArrivalGenerator arrivalGenerator){
         if(resourceProvisioner == null)
         {
             resourceProvisioner = new ResourceProvisionerSimple();
@@ -479,7 +509,7 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
                 hiddleVmsList.add(vm);
                 //vmList.remove(vm);
             }
-            //calculateOnDemandCost(vm);
+            //calculateOnDemandCost(event, vm,currentThreshold,arrivalGenerator);
         }
         if(hiddleVmsList.size()+broker.getVmExecList().size()>currentThreshold.getWorkLoad() && !hiddleVmsList.isEmpty()) {
 

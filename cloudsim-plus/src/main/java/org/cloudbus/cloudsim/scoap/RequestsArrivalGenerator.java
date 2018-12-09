@@ -13,4 +13,12 @@ public interface RequestsArrivalGenerator
     double allocateRequest();
 
     int workloadQueue();
+
+    double getRequestPeak();
+
+    double getRequestsAvg();
+
+    int getTotalPackets();
+
+    double getCurrentTime();
 }

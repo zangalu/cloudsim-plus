@@ -10,7 +10,8 @@ import java.util.Queue;
 public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGenerator
 {
 
-    private static final String ARRIVAL_GENERATOR_BATCH_SIZE = "arrivalGeneratorBatchSize";
+    private static final String ARRIVAL_GENERATOR_BATCH_SIZE_PROPERTY = "arrivalGeneratorBatchSize";
+    private static final String REQUEST_WEIGHT = "requestWeight";
 
     private Queue<Double> requests;
     private Queue<Integer> workLoadQueue;
@@ -22,6 +23,9 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
     private double workload;
     private Integer totalRequests;
     private Integer requestsInInterval;
+    private double requestsPeakMax;
+    private Integer requestsAvg;
+    private Integer requestWeight;
 
     
 
@@ -30,7 +34,8 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
         lambdaSwitchTimestamp=0.0;
         totalRequests=0;
         workLoadQueue = new LinkedList<>();
-        batcheSize= Integer.valueOf(simulationConfigMap.get(ARRIVAL_GENERATOR_BATCH_SIZE));
+        batcheSize= Integer.valueOf(simulationConfigMap.get(ARRIVAL_GENERATOR_BATCH_SIZE_PROPERTY));
+        requestWeight= Integer.valueOf(simulationConfigMap.get(REQUEST_WEIGHT));
     }
 
     @Override
@@ -39,6 +44,8 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
         requests = new LinkedList<>();
         double interval=10.0;
         double arrivalRate;
+        int scaleWorkload=10;
+
 
         //number of requests to read from the workload at every iteration
         workload=0;
@@ -46,26 +53,39 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
         for(int i=0; i<(workLoadQueue.size()/batcheSize); i++)
         {
             if(workLoadQueue.peek()!= null){
-                //double requestLoad  =workLoadQueue.poll()/interval;
                 double lambda = workLoadQueue.poll();
-
-                //workload +=lambda;
-                //requests.add(lambda);
-
+                totalRequests += Double.valueOf(lambda).intValue();
                 if(lambda==0){
                     lambda=1;
                 }
                 arrivalRate=lambda/interval;
+
+                if(arrivalRate>requestsPeakMax)
+                {
+                    requestsPeakMax = arrivalRate;
+                }
+
                 ExponentialGen genArr = new ExponentialGen(new MRG32k3a(),
                     arrivalRate); //new exponential with new lambda
                 double nextDouble = genArr.nextDouble();
 
-                workload +=nextDouble*10;
-                requests.add(nextDouble*10000);
+                timeStamp=currentTime;
+                nextArrival=nextDouble;
+                currentTime+=nextArrival;
+
+
+                //workload += nextDouble*scaleWorkload;
+                //requests.add(nextDouble*requestWeight);
+
+                workload += nextDouble;
+                requests.add(workload*requestWeight);
+
 
             }
+            if(workLoadQueue.size()/batcheSize == 1 && batcheSize>1){
+                batcheSize--;
+            }
         }
-        batcheSize+=1;
         return requests;
     }
 
@@ -98,7 +118,6 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
                 }
                 arrivalRate=lambda/interval;
 
-
                 genArr = new ExponentialGen(new MRG32k3a(), arrivalRate); //new exponential with new lambda
                 double nextDouble = genArr.nextDouble();
 
@@ -122,7 +141,7 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
     @Override
     public double getInstantWorkload()
     {
-        return workload;
+        return workload*10;
     }
 
     @Override
@@ -139,6 +158,30 @@ public class ExponentialRequestsArrivalGenerator implements RequestsArrivalGener
     public int workloadQueue()
     {
         return workLoadQueue.size();
+    }
+
+    @Override
+    public double getRequestPeak()
+    {
+        return this.requestsPeakMax;
+    }
+
+    @Override
+    public double getRequestsAvg()
+    {
+        return this.requestsAvg;
+    }
+
+    @Override
+    public int getTotalPackets()
+    {
+        return totalRequests;
+    }
+
+    @Override
+    public double getCurrentTime()
+    {
+        return currentTime;
     }
 
 }

@@ -16,9 +16,9 @@ public class HysteresisVmAllocationStrategy extends AbstractVmAllocationStrategy
     int isteresi;
 
     public HysteresisVmAllocationStrategy(Map<String, String> simulationConfigMap,
-        ArrayList<VMOnDemand> ondemandVMs)
+        ArrayList<VMOnDemand> ondemandVMs, ScoapStatistics statistics)
     {
-        super(simulationConfigMap, ondemandVMs);
+        super(simulationConfigMap, ondemandVMs, statistics);
         isteresi = Integer.valueOf(simulationConfigMap.get(ISTERESI_PROPERTY));
     }
 
@@ -49,10 +49,11 @@ public class HysteresisVmAllocationStrategy extends AbstractVmAllocationStrategy
 
 
     @Override
-    public void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
-        Threshold currentThreshold, Simulation simulation)
+    public void destroyIdleVMs(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
+        Threshold currentThreshold, Simulation simulation,
+        RequestsArrivalGenerator arrivalGenerator)
     {
-        super.destroyHiddleVms(event, broker, hiddleVmsList, currentThreshold, simulation);
+        super.destroyIdleVMs(event, broker, hiddleVmsList, currentThreshold, simulation, arrivalGenerator);
     }
 
     @Override

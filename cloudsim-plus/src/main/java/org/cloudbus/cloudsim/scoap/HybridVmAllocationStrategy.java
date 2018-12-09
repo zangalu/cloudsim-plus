@@ -17,9 +17,9 @@ public class HybridVmAllocationStrategy extends AbstractVmAllocationStrategy
     private double deactivationTime;
 
     public HybridVmAllocationStrategy(Map<String, String> simulationConfigMap,
-        ArrayList<VMOnDemand> ondemandVMs)
+        ArrayList<VMOnDemand> ondemandVMs, ScoapStatistics statistics)
     {
-        super(simulationConfigMap, ondemandVMs);
+        super(simulationConfigMap, ondemandVMs, statistics);
         isteresi = Integer.valueOf(simulationConfigMap.get(ISTERESI_PROPERTY));
         deactivationTime = Double.valueOf(simulationConfigMap.get(DEACTIVATION_TIME_PROPERTY));
     }
@@ -53,13 +53,14 @@ public class HybridVmAllocationStrategy extends AbstractVmAllocationStrategy
 
 
     @Override
-    public void destroyHiddleVms(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
-        Threshold currentThreshold, Simulation simulation)
+    public void destroyIdleVMs(CloudletVmEventInfo event, DatacenterBroker broker, List<Vm> hiddleVmsList,
+        Threshold currentThreshold, Simulation simulation,
+        RequestsArrivalGenerator arrivalGenerator)
     {
         //decido se spegnere VMs dopo il loro deactivation time in base all'arrival rate attuale
         if(simulation.clock()>=currentThreshold.deactivationTime)
         {
-            super.destroyHiddleVms(event, broker, hiddleVmsList, currentThreshold, simulation);
+            super.destroyIdleVMs(event, broker, hiddleVmsList, currentThreshold, simulation, arrivalGenerator);
         }
     }
 
