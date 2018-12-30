@@ -176,6 +176,7 @@ public class HybridVmCpuScalingWithScoap
         System.out.println("VM EXECUTION SIZE --> " + broker0.getVmExecList().size());
         System.out.println("VM WAITING SIZE --> " + broker0.getVmWaitingList().size());
         System.out.println("TOTAL COST --> "+allocationStrategy.getTotalCost());
+        System.out.println("RECONFIGURATIONS --> "+statistics.getReconfiguration_AVG());
 
         arrivalGenerator.getInstantWorkload();
 
@@ -226,7 +227,7 @@ public class HybridVmCpuScalingWithScoap
             out.println("AVG cost: "+statistics.getCost_AVG()+" Min: "+statistics.getCost_Min()+" Max : "+statistics.getCost_Max());
             out.println("total cost "+ allocationStrategy.getTotalCost());
             out.println("total packets "+ statistics.getTotalPackets());
-            //out.println("reconfigurations medio: "+" Min: ");
+            out.println("reconfigurations AVG: "+statistics.getReconfiguration_AVG());
             //out.println("availab media: "+" Min: "+" Max: ");
             out.close();
         }

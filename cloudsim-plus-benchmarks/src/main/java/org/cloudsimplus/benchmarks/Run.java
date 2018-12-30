@@ -23,13 +23,14 @@
  */
 package org.cloudsimplus.benchmarks;
 
-import java.io.IOException;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.openjdk.jmh.runner.options.VerboseMode;
+
+import java.io.IOException;
 
 /**
  * Configures parameters for the JMH Microbenchmarking framework and starts

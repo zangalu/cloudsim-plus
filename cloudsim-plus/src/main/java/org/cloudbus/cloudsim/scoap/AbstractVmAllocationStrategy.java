@@ -221,21 +221,25 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
                 for(Vm vm : newVmList.get(M_1_SMALL)) {
                     Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
                     newCloudletList.add(cloudlet);
+                    statistics.setReconfiguration_AVG(statistics.getReconfiguration_AVG()+1);
                 }
 
                 for(Vm vm : newVmList.get(C_1_MEDIUM)) {
                     Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
                     newCloudletList.add(cloudlet);
+                    statistics.setReconfiguration_AVG(statistics.getReconfiguration_AVG()+1);
                 }
 
                 for(Vm vm : newVmList.get(M_1_LARGE)) {
                     Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
                     newCloudletList.add(cloudlet);
+                    statistics.setReconfiguration_AVG(statistics.getReconfiguration_AVG()+1);
                 }
 
                 for(Vm vm : newVmList.get(C_1_XLARGE)) {
                     Cloudlet cloudlet = createCloudlet(vm, arrivalGenerator, broker, hiddleVmsList,currentThreshold, simulation, simulationTime);
                     newCloudletList.add(cloudlet);
+                    statistics.setReconfiguration_AVG(statistics.getReconfiguration_AVG()+1);
                 }
 
                 broker.submitVmList(newVmList.get(M_1_SMALL));
@@ -247,6 +251,7 @@ public abstract class AbstractVmAllocationStrategy implements VmAllocationStrate
             }
             if(totalCapacity>newThreshold.getWorkLoad()){
                 destroyIdleVMs(null, broker, hiddleVmsList, currentThreshold, simulation, arrivalGenerator);
+                statistics.setReconfiguration_AVG(statistics.getReconfiguration_AVG()+1);
             }
         }
         return newThreshold;
